@@ -1,1 +1,8 @@
 Hello world!
+
+<% if user_signed_in? %>
+  <p>Welcome, <%= current_user.name %>!</p>
+  <%= button_to "Logout", logout_path, method: :delete, class: "btn btn-logout" %>
+<% else %>
+  <p>Please <a href="<%= login_path %>">log in</a>.</p>
+<% end %>
