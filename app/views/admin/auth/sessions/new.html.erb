@@ -36,7 +36,7 @@
       <h2 class="login-title">Inicia Sesión</h2>
       <p class="login-subtitle">Accede a tu cuenta</p>
 
-      <%= form_for(:user, url: user_session_path) do |f| %>
+      <%= form_for(:user, url: new_user_session_path) do |f| %>
         <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
 
         <div class="form-label">
@@ -52,8 +52,6 @@
         <div class="form-label">
             <%= f.submit "Ingresar", class: "btn btn-login w-100" %>
         </div>
-      </form>
-
         
       <% end %>
 

@@ -1,9 +1,17 @@
 class ApplicationController < ActionController::Base
-  # Only allow modern browsers supporting webp images, web push, badges, import maps, CSS nesting, and CSS :has.
-  allow_browser versions: :modern
+  def after_sign_in_path_for(resource)
+    admin_dashboard_path
+  end
 
   def after_sign_out_path_for(resource_or_scope)
-    flash[:notice] = "Cierre de sesión exitoso."
-    login_path
+    new_user_session_path  
   end
+
+  def authenticate_user!
+    unless user_signed_in?
+      redirect_to new_user_session_path, alert: "Por favor, inicia sesión para continuar."
+    end
+  end
+
+
 end
