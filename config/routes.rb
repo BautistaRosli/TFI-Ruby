@@ -2,13 +2,13 @@ Rails.application.routes.draw do
   get "home/index"
 
   devise_for :users,
-    path: 'admin',
+    path: "admin",
     controllers: {
       sessions: "admin/auth/sessions"
     },
-    skip: [:sessions]  
-  
-  
+    skip: [ :sessions ]
+
+
   devise_scope :user do
     get    "admin/login",  to: "admin/auth/sessions#new", as: :new_user_session
     post   "admin/login",  to: "admin/auth/sessions#create", as: :user_session
@@ -16,7 +16,10 @@ Rails.application.routes.draw do
   end
 
   namespace :admin do
-    root to: 'dashboard#index', as: :dashboard
+    root to: "dashboard#index", as: :dashboard
+    namespace :users do
+      root to: "users#index", as: :users
+    end
     resources :users
   end
 
