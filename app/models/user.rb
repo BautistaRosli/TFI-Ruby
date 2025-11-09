@@ -5,7 +5,7 @@ class User < ApplicationRecord
 
   validates :name, presence: true
   validates :lastname, presence: true
-  validates :status, presence: true
+  validates :is_active, inclusion: { in: [ true, false ] }
 
   # Definición correcta del enum
   enum :role, { admin: 0, manager: 1, employee: 2 }, default: :employee

@@ -1,8 +1,62 @@
-<%= @users.each do |user| %>
-  <div>
-  <%= user.email %> - <%= user.role %>
-  <% if can? :update, user %>
-    <p>Podes editar genio</p>
-  <% end %>
-  </div>
-<%end  %>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Usuarios - Disquería</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <%= stylesheet_link_tag 'users_index', media: 'all' %>
+</head>
+<body>
+    <!-- Movida la estructura para que el header azul ocupe el ancho completo -->
+    <header class="users-header w-100">
+        <div class="header-content">
+            <div class="header-top">
+                <div>
+                    <h1 class="header-title">Gestión de Usuarios</h1>
+                    <p class="header-subtitle">Disquería - Sistema de Gestión</p>
+                </div>
+                <%= button_to "Salir", destroy_user_session_path, method: :get, class: "btn btn-logout" %>
+            </div>
+        </div>
+    </header>
+
+    <div class="flash-messages">
+        <% if flash.any? %>
+            <div class="flash-notifications">
+            <% flash.each do |type, message| %>         
+                <% 
+                alert_class = case type.to_s
+                when 'notice' then 'alert-success'
+                when 'alert' then 'alert-danger'
+                when 'warning' then 'alert-warning'
+                when 'info' then 'alert-info'
+                else 'alert-primary'
+                end
+                %>
+                <div class="alert <%= alert_class %> alert-dismissible fade show" role="alert">
+                    <span class="alert-message"><%= message %></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            <% end %>
+            </div>
+        <% end %>
+    </div>
+
+    <div class="users-container">
+        <div class="users-grid">
+          <% @users.each do |user| %>
+            <a href="#" class="user-card">
+                <div class="user-avatar">👤</div>
+                <div class="user-info">
+                  <h3 class="user-name"><%= user.name %></h3>
+                  <p class="user-apellido"><%= user.lastname %></p>
+                  <p class="user-username"><%= user.email %></p>
+                  <span class="user-role"><%= user.role %></span>
+                </div>
+            </a>
+          <% end  %>
+        </div>
+    </div>
+</body>
+</html>
