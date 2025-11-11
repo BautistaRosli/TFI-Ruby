@@ -9,4 +9,8 @@ class User < ApplicationRecord
 
   # Definición correcta del enum
   enum :role, { admin: 0, manager: 1, employee: 2 }, default: :employee
+
+  def active_for_authentication?
+    super && is_active?
+  end
 end

@@ -8,7 +8,6 @@
     <%= stylesheet_link_tag 'users_index', media: 'all' %>
 </head>
 <body>
-    <!-- Movida la estructura para que el header azul ocupe el ancho completo -->
     <header class="users-header w-100">
         <div class="header-content">
             <div class="header-top">
@@ -16,6 +15,7 @@
                     <h1 class="header-title">Gestión de Usuarios</h1>
                     <p class="header-subtitle">Disquería - Sistema de Gestión</p>
                 </div>
+                <%= link_to "Volver a menú de gestión", admin_dashboard_path, class: "btn btn-logout" %>
                 <%= button_to "Salir", destroy_user_session_path, method: :get, class: "btn btn-logout" %>
             </div>
         </div>
@@ -45,18 +45,38 @@
 
     <div class="users-container">
         <div class="users-grid">
-          <% @users.each do |user| %>
-            <a href="#" class="user-card">
+            <% @users.each do |user| %>
+            <% if can? :update, user %>
+                <%= link_to admin_user_path(user), class: "user-card" do %>
                 <div class="user-avatar">👤</div>
                 <div class="user-info">
-                  <h3 class="user-name"><%= user.name %></h3>
-                  <p class="user-apellido"><%= user.lastname %></p>
-                  <p class="user-username"><%= user.email %></p>
-                  <span class="user-role"><%= user.role %></span>
+                    <h3 class="user-name"><%= user.name %></h3>
+                    <p class="user-apellido"><%= user.lastname %></p>
+                    <p class="user-username"><%= user.email %></p>
+                    <span class="user-role"><%= user.role %></span>
                 </div>
-            </a>
-          <% end  %>
+                <% end %>
+            <% else %>
+                <div class="user-card user-card-disabled">
+                <div class="user-avatar">👤</div>
+                <div class="user-info">
+                    <h3 class="user-name"><%= user.name %></h3>
+                    <p class="user-apellido"><%= user.lastname %></p>
+                    <p class="user-username"><%= user.email %></p>
+                    <span class="user-role"><%= user.role  %></span>
+                </div>
+                </div>
+            <% end %>
+            <% end %>
         </div>
     </div>
+
+
+    <div class="create-user-button-container">
+        <% if can? :create, current_user %>
+            <%= button_to "Crear Usuario", new_admin_user_path, method: :get, class: "btn" %>
+        <% end %>
+    </div>
+    
 </body>
 </html>

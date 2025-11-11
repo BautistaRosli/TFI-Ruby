@@ -12,4 +12,28 @@ class ApplicationController < ActionController::Base
       redirect_to new_user_session_path, alert: "Por favor, inicia sesión para continuar."
     end
   end
+
+  rescue_from CanCan::AccessDenied do |exception|
+    previous_url = request.referer || root_path
+
+    flash[:alert] = "No tenés permisos para acceder a esa página."
+
+    redirect_to previous_url
+  end
+
+  rescue_from ActiveRecord::RecordNotFound do |exception|
+    flash[:alert] = "El recurso que estás buscando no existe."
+    previous_url = request.referer || default_redirect_path
+    redirect_to previous_url
+  end
+
+  private
+  def default_redirect_path
+    if current_user
+      admin_dashboard_path
+
+    else
+      root_path
+    end
+  end
 end

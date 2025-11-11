@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalle de Usuario - Disquería</title>               
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <%= stylesheet_link_tag 'users_show', media: 'all' %>
+</head>
+<body>
+    <header class="users-header w-100">
+        <div class="header-content">
+            <div class="header-top">
+                <div>
+                    <h1 class="header-title">Detalle de Usuario</h1>
+                    <p class="header-subtitle">Disquería - Sistema de Gestión</p>
+                </div>
+                <%= link_to "Volver a la lista de usuarios", admin_users_path, class: "btn btn-back" %>
+                <%= button_to "Salir", destroy_user_session_path, method: :get, class: "btn btn-logout" %>
+            </div>
+        </div>
+    </header>  
+    <div class="flash-messages">
+        <% if flash.any? %>
+            <div class="flash-notifications">
+            <% flash.each do |type, message| %>         
+                <% 
+                alert_class = case type.to_s
+                when 'notice' then 'alert-success'
+                when 'alert' then 'alert-danger'
+                when 'warning' then 'alert-warning'
+                when 'info' then 'alert-info'
+                else 'alert-primary'
+                end
+                %>
+                <div class="alert <%= alert_class %> alert-dismissible fade show" role="alert">
+                    <span class="alert-message"><%= message %></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div> 
+            <% end %>
+            </div>
+        <% end %>
+    </div>  
+    <div class="user-detail-container">
+        <div class="user-detail-card">
+            <div class="user-avatar-large">👤</div>
+            <div class="user-detail-form">
+                <%= form_for @user, url: admin_user_path(@user), method: :patch do |f| %>
+                    <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+                    <div class="user-detail-info">
+                        <div class="form-label">
+                            <label>Correo Electrónico</label><br>
+                            <%= f.email_field :email, autofocus: true, class: "form-control login-input" %>
+                        </div>
+                        <div class="form-label">
+                            <label>Nombre</label><br>
+                            <%= f.text_field :name, class: "form-control login-input" %>
+                        </div>
+                        <div class="form-label">
+                            <label>Apellido</label><br>
+                            <%= f.text_field :lastname, class: "form-control login-input" %>
+                        </div>
+                        <div class="form-label">
+                        <label>Estado</label><br>
+                        <%= f.select :is_active,
+                                options_for_select([['Activo', true], ['Desactivo', false]], @user.is_active),
+                                {},
+                                class: "form-control login-input custom-select" %>
+                        </div>
+                        <div class="form-label">
+                            <%= f.submit "Guardar Cambios", class: "btn btn-save w-100" %>
+                        </div>
+                    </div>
+                <% end %>
+            </div>
+            <p class="user-created-at"><strong>Creado el:</strong> <%= @user.created_at.strftime("%d/%m/%Y") %></p>
+            <p class="user-updated-at"><strong>Última actualización:</strong> <%= @user.updated_at.strftime("%d/%m/%Y") %></p>
+        </div>
+    </div>
+</body>
+</html>

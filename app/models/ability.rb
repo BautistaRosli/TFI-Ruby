@@ -9,8 +9,9 @@ class Ability
     elsif user.manager?
       can :read, :all
       can :update, User, role: [ :employee, :manager ]
+      can :create, User, role: [ :employee, :manager ]
     elsif user.employee?
-      can :read, :internal
+      can :read, :all
       can :update, User, id: user.id
     end
   end
