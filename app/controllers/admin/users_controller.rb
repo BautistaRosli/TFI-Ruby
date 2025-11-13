@@ -1,5 +1,5 @@
 
-class Admin::Users::UsersController < ApplicationController
+class Admin::UsersController < ApplicationController
   before_action :authenticate_user!
   load_and_authorize_resource
   def index
@@ -26,7 +26,7 @@ class Admin::Users::UsersController < ApplicationController
   def create
     @user = User.new(creation_params)
     if @user.save
-      redirect_to admin_user_path, notice: "Usuario creado correctamente."
+      redirect_to admin_users_path, notice: "Usuario creado correctamente."
     else
       render :new, status: :unprocessable_entity
     end
