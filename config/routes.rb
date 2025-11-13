@@ -1,4 +1,11 @@
 Rails.application.routes.draw do
+  get "sales/index"
+  get "sales/show"
+  post "sales/new"
+  patch "sales/edit"
+  get "sales/create"
+  patch "sales/update"
+  delete "sales/destroy"
   get "home/index"
 
   devise_for :users,

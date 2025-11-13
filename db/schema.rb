@@ -10,7 +10,27 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_11_09_092458) do
+ActiveRecord::Schema[8.0].define(version: 2025_11_12_193359) do
+  create_table "items", force: :cascade do |t|
+    t.decimal "price"
+    t.string "description"
+    t.integer "units_sold"
+    t.integer "sale_id", null: false
+    t.integer "product_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["sale_id"], name: "index_items_on_sale_id"
+  end
+
+  create_table "sales", force: :cascade do |t|
+    t.datetime "datetime"
+    t.decimal "total_amount"
+    t.integer "employee_id"
+    t.integer "customer_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "name"
     t.string "lastname"
@@ -26,4 +46,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_09_092458) do
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
+
+  add_foreign_key "items", "sales"
 end
