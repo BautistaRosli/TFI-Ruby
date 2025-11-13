@@ -1,11 +1,4 @@
 Rails.application.routes.draw do
-  get "sales/index"
-  get "sales/show"
-  post "sales/new"
-  patch "sales/edit"
-  get "sales/create"
-  patch "sales/update"
-  delete "sales/destroy"
   get "home/index"
 
   devise_for :users,
@@ -26,6 +19,7 @@ Rails.application.routes.draw do
     root to: "dashboard#index", as: :dashboard
     resources :users, module: :users
     resources :users
+    resources :sales
   end
 
   get "up" => "rails/health#show", as: :rails_health_check

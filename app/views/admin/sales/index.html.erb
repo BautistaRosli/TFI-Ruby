@@ -50,7 +50,7 @@
                         <div class="card-icon">+</div>
                         <h2 class="card-title">Crear Venta</h2>
                         <p class="card-description">Registra una nueva venta</p>
-                        <a href="/sales/create" class="btn btn-primary btn-lg">Acceder</a> <!-- Cambiar a boton usando ruby -->
+                      <%= button_to "Acceder", new_admin_sale_path, method: :get, class: "btn btn-primary btn-lg" %>
                     </div>
 
                     <div class="module-card users-card">
