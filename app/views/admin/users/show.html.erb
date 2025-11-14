@@ -43,7 +43,7 @@
     </div>  
     <div class="user-detail-container">
         <div class="user-detail-card">
-            <div class="user-avatar-large">👤</div>
+            <div class="user-avatar-large"><%= @user.name.first.upcase + @user.lastname.first.upcase %></div>
             <div class="user-detail-form">
                 <%= form_for @user, url: admin_user_path(@user), method: :patch do |f| %>
                     <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
@@ -60,6 +60,12 @@
                             <label>Apellido</label><br>
                             <%= f.text_field :lastname, class: "form-control login-input" %>
                         </div>
+                        <% if current_user.admin? %>
+                            <div class="form-label">
+                                <label>Rol</label><br>
+                                <%= f.select :role, options_for_select([['Administrador', 'admin'], ['Gerente', 'manager'], ['Empleado', 'employee']], @user.role), {}, class: "form-select login-input" %>
+                            </div>
+                        <% end %>
                         <div class="form-label">
                             <%= f.submit "Guardar Cambios", class: "btn btn-save w-100" %>
                         </div>
