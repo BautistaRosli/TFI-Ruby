@@ -17,7 +17,11 @@ Rails.application.routes.draw do
 
   namespace :admin do
     root to: "dashboard#index", as: :dashboard
-    resources :users
+    resources :users do
+      member do
+        patch :reactivate
+      end
+    end
   end
 
   get "up" => "rails/health#show", as: :rails_health_check

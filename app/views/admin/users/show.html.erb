@@ -61,13 +61,6 @@
                             <%= f.text_field :lastname, class: "form-control login-input" %>
                         </div>
                         <div class="form-label">
-                        <label>Estado</label><br>
-                        <%= f.select :is_active,
-                                options_for_select([['Activo', true], ['Desactivo', false]], @user.is_active),
-                                {},
-                                class: "form-control login-input custom-select" %>
-                        </div>
-                        <div class="form-label">
                             <%= f.submit "Guardar Cambios", class: "btn btn-save w-100" %>
                         </div>
                     </div>
