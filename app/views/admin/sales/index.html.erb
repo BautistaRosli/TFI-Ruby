@@ -3,11 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Disquería</title>
+    <title>Ventas - Disquería</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
-    <%= stylesheet_link_tag 'admin_index', media: 'all' %>
+    <%= stylesheet_link_tag 'sales_index', media: 'all' %>
 </head>
 <body>
+    <header class="sales-header w-100">
+        <div class="header-content">
+            <div class="header-top">
+                <div>
+                    <h1 class="header-title">Gestión de Ventas</h1>
+                    <p class="header-subtitle">Disquería - Sistema de Gestión</p>
+                </div>
+                <%= link_to "Volver a menú de gestión", admin_dashboard_path, class: "btn btn-logout" %>
+                <%= button_to "Salir", destroy_user_session_path, method: :get, class: "btn btn-logout" %>
+            </div>
+        </div>
+    </header>
+
     <div class="flash-messages">
         <% if flash.any? %>
             <div class="flash-notifications">
@@ -29,45 +42,43 @@
             </div>
         <% end %>
     </div>
-    <div class="dashboard-container">
-        <header class="dashboard-header">
-            <div class="header-content">
-                <div class="header-top">
-                    <div>
-                        <h1 class="header-title">Panel Administrativo</h1>
-                        <p class="header-subtitle">Disquería - Sistema de Gestión</p>
-                    </div>
-                    <%= button_to "Salir", destroy_user_session_path, method: :get, class: "btn btn-logout" %>
+
+    <div class="sales-container">
+        <div class="sales-grid">
+            <% if @sales && @sales.any? %>
+                <% @sales.each do |sale| %>
+                    <%= link_to admin_sale_path(sale), class: "sale-card" do %>
+                        <div class="sale-avatar">
+                            #<%= sale.id %>
+                        </div>
+
+                        <div class="sale-info">
+                            <h3 class="sale-name">Venta #<%= sale.id %></h3>
+                            <p class="sale-detail">Empleado ID: <%= sale.employee_id || 'N/A' %></p>
+                            <p class="sale-detail">Cliente ID: <%= sale.customer_id || 'N/A' %></p>
+                            <p class="sale-amount">Total: $<%= number_with_precision(sale.total_amount, precision: 2) %></p>
+                            <span class="sale-date"><%= sale.datetime&.strftime("%d/%m/%Y %H:%M") || sale.created_at.strftime("%d/%m/%Y %H:%M") %></span>
+                        </div>
+
+                        <%= button_to "Eliminar",
+                            admin_sale_path(sale),
+                            method: :delete,
+                            data: { confirm: "¿Estás seguro de eliminar esta venta?" },
+                            class: "btn-sale-action btn-delete" %>
+                    <% end %>
+                <% end %>
+            <% else %>
+                <div class="no-sales-message">
+                    <h4>No hay ventas registradas</h4>
+                    <p>Comienza creando tu primera venta usando el botón "Nueva Venta"</p>
                 </div>
-            </div>
-        </header>
-
-        <main class="dashboard-main">
-            <div class="container-fluid">
-                <div class="modules-grid">
-                   
-                    <div class="module-card sales-card">
-                        <div class="card-icon">+</div>
-                        <h2 class="card-title">Crear Venta</h2>
-                        <p class="card-description">Registra una nueva venta</p>
-                      <%= button_to "Acceder", new_admin_sale_path, method: :get, class: "btn btn-primary btn-lg" %>
-                    </div>
-
-                    <div class="module-card users-card">
-                        <div class="card-icon">👥</div>
-                        <h2 class="card-title">Listar Ventas</h2>
-                        <p class="card-description">Gestiona clientes, empleados y permisos</p>
-                        <%= button_to "Acceder", admin_users_path, method: :get, class: "btn btn-primary btn-lg" %>
-                    </div>
-
-           
-                </div>
-            </div>
-        </main>
-
-        <footer class="dashboard-footer">
-            <p>&copy; 2025 Disquería. Todos los derechos reservados.</p>
-        </footer>
+            <% end %>
+        </div>
     </div>
+
+    <div class="create-sale-button-container">
+        <%= button_to "Nueva Venta", new_admin_sale_path, method: :get, class: "btn" %>
+    </div>
+
 </body>
 </html>
