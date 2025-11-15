@@ -66,3 +66,4 @@ end
 gem "devise"
 gem "cancancan"
 gem "bcrypt"
+gem "kaminari"
