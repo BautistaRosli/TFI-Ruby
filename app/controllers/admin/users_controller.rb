@@ -2,8 +2,9 @@
 class Admin::UsersController < ApplicationController
   before_action :authenticate_user!
   load_and_authorize_resource
+  layout "admin_users"
   def index
-    @users = can?(:delete, User) ? User.all : User.where(is_active: true)
+    @users = can?(:delete, User) ? User.page(params[:page]).per(10) : User.where(is_active: true).page(params[:page]).per(10)
   end
 
 

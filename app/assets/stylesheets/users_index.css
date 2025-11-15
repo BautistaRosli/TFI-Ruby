@@ -184,6 +184,178 @@ body {
   transform: translateY(0);
 }
 
+/* Estilos mejorados para el dropdown de perfil */
+.dropdown {
+  position: relative;
+  display: inline-block;
+  /* Asegurar que el dropdown no se desplace */
+  overflow: visible;
+}
+
+.dropdown .btn {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+  /* remover outline de focus para un look más limpio */
+  outline: none;
+}
+
+.dropdown .btn:hover {
+  background-color: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.6);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  color: white;
+}
+
+.dropdown .btn:focus,
+.dropdown .btn:active {
+  background-color: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.7);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.2);
+  color: white;
+  outline: none;
+  /* Remover transform para evitar que el botón se desplace */
+  transform: none !important;
+}
+
+/* Estilos que anulan el comportamiento de Bootstrap para evitar desplazamiento */
+.dropdown-menu {
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15);
+  padding: 0.75rem 0;
+  /* Aumentar margen-top para separar del botón */
+  margin-top: 8px;
+  min-width: 200px;
+  animation: slideDownMenu 0.2s ease-out;
+  position: absolute !important;
+  /* Posicionar correctamente para que no superponga el botón */
+  top: calc(100% + 8px) !important;
+  right: 0 !important;
+  left: auto !important;
+  z-index: 1050;
+  background-color: #ffffff;
+  display: none;
+  /* Remover cualquier transform de Bootstrap con !important */
+  transform: none !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.dropdown-menu.show {
+  display: block !important;
+  /* Mantener transform en none cuando se muestra */
+  transform: none !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Neutralizar estilos de Popper.js */
+.dropdown-menu[data-popper-placement] {
+  position: absolute !important;
+  transform: none !important;
+  top: calc(100% + 8px) !important;
+  right: 0 !important;
+  left: auto !important;
+}
+
+/* Remover animación de transform de Bootstrap sobre dropdown-menu */
+.dropdown-menu[data-bs-popper] {
+  transform: none !important;
+  top: calc(100% + 8px) !important;
+  right: 0 !important;
+}
+
+@keyframes slideDownMenu {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dropdown-menu .dropdown-item {
+  padding: 0.75rem 1.25rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  border-radius: 8px;
+  margin: 0.25rem 0.5rem;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  display: block;
+}
+
+.dropdown-menu .dropdown-item:hover {
+  background-color: rgba(37, 99, 235, 0.08);
+  color: var(--primary-color);
+  transform: translateX(4px);
+}
+
+.dropdown-menu .dropdown-item.text-danger {
+  color: var(--danger-color);
+}
+
+.dropdown-menu .dropdown-item.text-danger:hover {
+  background-color: rgba(220, 38, 38, 0.08);
+  color: #991b1b;
+}
+
+/* Contenedor del botón crear usuario */
+.create-user-button-container {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 2rem;
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* Estilos mejorados para el botón "Crear Usuario" */
+.create-user-button-container .btn {
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+  color: white;
+  border: none;
+  padding: 0.8rem 2rem;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: 0.3px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.create-user-button-container .btn:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(37, 99, 235, 0.4);
+  background: linear-gradient(135deg, #1d4ed8 0%, #1e3a8a 100%);
+  color: white;
+  text-decoration: none;
+}
+
+.create-user-button-container .btn:active {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
 .users-container {
   max-width: 1200px;
   margin: 0 auto;
@@ -213,7 +385,7 @@ body {
   overflow: hidden;
 }
 
-/* Estilos para botones de eliminar/reactivar */
+
 .btn-user-action {
   position: absolute;
   top: 1rem;
@@ -265,10 +437,6 @@ body {
 
 .btn-reactivate:active {
   transform: scale(0.98);
-}
-
-.user-card {
-  position: relative;
 }
 
 .user-card::before {
@@ -423,10 +591,26 @@ body {
   .header-top {
     flex-direction: column;
     align-items: flex-start;
+    gap: 1.5rem;
   }
 
   .btn-logout {
     align-self: flex-start;
+  }
+
+  .dropdown {
+    width: 100%;
+  }
+
+  .dropdown .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .dropdown-menu {
+    width: 100%;
+    left: 0;
+    right: 0;
   }
 
   .flash-notifications {
@@ -445,6 +629,16 @@ body {
 
   .users-container {
     padding: 2.5rem 1rem;
+  }
+
+  .create-user-button-container {
+    padding: 0 1rem;
+    justify-content: center;
+  }
+
+  .create-user-button-container .btn {
+    width: 100%;
+    justify-content: center;
   }
 }
 
@@ -516,4 +710,23 @@ body {
   .header-content {
     padding: 0 0.75rem;
   }
+
+  .create-user-button-container {
+    padding: 0 1rem;
+    margin: 1.5rem auto;
+  }
+
+  .create-user-button-container .btn {
+    width: 100%;
+    padding: 0.7rem 1.5rem;
+    font-size: 0.9rem;
+  }
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin: 30px 0;
+  padding: 20px 0;
 }

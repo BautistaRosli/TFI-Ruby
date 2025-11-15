@@ -8,3 +8,42 @@
  *
  * Consider organizing styles into separate files for maintainability.
  */
+.pagination {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin: 30px 0;
+    padding: 20px 0;
+}
+
+.pagination a,
+.pagination span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px;
+    height: 40px;
+    padding: 0 12px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 500;
+    border: 2px solid #e5e7eb;
+    background: white;
+    color: #374151;
+}
+
+.pagination a:hover {
+    background: #f3f4f6;
+    border-color: #3b82f6;
+}
+
+.pagination .current {
+    background: #3b82f6;
+    color: white;
+    border-color: #3b82f6;
+}
+
+.pagination .gap {
+    border: none;
+    background: none;
+}
