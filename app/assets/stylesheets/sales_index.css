@@ -1,3 +1,4 @@
+/* Sales Index - Estilos específicos */
 :root {
     --primary-color: #2563eb;
     --primary-dark: #1e40af;
@@ -16,89 +17,6 @@
     --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
 }
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-}
-
-/* Header */
-.sales-header {
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
-    color: white;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    padding: 1.5rem 0;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-}
-
-.header-content {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 0 2rem;
-}
-
-.header-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 1rem;
-}
-
-.header-title {
-    font-size: 2rem;
-    font-weight: 700;
-    color: white;
-    margin: 0;
-}
-
-.header-subtitle {
-    font-size: 1rem;
-    color: rgba(255, 255, 255, 0.9);
-    margin: 0.25rem 0 0 0;
-}
-
-/* Flash Messages */
-.flash-messages {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    z-index: 1000;
-    max-width: 400px;
-}
-
-.flash-notifications {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.alert {
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    animation: slideIn 0.3s ease-out;
-}
-
-@keyframes slideIn {
-    from {
-        transform: translateX(100%);
-        opacity: 0;
-    }
-    to {
-        transform: translateX(0);
-        opacity: 1;
-    }
-}
-
 /* Sales Container */
 .sales-container {
     flex: 1;
@@ -113,6 +31,11 @@ body {
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     gap: 1.5rem;
     padding: 1rem 0;
+}
+
+/* Sale Card Wrapper */
+.sale-card-wrapper {
+    position: relative;
 }
 
 /* Sale Card */
@@ -199,6 +122,36 @@ body {
 }
 
 /* Buttons */
+.btn-delete-corner {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    width: 36px;
+    height: 36px;
+    background: #f56565;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 10;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.btn-delete-corner:hover {
+    background: #e53e3e;
+    transform: scale(1.1);
+    box-shadow: 0 4px 8px rgba(245, 101, 101, 0.4);
+}
+
+.btn-delete-corner svg {
+    width: 16px;
+    height: 16px;
+}
+
 .btn-sale-action {
     padding: 0.6rem 1.5rem;
     border: none;
@@ -233,7 +186,7 @@ body {
 .btn-logout {
     padding: 0.75rem 1.5rem;
     background: white;
-    color: #667eea;
+    color: var(--primary-dark);
     border: none;
     border-radius: 8px;
     font-weight: 600;

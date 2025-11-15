@@ -1,4 +1,6 @@
 class Admin::SalesController < ApplicationController
+  layout 'admin'
+  
   def index
     @sales = Sale.all.order(created_at: :desc)
   end

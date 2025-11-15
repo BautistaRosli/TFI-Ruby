@@ -1,52 +1,24 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ventas - Disquería</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+<% content_for :title, "Ventas - Disquería" %>
+<% content_for :page_title, "Gestión de Ventas" %>
+<% content_for :stylesheets do %>
     <%= stylesheet_link_tag 'sales_index', media: 'all' %>
-</head>
-<body>
-    <header class="sales-header w-100">
-        <div class="header-content">
-            <div class="header-top">
-                <div>
-                    <h1 class="header-title">Gestión de Ventas</h1>
-                    <p class="header-subtitle">Disquería - Sistema de Gestión</p>
-                </div>
-                <%= link_to "Volver a menú de gestión", admin_dashboard_path, class: "btn btn-logout" %>
-                <%= button_to "Salir", destroy_user_session_path, method: :get, class: "btn btn-logout" %>
-            </div>
-        </div>
-    </header>
+<% end %>
 
-    <div class="flash-messages">
-        <% if flash.any? %>
-            <div class="flash-notifications">
-            <% flash.each do |type, message| %>
-                <% 
-                alert_class = case type.to_s
-                when 'notice' then 'alert-success'
-                when 'alert' then 'alert-danger'
-                when 'warning' then 'alert-warning'
-                when 'info' then 'alert-info'
-                else 'alert-primary'
-                end
-                %>
-                <div class="alert <%= alert_class %> alert-dismissible fade show" role="alert">
-                    <span class="alert-message"><%= message %></span>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            <% end %>
-            </div>
-        <% end %>
-    </div>
-
-    <div class="sales-container">
-        <div class="sales-grid">
-            <% if @sales && @sales.any? %>
-                <% @sales.each do |sale| %>
+<div class="sales-container">
+    <div class="sales-grid">
+        <% if @sales && @sales.any? %>
+            <% @sales.each do |sale| %>
+                <div class="sale-card-wrapper">
+                    <%= button_to admin_sale_path(sale),
+                        method: :delete,
+                        data: { confirm: "¿Estás seguro de eliminar esta venta?" },
+                        class: "btn-delete-corner" do %>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                            <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                        </svg>
+                    <% end %>
+                    
                     <%= link_to admin_sale_path(sale), class: "sale-card" do %>
                         <div class="sale-avatar">
                             #<%= sale.id %>
@@ -59,26 +31,19 @@
                             <p class="sale-amount">Total: $<%= number_with_precision(sale.total_amount, precision: 2) %></p>
                             <span class="sale-date"><%= sale.datetime&.strftime("%d/%m/%Y %H:%M") || sale.created_at.strftime("%d/%m/%Y %H:%M") %></span>
                         </div>
-
-                        <%= button_to "Eliminar",
-                            admin_sale_path(sale),
-                            method: :delete,
-                            data: { confirm: "¿Estás seguro de eliminar esta venta?" },
-                            class: "btn-sale-action btn-delete" %>
                     <% end %>
-                <% end %>
-            <% else %>
-                <div class="no-sales-message">
-                    <h4>No hay ventas registradas</h4>
-                    <p>Comienza creando tu primera venta usando el botón "Nueva Venta"</p>
                 </div>
             <% end %>
-        </div>
+        <% else %>
+            <div class="no-sales-message">
+                <h4>No hay ventas registradas</h4>
+                <p>Comienza creando tu primera venta usando el botón "Nueva Venta"</p>
+            </div>
+        <% end %>
     </div>
+</div>
 
-    <div class="create-sale-button-container">
-        <%= button_to "Nueva Venta", new_admin_sale_path, method: :get, class: "btn" %>
-    </div>
+<div class="create-sale-button-container">
+    <%= button_to "Nueva Venta", new_admin_sale_path, method: :get, class: "btn" %>
+</div>
 
-</body>
-</html>

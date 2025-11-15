@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= content_for(:title) || "Admin - Disquería" %></title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <%= stylesheet_link_tag 'admin_layout', media: 'all' %>
+    <%= yield :stylesheets %>
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+</head>
+<body>
+    <!-- Header común para todas las vistas admin -->
+    <header class="admin-header w-100">
+        <div class="header-content">
+            <div class="header-top">
+                <div>
+                    <h1 class="header-title"><%= content_for(:page_title) || "Panel Administrativo" %></h1>
+                    <p class="header-subtitle">Disquería - Sistema de Gestión</p>
+                </div>
+                <div class="header-buttons">
+                    <%= link_to "Volver a menú de gestión", admin_dashboard_path, class: "btn btn-logout" %>
+                    <%= button_to "Salir", destroy_user_session_path, method: :get, class: "btn btn-logout" %>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Flash Messages -->
+    <div class="flash-messages">
+        <% if flash.any? %>
+            <div class="flash-notifications">
+                <% flash.each do |type, message| %>
+                    <% 
+                    alert_class = case type.to_s
+                    when 'notice' then 'alert-success'
+                    when 'alert' then 'alert-danger'
+                    when 'warning' then 'alert-warning'
+                    when 'info' then 'alert-info'
+                    else 'alert-primary'
+                    end
+                    %>
+                    <div class="alert <%= alert_class %> alert-dismissible fade show" role="alert">
+                        <span class="alert-message"><%= message %></span>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                <% end %>
+            </div>
+        <% end %>
+    </div>
+
+    <!-- Contenido específico de cada vista -->
+    <main class="admin-main">
+        <%= yield %>
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <%= yield :javascripts %>
+</body>
+</html>
