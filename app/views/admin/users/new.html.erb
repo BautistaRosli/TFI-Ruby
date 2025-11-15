@@ -81,13 +81,6 @@
                             <%= f.password_field :password_confirmation, autocomplete: "new-password", class: "form-control login-input" %>
                         </div>
                         <div class="form-label">
-                        <label>Estado</label><br>
-                        <%= f.select :is_active,
-                                options_for_select([['Activo', true], ['Desactivo', false]], true),
-                                {},
-                                class: "form-control login-input custom-select" %>
-                        </div>
-                        <div class="form-label">
                             <%= f.submit "Guardar Cambios", class: "btn btn-save w-100" %>
                         </div>
                     </div>

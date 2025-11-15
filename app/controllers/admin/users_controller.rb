@@ -3,8 +3,9 @@ class Admin::UsersController < ApplicationController
   before_action :authenticate_user!
   load_and_authorize_resource
   def index
-    @users = User.all
+    @users = can?(:delete, User) ? User.all : User.where(is_active: true)
   end
+
 
   def show(method: :patch)
     @user = User.find(params[:id])
@@ -30,6 +31,18 @@ class Admin::UsersController < ApplicationController
     else
       render :new, status: :unprocessable_entity
     end
+  end
+
+  def destroy
+    @user = User.find(params[:id])
+    @user.update(is_active: false)
+    redirect_to admin_users_path, notice: "Usuario desactivado correctamente."
+  end
+
+  def reactivate(method: :patch)
+    @user = User.find(params[:id])
+    @user.update(is_active: true)
+    redirect_to admin_users_path, notice: "Usuario reactivado correctamente."
   end
 
   private
