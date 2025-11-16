@@ -2,7 +2,7 @@ class Admin::SalesController < ApplicationController
   layout 'admin'
   
   def index
-    @sales = Sale.all.order(created_at: :desc)
+    @sales = Sale.order(created_at: :asc).page(params[:page]).per(1)
   end
 
   def show

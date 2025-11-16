@@ -47,3 +47,11 @@
     <%= button_to "Nueva Venta", new_admin_sale_path, method: :get, class: "btn" %>
 </div>
 
+
+<div class="pagination-container">
+    <%= paginate @sales, 
+        previous_label: '‹ Anterior',
+        next_label: 'Siguiente ›',
+        first_label: '« Primera',
+        last_label: 'Última »' %>
+</div>

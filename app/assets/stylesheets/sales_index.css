@@ -254,25 +254,93 @@
   border-color: rgba(59, 130, 246, 0.5);
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-    .header-top {
-        flex-direction: column;
-        gap: 1rem;
-        text-align: center;
-    }
+/* Pagination - Kaminari específico */
+.pagination-container {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    margin: 3rem 0 2rem !important;
+    width: 100% !important;
+}
 
-    .sales-grid {
-        grid-template-columns: 1fr;
-        gap: 1.5rem;
-    }
+/* Nav de paginación generado por Kaminari */
+.pagination-container nav.pagination {
+    display: flex !important;
+    gap: 0.5rem !important;
+    align-items: center !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
 
-    .header-title {
-        font-size: 1.5rem;
-    }
+/* Todos los spans dentro de la paginación */
+.pagination-container nav.pagination span {
+    display: inline-flex !important;
+}
 
-    .create-sale-button-container {
-        bottom: 1rem;
-        right: 1rem;
-    }
+/* Links y spans (números de página) */
+.pagination-container nav.pagination span a,
+.pagination-container nav.pagination span.current {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-width: 40px !important;
+    height: 40px !important;
+    padding: 0.5rem 0.75rem !important;
+    background: white !important;
+    color: #2563eb !important;
+    border: 2px solid #e2e8f0 !important;
+    border-radius: 8px !important;
+    font-weight: 600 !important;
+    text-decoration: none !important;
+    transition: all 0.3s ease !important;
+    cursor: pointer !important;
+}
+
+/* Hover en los links */
+.pagination-container nav.pagination span a:hover {
+    background: #2563eb !important;
+    color: white !important;
+    border-color: #2563eb !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 8px rgba(37, 99, 235, 0.3) !important;
+}
+
+/* Página actual */
+.pagination-container nav.pagination span.current {
+    background: linear-gradient(135deg, #2563eb 0%, #764ba2 100%) !important;
+    color: white !important;
+    border-color: #2563eb !important;
+    box-shadow: 0 4px 8px rgba(37, 99, 235, 0.4) !important;
+    cursor: default !important;
+}
+
+/* Gap (puntos suspensivos ...) */
+.pagination-container nav.pagination span.gap {
+    border: none !important;
+    background: transparent !important;
+    color: #718096 !important;
+    cursor: default !important;
+    min-width: auto !important;
+}
+
+/* Disabled (cuando no hay prev/next) */
+.pagination-container nav.pagination span.disabled {
+    opacity: 0.5 !important;
+    pointer-events: none !important;
+}
+
+.pagination-container nav.pagination span.disabled a {
+    background: #f8fafc !important;
+    color: #cbd5e1 !important;
+    border-color: #e2e8f0 !important;
+    cursor: not-allowed !important;
+}
+
+/* First, Last, Prev, Next - más destacados */
+.pagination-container nav.pagination span.first a,
+.pagination-container nav.pagination span.last a,
+.pagination-container nav.pagination span.prev a,
+.pagination-container nav.pagination span.next a {
+    font-weight: 700 !important;
+    min-width: 70px !important;
 }
