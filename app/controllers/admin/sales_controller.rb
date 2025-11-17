@@ -6,6 +6,7 @@ class Admin::SalesController < ApplicationController
   end
 
   def show
+    @sale = Sale.includes(items: :disk).find(params[:id])
   end
 
   def new

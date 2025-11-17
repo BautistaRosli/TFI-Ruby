@@ -1,2 +1,85 @@
-<h1>Sales#show</h1>
-<p>Find me in app/views/sales/show.html.erb</p>
+<% content_for :title, "Detalle Venta ##{@sale.id} - Disquería" %>
+<% content_for :page_title, "Detalle de Venta ##{@sale.id}" %>
+<% content_for :stylesheets do %>
+    <%= stylesheet_link_tag 'sales_show', media: 'all' %>
+<% end %>
+
+<div class="sales-container">
+    <div class="sale-detail-card">
+        <!-- Información general de la venta -->
+        <div class="sale-header">
+            <div class="sale-info-section">
+                <h3>Información General</h3>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Fecha y Hora:</span>
+                        <span class="info-value"><%= @sale.datetime&.strftime("%d/%m/%Y %H:%M") || @sale.created_at.strftime("%d/%m/%Y %H:%M") %></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Total:</span>
+                        <span class="info-value sale-total">$<%= number_with_precision(@sale.total_amount, precision: 2) %></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Empleado ID:</span>
+                        <span class="info-value"><%= @sale.employee_id || 'N/A' %></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Cliente ID:</span>
+                        <span class="info-value"><%= @sale.customer_id || 'N/A' %></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Items de la venta -->
+        <div class="sale-items-section">
+            <h3>Items de la Venta</h3>
+            <% if @sale.items.any? %>
+                <div class="items-table-container">
+                    <table class="items-table">
+                        <thead>
+                            <tr>
+                                <th>Disco</th>
+                                <th>Formato</th>
+                                <th>Descripción</th>
+                                <th>Cantidad</th>
+                                <th>Precio Unitario</th>
+                                <th>Precio Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% @sale.items.each do |item| %>
+                                <tr>
+                                    <td class="item-disk-name">
+                                        <%= item.disk&.name || 'Sin disco asociado' %>
+                                    </td>
+                                    <td>
+                                        <% if item.disk&.format %>
+                                            <span class="format-badge format-<%= item.disk.format.downcase %>"><%= item.disk.format %></span>
+                                        <% else %>
+                                            <span class="format-badge">N/A</span>
+                                        <% end %>
+                                    </td>
+                                    <td><%= item.description %></td>
+                                    <td class="text-center"><%= item.units_sold %></td>
+                                    <td class="text-right">$<%= number_with_precision(item.price, precision: 2) %></td>
+                                    <td class="text-right item-subtotal">$<%= number_with_precision(item.price * item.units_sold, precision: 2) %></td>
+                                </tr>
+                            <% end %>
+                        </tbody>
+                    </table>
+                </div>
+            <% else %>
+                <div class="no-items-message">
+                    <p>Esta venta no tiene items asociados</p>
+                </div>
+            <% end %>
+        </div>
+
+        <!-- Acciones -->
+        <div class="sale-actions">
+            <%= link_to "Volver a Ventas", admin_sales_path, class: "btn btn-secondary" %>
+            <%= link_to "Editar Venta", edit_admin_sale_path(@sale), class: "btn btn-primary" %>
+        </div>
+    </div>
+</div>
