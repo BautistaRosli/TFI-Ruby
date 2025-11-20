@@ -1,8 +1,9 @@
 class Admin::SalesController < ApplicationController
   layout 'admin'
   
+  #Llevar al modelo. las deleted. El order y el page, esta bien.
   def index
-    @sales = Sale.where(deleted: false).order(created_at: :asc).page(params[:page]).per(10)
+    @sales = Sale.where(deleted: false).order(created_at: :asc).page(params[:page]).per(3 )
   end
 
   def show
