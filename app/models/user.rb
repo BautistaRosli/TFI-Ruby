@@ -3,8 +3,8 @@ class User < ApplicationRecord
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable
 
-  validates :name, presence: true
-  validates :lastname, presence: true
+  validates :name, presence: true, length: { minimum: 2, maximum: 50 }
+  validates :lastname, presence: true, length: { minimum: 2, maximum: 50 }
   validates :is_active, inclusion: { in: [ true, false ] }
 
   # Definición correcta del enum

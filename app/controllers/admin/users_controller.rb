@@ -17,7 +17,8 @@ class Admin::UsersController < ApplicationController
     if @user.update(user_params)
       redirect_to admin_user_path(@user), notice: "Usuario actualizado correctamente."
     else
-      redirect_to admin_user_path(@user), alert: "El usuario no pudo ser actualizado."
+      flash.now[:alert] = "El usuario no pudo ser actualizado. Revisa los errores."
+      render :show, status: :unprocessable_entity
     end
   end
 
@@ -30,6 +31,7 @@ class Admin::UsersController < ApplicationController
     if @user.save
       redirect_to admin_users_path, notice: "Usuario creado correctamente."
     else
+      flash.now[:alert] = "El usuario no pudo ser creado. Revisa los errores."
       render :new, status: :unprocessable_entity
     end
   end
