@@ -4,3 +4,6 @@
 Rails.application.config.assets.version = "1.0"
 
 # Add additional assets to the asset load path.
+
+# Sirve para precompilar estos archivos 
+#Rails.application.config.assets.precompile += %w( admin_layout.css sales_index.css sales_show.css users_index.css admin_index.css custom_modal.css custom_modal.js pdf.css )

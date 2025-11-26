@@ -1,11 +1,26 @@
 class Admin::SalesController < ApplicationController
   layout 'admin'
   
+  #Llevar al modelo. las deleted. El order y el page, esta bien.
   def index
-    @sales = Sale.where(deleted: false).order(created_at: :asc).page(params[:page]).per(10)
+    @sales = Sale.where(deleted: false).order(created_at: :asc).page(params[:page]).per(3 )
   end
 
   def show
+    @sale = Sale.includes(items: :disk).find(params[:id])
+    
+
+    #responde_to sirve para manejar los formatos HTML y PDF
+    respond_to do |format|
+      #si es HTML, renderiza la vista normal
+      format.html
+      #si es PDF, genera el PDF usando wicked_pdf
+      format.pdf do
+        render pdf: "comprobante_venta_#{@sale.id}",
+               layout: false,
+               page_size: 'A4'
+      end
+    end
   end
 
   def new

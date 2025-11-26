@@ -1,0 +1,55 @@
+/* PDF Styles - Solo estilos específicos para comprobante impreso */
+
+/* Header del comprobante */
+.header {
+  text-align: center;
+  border-bottom: 3px solid #2c3e50;
+  padding-bottom: 15px;
+  margin-bottom: 25px;
+}
+
+.header h1 {
+  margin: 0 0 10px 0;
+  font-size: 24px;
+  color: #2c3e50;
+  font-weight: bold;
+}
+
+.header p {
+  margin: 5px 0;
+  font-size: 14px;
+}
+
+/* Total destacado */
+.total-section {
+  text-align: right;
+  padding: 20px;
+  background-color: #2c3e50;
+  color: white;
+  border-radius: 5px;
+  margin-bottom: 25px;
+}
+
+.total-label {
+  font-size: 18px;
+  font-weight: bold;
+  margin-right: 15px;
+}
+
+.total-value {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+/* Footer del comprobante */
+.footer {
+  text-align: center;
+  padding-top: 20px;
+  border-top: 2px solid #ecf0f1;
+  color: #6c757d;
+  font-size: 11px;
+}
+
+.footer p {
+  margin: 5px 0;
+}

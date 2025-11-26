@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <%= wicked_pdf_stylesheet_link_tag 'sales_show' %>
+  <%= wicked_pdf_stylesheet_link_tag 'pdf' %>
+</head>
+<body>
+
+<div class="container">
+  <!-- Header -->
+  <div class="header">
+    <h1>COMPROBANTE DE VENTA</h1>
+    <p>Disquería - Sistema de Gestión</p>
+    <p>Venta #<%= @sale.id %></p>
+  </div>
+
+  <!-- Información General -->
+  <div class="info-section">
+    <h2>Información de la Venta</h2>
+    <div class="info-grid">
+      <div class="info-row">
+        <div class="info-label">Fecha y Hora:</div>
+        <div class="info-value"><%= @sale.datetime&.strftime("%d/%m/%Y %H:%M") || @sale.created_at.strftime("%d/%m/%Y %H:%M") %></div>
+      </div>
+      <div class="info-row">
+        <div class="info-label">Empleado ID:</div>
+        <div class="info-value"><%= @sale.employee_id || 'N/A' %></div>
+      </div>
+      <div class="info-row">
+        <div class="info-label">Cliente ID:</div>
+        <div class="info-value"><%= @sale.customer_id || 'N/A' %></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Items de la Venta -->
+  <div class="items-section">
+    <h2>Detalle de Items</h2>
+    
+    <% if @sale.items.any? %>
+      <table class="items-table">
+        <thead>
+          <tr>
+            <th>Disco</th>
+            <th>Formato</th>
+            <th>Descripción</th>
+            <th>Cantidad</th>
+            <th>Precio Unit.</th>
+            <th>Subtotal</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @sale.items.each do |item| %>
+            <tr>
+              <td><%= item.disk&.name || 'Sin disco asociado' %></td>
+              <td>
+                <% if item.disk&.format %>
+                  <span class="format-badge format-<%= item.disk.format.downcase %>">
+                    <%= item.disk.format %>
+                  </span>
+                <% else %>
+                  N/A
+                <% end %>
+              </td>
+              <td><%= item.description %></td>
+              <td class="text-center p-5"><%= item.units_sold %></td>
+              <td class="text-center p-5">$<%= number_with_precision(item.price, precision: 2) %></td>
+              <td class="text-center p-5 item-subtotal">$<%= number_with_precision(item.price * item.units_sold, precision: 2) %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    <% else %>
+      <p class="no-items">Esta venta no tiene items asociados</p>
+    <% end %>
+  </div>
+
+  <!-- Total -->
+  <div class="total-section">
+    <span class="total-label">TOTAL:</span>
+    <span class="total-value">$<%= number_with_precision(@sale.total_amount, precision: 2) %></span>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <p>Documento generado el <%= Time.current.strftime("%d/%m/%Y a las %H:%M") %></p>
+    <p>Este comprobante es válido como constancia de compra</p>
+  </div>
+</div>
+
+</body>
+</html>

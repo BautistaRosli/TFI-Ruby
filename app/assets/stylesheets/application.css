@@ -8,42 +8,99 @@
  *
  * Consider organizing styles into separate files for maintainability.
  */
-.pagination {
+
+/* ============================================
+   ESTILOS GLOBALES DE PAGINACIÓN (KAMINARI)
+   ============================================ */
+
+/* Contenedor principal de paginación */
+.pagination-container {
     display: flex;
     justify-content: center;
-    gap: 8px;
-    margin: 30px 0;
-    padding: 20px 0;
+    align-items: center;
+    margin: 3rem 0 2rem;
+    width: 100%;
 }
 
-.pagination a,
-.pagination span {
+/* Nav de paginación generado por Kaminari */
+.pagination-container nav.pagination,
+nav.pagination {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    padding: 0;
+    margin: 0;
+    justify-content: center;
+}
+
+/* Todos los spans dentro de la paginación */
+.pagination-container nav.pagination span,
+nav.pagination span {
+    display: inline-flex;
+}
+
+/* Links y números de página */
+.pagination-container nav.pagination span a,
+.pagination-container nav.pagination span.current,
+nav.pagination span a,
+nav.pagination span.current {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     min-width: 40px;
     height: 40px;
-    padding: 0 12px;
-    border-radius: 8px;
-    text-decoration: none;
-    font-weight: 500;
-    border: 2px solid #e5e7eb;
+    padding: 0.5rem 0.75rem;
     background: white;
-    color: #374151;
+    color: #2563eb;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    cursor: pointer;
 }
 
-.pagination a:hover {
-    background: #f3f4f6;
-    border-color: #3b82f6;
-}
-
-.pagination .current {
-    background: #3b82f6;
+/* Hover en los links */
+.pagination-container nav.pagination span a:hover,
+nav.pagination span a:hover {
+    background: #2563eb;
     color: white;
-    border-color: #3b82f6;
+    border-color: #2563eb;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(37, 99, 235, 0.3);
 }
 
-.pagination .gap {
+/* Página actual */
+.pagination-container nav.pagination span.current,
+nav.pagination span.current {
+    background: linear-gradient(135deg, #2563eb 0%, #051ca0 100%);
+    color: white;
+    border-color: #2563eb;
+    box-shadow: 0 4px 8px rgba(37, 99, 235, 0.4);
+    cursor: default;
+}
+
+/* Gap (puntos suspensivos ...) */
+.pagination-container nav.pagination span.gap,
+nav.pagination span.gap {
     border: none;
-    background: none;
+    background: transparent;
+    color: #718096;
+    cursor: default;
+    min-width: auto;
+}
+
+/* Disabled (cuando no hay prev/next) */
+.pagination-container nav.pagination span.disabled,
+nav.pagination span.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.pagination-container nav.pagination span.disabled a,
+nav.pagination span.disabled a {
+    background: #f8fafc;
+    color: #cbd5e1;
+    border-color: #e2e8f0;
+    cursor: not-allowed;
 }
