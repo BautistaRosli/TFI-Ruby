@@ -62,8 +62,8 @@
                                     </td>
                                     <td><%= item.description %></td>
                                     <td class="text-center"><%= item.units_sold %></td>
-                                    <td class="text-right">$<%= number_with_precision(item.price, precision: 2) %></td>
-                                    <td class="text-right item-subtotal">$<%= number_with_precision(item.price * item.units_sold, precision: 2) %></td>
+                                    <td class="text-center">$<%= number_with_precision(item.price, precision: 2) %></td>
+                                    <td class="text-center  item-subtotal">$<%= number_with_precision(item.price * item.units_sold, precision: 2) %></td>
                                 </tr>
                             <% end %>
                         </tbody>
@@ -79,6 +79,8 @@
         <!-- Acciones -->
         <div class="sale-actions">
             <%= link_to "Volver a Ventas", admin_sales_path, class: "btn btn-secondary" %>
+            <%= link_to "Descargar Comprobante PDF", admin_sale_path(@sale, format: :pdf), class: "btn btn-primary", target: "_blank" %>
         </div>
+
     </div>
 </div>
