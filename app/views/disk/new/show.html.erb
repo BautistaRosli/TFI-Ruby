@@ -1,0 +1,38 @@
+<div class="container">
+  <div class="disk-show-card">
+    <div class="disk-show-info">
+      <h1 class="disk-show-title"><%= @disk.name %></h1>
+
+      <ul class="disk-details">
+        <li><strong>Artista:</strong> <span class="muted"><%= @disk.author %></span></li>
+        <li><strong>Año:</strong> <span class="muted"><%= @disk.year if @disk.respond_to?(:year) %></span></li>
+        <li><strong>Formato:</strong> <span class="muted"><%= @disk.format %></span></li>
+        <li><strong>Stock:</strong> <span class="muted"><%= @disk.stock if @disk.respond_to?(:stock) %></span></li>
+        <li><strong>Precio:</strong> <span class="price">$<%= @disk.unit_price %></span></li>
+      </ul>
+
+        <div class="disk-description">
+    <h2>Descripción</h2>
+    <div class="description-body">
+      <%= simple_format(@disk.description || 'Sin descripción disponible') %>
+    </div>
+  </div>
+
+      <div class="disk-actions">
+        <%= link_to 'Volver al catálogo', disk_new_index_path, class: 'btn-primary btn-gold' %>
+      </div>
+    </div>
+
+    <div class="disk-show-media">
+      <% if @disk.cover.present? %>
+        <%= image_tag @disk.cover, alt: @disk.name, class: 'disk-large-img' %>
+      <% else %>
+        <%= image_tag '/tony/tony3.png', alt: 'Portada provisional', class: 'disk-large-img' %>
+      <% end %>
+    </div>
+
+    
+  </div>
+
+
+</div>

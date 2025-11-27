@@ -1,6 +1,7 @@
 class Disk < ApplicationRecord
   # Attach images (needs Active Storage tables)
   has_many_attached :images
+  has_one_attached :cover
 
   # Common validations
   validates :name, presence: true
