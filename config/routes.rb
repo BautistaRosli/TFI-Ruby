@@ -24,12 +24,13 @@ Rails.application.routes.draw do
       end
     end
 
-    resources :sales 
+    resources :sales
+    resources :graphics
   end
 
   namespace :disk do
-    resources :new,  only: [:index, :show]
-    resources :used, only: [:index, :show]
+    resources :new,  only: [ :index, :show ]
+    resources :used, only: [ :index, :show ]
   end
 
   get "up" => "rails/health#show", as: :rails_health_check

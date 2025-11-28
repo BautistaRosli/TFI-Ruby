@@ -1,0 +1,14 @@
+<% series = [
+  {name: "Inactive", data: @inactive_properties},
+  {name: "Active", data: @active_properties}
+] %>
+
+<% options = {
+  title: 'Properties Growth',
+  subtitle: 'Grouped Per Week',
+  xtitle: 'Week',
+  ytitle: 'Properties',
+  stacked: true
+} %>
+<%= line_chart(series, options) %>
+asas
