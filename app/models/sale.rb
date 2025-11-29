@@ -1,18 +1,17 @@
 class Sale < ApplicationRecord
   #Relacion con items de venta, 
   #depends indica que si se borra una venta, se borran sus items asociados, como el borrado es lógico, no pongo el destroy 
-  has_many :items
+  has_many :items 
 
   # Callbacks
   before_create :validate_and_decrease_stock
   after_update :return_stock, if: :saved_change_to_deleted?
 
-  # Validations
-  validates :datetime, presence: true
+  # Validaciones
   validates :total_amount, numericality: { greater_than_or_equal_to: 0 }
 
   # relaciones (a implementar)
-  # belongs_to :employee
+  belongs_to :user
   # belongs_to :customer
   
   private

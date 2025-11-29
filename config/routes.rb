@@ -22,7 +22,15 @@ Rails.application.routes.draw do
         patch :reactivate
       end
     end
-    resources :sales
+    resources :sales do
+      collection do
+        get :cart
+        post :add_item
+        delete :remove_item
+        delete :clear_cart
+      end
+    end
+    resources :disks, only: [:index]
   end
 
   get "up" => "rails/health#show", as: :rails_health_check

@@ -1,11 +1,13 @@
 class Disk < ApplicationRecord
   # Attach images (needs Active Storage tables)
   has_many_attached :images
-
+  has_many :items
+  
   # Common validations
   validates :name, presence: true
   validates :unit_price, numericality: { greater_than_or_equal_to: 0 }
   validates :format, inclusion: { in: %w[vinilo CD], allow_nil: true }
+  
 
   scope :active, -> { where(deleted_at: nil) }
   scope :deleted, -> { where.not(deleted_at: nil) }
