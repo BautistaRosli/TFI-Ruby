@@ -1,0 +1,50 @@
+<div class="container">
+  <h1><%= @disk.name %> <small class="muted">(<%= @disk.type %>)</small></h1>
+
+  <div class="disk-meta">
+    <p><strong>Autor:</strong> <%= @disk.author %></p>
+    <p><strong>Categoría:</strong> <%= @disk.category %></p>
+    <p><strong>Formato:</strong> <%= @disk.format %></p>
+    <p><strong>Precio:</strong> $<%= @disk.unit_price %></p>
+    <p><strong>Stock:</strong> <%= @disk.stock || '-' %></p>
+    <p><strong>Ingresado:</strong> <%= @disk.date_ingreso %></p>
+    <p><strong>Última modificación:</strong> <%= @disk.updated_at %></p>
+    <p><strong>Fecha baja:</strong> <%= @disk.deleted_at %></p>
+  </div>
+
+  <div class="disk-media">
+    <% if @disk.cover.attached? %>
+      <%= image_tag @disk.cover.variant(resize_to_limit: [400,400]) %>
+    <% end %>
+
+    <% if @disk.images.attached? %>
+      <div class="gallery">
+        <% @disk.images.each do |img| %>
+          <%= image_tag img.variant(resize_to_limit: [120,120]) %>
+        <% end %>
+      </div>
+    <% end %>
+
+    <% if @disk.respond_to?(:audio) && @disk.audio.attached? %>
+      <h4>Audio</h4>
+      <audio controls>
+        <source src="<%= url_for(@disk.audio) %>" type="<%= @disk.audio.blob.content_type %>">
+      </audio>
+    <% end %>
+  </div>
+
+  <div class="actions">
+    <%= link_to 'Editar', edit_admin_disk_path(@disk), class: 'btn-outline' %>
+    <%= link_to 'Volver', admin_disks_path, class: 'btn-outline' %>
+  </div>
+
+  <% if @disk.is_a?(NewDisk) %>
+    <div class="change-stock">
+      <h3>Cambiar stock</h3>
+      <%= form_with url: change_stock_admin_disk_path(@disk), method: :patch, local: true do |f| %>
+        <%= number_field_tag 'disk[stock]', @disk.stock || 0, min: 0 %>
+        <%= submit_tag 'Actualizar stock', class: 'btn-primary' %>
+      <% end %>
+    </div>
+  <% end %>
+</div>

@@ -1,0 +1,58 @@
+<% content_for :title, "Discos - Disquería" %>
+<% content_for :page_title, "Administración de Discos" %>
+<% content_for :stylesheets do %>
+  <%= stylesheet_link_tag 'disks', media: 'all' %>
+<% end %>
+
+<div class="disks-container">
+  <div class="disks-grid">
+    <% if @disks && @disks.any? %>
+      <% @disks.each do |disk| %>
+        <div class="disk-card-wrapper">
+          <%= button_to admin_disk_path(disk),
+                method: :delete,
+                class: "btn-delete-corner",
+                form: { data: { confirm: "¿Dar de baja este disco?" } } do %>
+            <!-- icono basura -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+              <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+              <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+            </svg>
+          <% end %>
+
+          <%= link_to admin_disk_path(disk), class: "disk-card" do %>
+            <div class="disk-avatar">
+              <% if disk.cover.attached? %>
+                <%= image_tag disk.cover.variant(resize_to_limit: [140,140]), alt: disk.name %>
+              <% else %>
+                <%= image_tag '/tony/tony1.png', alt: 'sin portada', class: 'fallback-img' %>
+              <% end %>
+            </div>
+
+            <div class="disk-info">
+              <h3 class="disk-name"><%= disk.name %></h3>
+              <p class="disk-meta"><%= disk.author.presence || '—' %> • <%= disk.category.presence || '—' %></p>
+              <p class="disk-price">Precio: $<%= number_with_precision(disk.unit_price, precision: 2) %></p>
+              <p class="disk-stock">Stock: <%= disk.stock.present? ? disk.stock : 'N/A' %></p>
+              <span class="disk-date">Ingresado: <%= disk.date_ingreso&.strftime("%d/%m/%Y") || disk.created_at.strftime("%d/%m/%Y") %></span>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+    <% else %>
+      <div class="no-disks-message">
+        <h4>No hay discos en el catálogo</h4>
+        <p>Puedes agregar discos nuevos o usados desde los botones abajo.</p>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<div class="create-disk-buttons">
+  <%= button_to 'Nuevo disco (nuevo)', new_admin_disk_path(type: 'NewDisk'), method: :get, class: 'btn btn-primary' %>
+  <%= button_to 'Nuevo disco (usado)', new_admin_disk_path(type: 'UsedDisk'), method: :get, class: 'btn btn-secondary' %>
+</div>
+
+<div class="pagination-container">
+  <%= paginate @disks %>
+</div>

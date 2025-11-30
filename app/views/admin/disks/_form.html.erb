@@ -1,0 +1,101 @@
+<% form_url = @disk.persisted? ? admin_disk_path(@disk) : admin_disks_path %>
+<% form_method = @disk.persisted? ? :patch : :post %>
+
+<%= form_with model: [:admin, @disk], url: form_url, method: form_method, local: true, html: { multipart: true } do |f| %>
+  <% if @disk.errors.any? %>
+    <div class="errors">
+      <h3><%= pluralize(@disk.errors.count, "error") %> impiden guardar</h3>
+      <ul>
+        <% @disk.errors.full_messages.each do |m| %>
+          <li><%= m %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :type, "Estado" %>
+    <%= f.select :type, options_for_select([['Nuevo', 'NewDisk'], ['Usado', 'UsedDisk']], @disk.type), {}, { class: 'form-control' } %>
+  </div>
+
+  <div class="field">
+    <%= f.label :name, "Nombre" %>
+    <%= f.text_field :name, class: 'form-control' %>
+  </div>
+
+  <div class="field">
+    <%= f.label :author, "Autor / Artista" %>
+    <%= f.text_field :author, class: 'form-control' %>
+  </div>
+
+  <div class="field">
+    <%= f.label :description, "Descripción" %>
+    <%= f.text_area :description, class: 'form-control' %>
+  </div>
+
+  <div class="field">
+    <%= f.label :unit_price, "Precio unitario" %>
+    <%= f.number_field :unit_price, step: 0.01, class: 'form-control' %>
+  </div>
+
+  <div class="field">
+    <%= f.label :category, "Categoría (género)" %>
+    <%= f.text_field :category, class: 'form-control' %>
+  </div>
+
+  <div class="field">
+    <%= f.label :format, "Formato" %>
+    <%= f.select :format, options_for_select([['vinilo','vinilo'], ['CD','CD']], @disk.format), {}, class: 'form-control' %>
+  </div>
+
+  <div class="field">
+    <%= f.label :date_ingreso, "Fecha de ingreso" %>
+    <%= f.datetime_field :date_ingreso, value: (@disk.date_ingreso || Time.current), class: 'form-control' %>
+  </div>
+
+  <% if @disk.is_a?(NewDisk) || @disk.type == 'NewDisk' %>
+    <div class="field">
+      <%= f.label :stock, "Stock" %>
+      <%= f.number_field :stock, class: 'form-control', min: 0 %>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :cover, "Portada (cover)" %>
+    <%= f.file_field :cover, accept: 'image/*' %>
+    <% if @disk.cover.attached? %>
+      <div class="current-cover">
+        <%= image_tag @disk.cover.variant(resize_to_limit: [200,200]), alt: 'cover' %>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="field">
+    <%= f.label :images, "Imágenes (puede subir varias)" %>
+    <%= f.file_field :images, multiple: true, accept: 'image/*' %>
+    <% if @disk.images.attached? %>
+      <div class="current-images">
+        <% @disk.images.each do |img| %>
+          <%= image_tag img.variant(resize_to_limit: [100,100]), alt: 'img' %>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+
+  <% if @disk.is_a?(UsedDisk) || @disk.type == 'UsedDisk' %>
+    <div class="field">
+      <%= f.label :audio, "Audio de muestra (solo usados)" %>
+      <%= f.file_field :audio, accept: 'audio/*' %>
+      <% if @disk.respond_to?(:audio) && @disk.audio.attached? %>
+        <audio controls>
+          <source src="<%= url_for(@disk.audio) %>" type="<%= @disk.audio.blob.content_type %>">
+        </audio>
+      <% end %>
+    </div>
+  <% end %>
+
+  <div class="actions">
+    <%= f.submit class: 'btn-primary' %>
+    <%= link_to 'Volver', admin_disks_path, class: 'btn-outline' %>
+  </div>
+<% end %>
