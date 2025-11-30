@@ -10,7 +10,7 @@ class Admin::SalesController < ApplicationController
     @sale = Sale.includes(items: :disk).find(params[:id])
     
 
-    #responde_to sirve para manejar los formatos HTML y PDF
+    #respond_to sirve para manejar los formatos HTML y PDF
     respond_to do |format|
       #si es HTML, renderiza la vista normal
       format.html

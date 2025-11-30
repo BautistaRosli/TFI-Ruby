@@ -1,0 +1,44 @@
+<div class="container">
+  <div class="disks-hero">
+    <div>
+      <h1>Catálogo de Discos Usados</h1>
+      <p class="muted">Explora nuestra selección de discos usados</p>
+    </div>
+  </div>
+
+  <div class="disks-grid">
+    <% @disks.each do |disk| %>
+      <div class="disk-card">
+        <%= link_to disk_used_path(disk), class: "card-link" do %>
+          <div class="disk-media">
+            <% if disk.cover.present? %>
+              <%= image_tag disk.cover, alt: disk.name %>
+            <% else %>
+              <%= image_tag "/tony/tony#{rand(1..5)}.png", alt: "Imagen provisional", class: "fallback-img" %>
+            <% end %>
+          </div>
+
+          <div class="disk-body">
+            <h3 class="disk-title"><%= disk.name %></h3>
+            <div class="disk-meta"><%= disk.author %></div>
+            <% if disk.category.present? %>
+              <div class="tags"><span class="tag"><%= disk.category %></span></div>
+            <% end %>
+          </div>
+
+          <div class="disk-footer">
+            <div class="price">$<%= disk.unit_price %></div>
+            <div class="actions">
+              <%= link_to 'Ver detalles', disk_used_path(disk), class: 'btn-primary' %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+  <div class="pagination-wrap">
+    <%= paginate @disks %>
+  </div>
+</div>
+
+
