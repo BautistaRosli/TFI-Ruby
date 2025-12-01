@@ -1,4 +1,6 @@
 class Admin::DisksController < ApplicationController
+  include CartManagement
+  
   layout 'admin'
   
   def index
@@ -8,8 +10,8 @@ class Admin::DisksController < ApplicationController
                  .page(params[:page])
                  .per(10)
     
-    # Info del carrito para mostrar en la vista
-    @cart_items_count = session[:cart]["items"]&.size || 0
-    
+    # Info del carrito para mostrar en la vista usando el concern
+    @cart_items_count = cart_items_count
+    @cart_total = cart_total
   end
 end
