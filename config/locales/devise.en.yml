@@ -1,6 +1,38 @@
 # Additional translations at https://github.com/heartcombo/devise/wiki/I18n
 
-en:
+es:
+  activerecord:
+    attributes:
+      user:
+        name: "Nombre"
+        lastname: "Apellido"
+        email: "Correo electrónico"
+        password: "Contraseña"
+        password_confirmation: "Confirmación de contraseña"
+        role: "Rol"
+        is_active: "Activo"
+    
+    errors:
+      models:
+        user:
+          attributes:
+            name:
+              too_short: "es demasiado corto (mínimo %{count} caracteres)"
+              too_long: "es demasiado largo (máximo %{count} caracteres)"
+              blank: "no puede estar en blanco"
+            lastname:
+              too_short: "es demasiado corto (mínimo %{count} caracteres)"
+              blank: "no puede estar en blanco"
+            email:
+              invalid: "no tiene un formato válido"
+              blank: "no puede estar en blanco"
+              taken: "ya está registrado"
+            password:
+              confirmation: "las contraseñas no coinciden"
+            password_confirmation:
+              confirmation: "las contraseñas no coinciden"
+
+
   devise:
     confirmations:
       confirmed: "Your email address has been successfully confirmed."
@@ -54,12 +86,23 @@ en:
       send_paranoid_instructions: "If your account exists, you will receive an email with instructions for how to unlock it in a few minutes."
       unlocked: "Your account has been unlocked successfully. Please sign in to continue."
   errors:
+    format: "%{attribute} %{message}"
     messages:
-      already_confirmed: "was already confirmed, please try signing in"
-      confirmation_period_expired: "needs to be confirmed within %{period}, please request a new one"
-      expired: "has expired, please request a new one"
-      not_found: "not found"
-      not_locked: "was not locked"
+      already_confirmed: "ya ha sido confirmado, por favor intenta iniciar sesión"
+      confirmation_period_expired: "necesita ser confirmado en %{period}, por favor solícitalo de nuevo"
+      expired: "ha expirado, por favor solicita uno nuevo"
+      not_found: "no encontrado"
+      not_locked: "no estaba bloqueado"
       not_saved:
-        one: "1 error prohibited this %{resource} from being saved:"
-        other: "%{count} errors prohibited this %{resource} from being saved:"
+        one: "Ha habido 1 error:"
+        other: "Han habido %{count} errores:"
+      
+      model_invalid: "La validación falló: %{errors}"
+      too_short: "es demasiado corto (mínimo %{count} caracteres)"
+      too_long: "es demasiado largo (máximo %{count} caracteres)"
+      blank: "no puede estar en blanco"
+      invalid: "no es válido"
+      taken: "ya está en uso"
+      inclusion: "no es una opción válida"
+      required: "debe existir"
+

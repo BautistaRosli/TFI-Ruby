@@ -1,3 +1,9 @@
-panel publico
+<h1>Catálogo de Discos</h1>
 
-
+<ul>
+  <% @disks.each do |disk| %>
+    <li>
+      <%= link_to disk.title, disk_path(disk) %>
+    </li>
+  <% end %>
+</ul>

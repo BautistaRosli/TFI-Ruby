@@ -1,0 +1,17 @@
+<nav class="site-navbar">
+  <div class="container nav-inner">
+    <div class="brand">
+      <%= link_to root_path, class: "brand-link" do %>
+        <%= image_tag "/logo.png", alt: "VendoDiscos logo", class: "brand-logo" %>
+        <span class="brand-text">VendoDiscos.com</span>
+      <% end %>
+    </div>
+
+    <ul class="nav-links">
+      <li><%= link_to "Discos Nuevos", disk_new_index_path, class: "nav-link" %></li>
+      <li><%= link_to "Discos Usados", disk_used_index_path, class: "nav-link" %></li>
+    </ul>
+
+    
+  </div>
+</nav>

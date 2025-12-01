@@ -3,6 +3,8 @@ class Disk < ApplicationRecord
   has_many_attached :images
   has_many :items
   
+  has_one_attached :cover
+
   # Common validations
   validates :name, presence: true
   validates :unit_price, numericality: { greater_than_or_equal_to: 0 }
