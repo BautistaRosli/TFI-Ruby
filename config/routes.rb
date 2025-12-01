@@ -24,8 +24,18 @@ Rails.application.routes.draw do
       end
     end
 
-    resources :sales
     resources :graphics
+
+    resources :sales do
+      collection do
+        get :cart
+        post :add_item
+        delete :remove_item
+        delete :clear_cart
+      end
+    end
+
+    resources :disks, only: [ :index ]
   end
 
   namespace :disk do

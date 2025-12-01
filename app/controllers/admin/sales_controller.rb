@@ -1,7 +1,8 @@
 class Admin::SalesController < ApplicationController
+  include CartManagement
+  
   layout 'admin'
   
-  #Llevar al modelo. las deleted. El order y el page, esta bien.
   def index
     @sales = Sale.where(deleted: false).order(created_at: :asc).page(params[:page]).per(3 )
   end
@@ -22,18 +23,83 @@ class Admin::SalesController < ApplicationController
       end
     end
   end
-
+  
   def new
+    initialize_cart
+    redirect_to admin_disks_path, notice: "Selecciona discos para agregar a la venta"
   end
 
-  def edit
+  def cart
+    @cart_items = cart_items
+    @total = cart_total
   end
+
+  def add_item
+    disk = Disk.find(params[:disk_id])
+    units = params[:units_sold].to_i
+    
+    # Validar stock usando el concern (ya considera unidades en carrito)
+    validation = validate_stock(disk, units)
+    unless validation[:valid]
+      redirect_to admin_disks_path, alert: validation[:message]
+      return
+    end
+    
+    # Agregar al carrito usando el concern
+    add_to_cart(disk, units)
+    
+    redirect_to admin_disks_path, notice: "#{disk.name} agregado al carrito"
+  end
+
+  def remove_item
+    index = params[:index].to_i
+    remove_from_cart(index)
+    redirect_to cart_admin_sales_path, notice: "Item eliminado del carrito"
+  end
+
+  def clear_cart
+    clear_cart
+    redirect_to admin_sales_path, notice: "Carrito vaciado"
+  end
+
 
   def create
-  end
+     if cart_empty?
+       redirect_to admin_sales_path, alert: "El carrito está vacío"
+       return
+     end
+     
+     cart = session["cart"]
 
-  def update
+    # Crear la venta en memoria (sin guardar aún)
+    @sale = Sale.new(
+      total_amount: cart['total_amount'],
+      deleted: false,
+      user_id: current_user.id
+    )
+    
+    # Asociar items en memoria (sin guardar aún)
+    cart['items'].each do |item_data|
+      disk = Disk.find(item_data['disk_id'])
+      @sale.items.build(
+        disk: disk,
+        description: item_data['name'],
+        units_sold: item_data['units_sold'],
+        price: item_data['price']
+      )
+    end
+    
+    # Ahora guardar todo junto (sale + items)
+    if @sale.save
+      # Si todo salió bien, limpiar carrito
+      clear_cart
+      redirect_to admin_sale_path(@sale), notice: "Venta creada exitosamente"
+    else
+      redirect_to cart_admin_sales_path, alert: @sale.errors.full_messages.join(", ")
+    end
   end
+  
+
 
   def destroy
     @sale = Sale.find(params[:id])

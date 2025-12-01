@@ -8,7 +8,7 @@ Pasos al momento de clonar:
 - bundle install
 - rails db:create db:migrate
 - rails server
-- rails generate wicked_pdf (Crea los archivos de configuración e inicialización para la gema WickedPDF.)
+- rails generate wicked_pdf o rails g wicked_pdf (Crea los archivos de configuración e inicialización para la gema WickedPDF.)
 
 En caso de problemas con sqlite3:
 gem uninstall sqlite3
