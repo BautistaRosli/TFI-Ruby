@@ -3,6 +3,9 @@ class Disk < ApplicationRecord
   has_many_attached :images
   has_one_attached :cover
 
+  has_many :items
+  has_many :sales, through: :items
+
   # Common validations
   validates :name, presence: true
   validates :unit_price, numericality: { greater_than_or_equal_to: 0 }
@@ -28,4 +31,10 @@ class Disk < ApplicationRecord
   def update_stock_on_delete
     update_column(:stock, 0) if has_attribute?(:stock)
   end
+
+  scope :sold_in_active_sales, -> {
+    joins(:sales)
+    .where(sales: { deleted: [ false, nil ] })
+    .distinct
+  }
 end

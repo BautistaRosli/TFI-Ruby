@@ -9,21 +9,28 @@
 
 <body>
 
-<% series = [
-  {name: "Inactive", data: @inactive_properties},
-  {name: "Active", data: @active_properties}
-] %>
 
+<div style="height: 400px;">
+  <% series = [
+    {name: "Discos", data: @sales_by_disks}
+  ] %>
 <% options = {
-  title: 'Properties Growth',
-  subtitle: 'Grouped Per Day',
-  xtitle: 'day',
-  ytitle: 'Properties',
   stacked: true,
-  defer: true  # <--- ¡AGREGA ESTO! Es la clave para que se vea en Rails 8
+  defer: true 
 } %>
 
-<%= line_chart(series, options) %>
+<%= column_chart(series, {**options, theme: 'palette4'}) %>
+
+
+<div style="height: 400px;">
+  <% dinero = [
+    {name: "Dinero", data: @revenue_by_week}
+  ] %>
+
+<%= column_chart(dinero, {**options, theme: 'palette4'}) %>
+
+</div>
+
 
 </body>
 </html>

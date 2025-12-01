@@ -1,9 +1,7 @@
 class Admin::GraphicsController < ApplicationController
   def index
-    # is_active: false son las INACTIVAS
-    @inactive_properties = User.where(is_active: false).group_by_day(:created_at).count
+    @sales_by_disks = Disk.sold_in_active_sales.group(:name).count
 
-    # is_active: true son las ACTIVAS
-    @active_properties = User.where(is_active: true).group_by_day(:created_at).count
+    @revenue_by_week = Sale.revenue_by_week
   end
 end

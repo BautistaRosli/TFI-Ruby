@@ -1,12 +1,12 @@
 class Sale < ApplicationRecord
-  #Relacion con items de venta, 
-  #depends indica que si se borra una venta, se borran sus items asociados, como el borrado es lógico, no pongo el destroy 
+  # Relacion con items de venta,
+  # depends indica que si se borra una venta, se borran sus items asociados, como el borrado es lógico, no pongo el destroy
   has_many :items
 
 
- #Trigger para borrar logico de items al borrar logico de venta
+  # Trigger para borrar logico de items al borrar logico de venta
   after_update :return_stock, if: :saved_change_to_deleted?
- #saved_change_to_deleted? es un metodo de Active Record que devuelve true si el atributo deleted ha cambiado en la ultima operacion de guardado.
+  # saved_change_to_deleted? es un metodo de Active Record que devuelve true si el atributo deleted ha cambiado en la ultima operacion de guardado.
 
 
   # Validations
@@ -16,6 +16,13 @@ class Sale < ApplicationRecord
   # relaciones (a implementar)
   # belongs_to :employee
   # belongs_to :customer
+
+  scope :revenue_by_week, -> {
+    where(deleted: false).
+    group_by_week(:created_at).
+    sum(:total_amount)
+  }
+
   private
   def return_stock
     if deleted
