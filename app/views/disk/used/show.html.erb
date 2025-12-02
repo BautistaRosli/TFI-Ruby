@@ -15,22 +15,23 @@
         <div class="description-body">
           <%= simple_format(@disk.description || 'Sin descripción disponible') %>
         </div>
-        </div>
+      </div>
 
-        <div class="disk-audio">
-          <h3>Audio de muestra</h3>
-          <audio id="sample-audio" preload="none">
-            <source src="/samsung-sound.mp3" type="audio/mpeg">
-            Tu navegador no soporta audio.
-          </audio>
-          <div style="margin-top:10px">
-            <button id="play-sample" type="button" class="btn-primary">Reproducir audio</button>
-          </div>
+      <div class="disk-audio">
+        <h3>Audio de muestra</h3>
+        <audio id="sample-audio" preload="none">
+          <source src="<%= (@disk.respond_to?(:audio) && @disk.audio.attached?) ? url_for(@disk.audio) : '/samsung-sound.mp3' %>"
+                  type="<%= (@disk.respond_to?(:audio) && @disk.audio.attached?) ? @disk.audio.blob.content_type : 'audio/mpeg' %>">
+          Tu navegador no soporta audio.
+        </audio>
+        <div style="margin-top:10px">
+          <button id="play-sample" type="button" class="btn-primary">Reproducir audio</button>
         </div>
+      </div>
 
-        <div class="disk-actions">
-          <%= link_to 'Volver al catálogo', disk_used_index_path, class: 'btn-outline btn-gold' %>
-        </div>
+      <div class="disk-actions">
+        <%= link_to 'Volver al catálogo', disk_used_index_path, class: 'btn-outline btn-gold' %>
+      </div>
     </div>
 
     <div class="disk-show-media">
@@ -40,10 +41,7 @@
         <%= image_tag '/tony/tony2.png', alt: 'Portada provisional', class: 'disk-large-img' %>
       <% end %>
     </div>
-
   </div>
-
-
 </div>
 
 <script>
