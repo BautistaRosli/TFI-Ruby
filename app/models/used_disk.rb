@@ -22,6 +22,10 @@ class UsedDisk < Disk
     end
   end
 
+  def set_default_stock
+    self.stock = 1 if stock.nil?
+  end
+
   # def update_stock_on_delete
   # end
 end
