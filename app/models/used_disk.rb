@@ -1,12 +1,11 @@
 class UsedDisk < Disk
-  # Used disks are unique items: no stock, optional audio
-  validate :stock_must_be_nil
+  before_validation :set_default_stock
   has_one_attached :audio
 
   private
 
-  def stock_must_be_nil
-    errors.add(:stock, "must be blank for used disks") if stock.present?
+  def set_default_stock
+    self.stock = 1 if stock.nil?
   end
 
   # For used disks soft_delete only sets deleted_at; stock should already be nil
