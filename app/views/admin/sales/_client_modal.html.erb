@@ -1,0 +1,138 @@
+<div class="modal fade" id="clientModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <%= form_with url: admin_sales_path, method: :post, local: true, id: "sale-form" do |f| %>
+        <div class="modal-header">
+          <h5 class="modal-title">Asignar Cliente</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        
+        <div class="modal-body">
+          <div class="mb-4 text-center">
+            <div class="btn-group w-100" role="group">
+              <input type="radio" class="btn-check" name="client_mode" id="mode_existing" value="existing" checked onchange="toggleClientForm()">
+              <label class="btn btn-outline-primary" for="mode_existing">Cliente Existente</label>
+
+              <input type="radio" class="btn-check" name="client_mode" id="mode_new" value="new" onchange="toggleClientForm()">
+              <label class="btn btn-outline-primary" for="mode_new">Cliente Nuevo</label>
+            </div>
+          </div>
+
+          <div id="existing_client_form">
+            <div class="input-group mb-3">
+              <%= text_field_tag :existing_dni, nil, class: "form-control", placeholder: "Ingrese DNI del cliente", id: "dni_input" %>
+              <button class="btn btn-primary" type="button" onclick="searchClient()">Buscar Cliente</button>
+            </div>
+            
+            <div id="search_error" class="alert alert-danger d-none p-2 text-center">
+              <small>No se encontró ningún cliente con ese DNI.</small>
+            </div>
+
+            <div id="client_preview" class="card border-success mb-3 d-none">
+              <div class="card-header bg-success text-white py-1">
+                <small>Cliente Encontrado</small>
+              </div>
+              <div class="card-body py-2">
+                <h5 class="card-title mb-1" id="preview_name">Nombre Apellido</h5>
+                <p class="card-text mb-0 text-muted"><small id="preview_email">email@ejemplo.com</small></p>
+              </div>
+            </div>
+          </div>
+
+          <div id="new_client_form" class="d-none">
+            <div class="mb-3">
+              <label class="form-label">Email *</label>
+              <%= email_field_tag "new_client[email]", nil, class: "form-control", placeholder: "email@nuevo.com" %>
+            </div>
+            <div class="row">
+              <div class="col-6 mb-3">
+                <label class="form-label">Nombre *</label>
+                <%= text_field_tag "new_client[name]", nil, class: "form-control" %>
+              </div>
+              <div class="col-6 mb-3">
+                <label class="form-label">Apellido *</label>
+                <%= text_field_tag "new_client[lastname]", nil, class: "form-control" %>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-4 mb-3">
+                <label class="form-label">Tipo *</label>
+                <%= select_tag "new_client[document_type]", options_for_select(['DNI', 'LC', 'LE', 'PASAPORTE']), class: "form-select" %>
+              </div>
+              <div class="col-8 mb-3">
+                <label class="form-label">Documento *</label>
+                <%= text_field_tag "new_client[document_number]", nil, class: "form-control" %>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <%= f.submit "Confirmar y Finalizar", class: "btn btn-success", id: "submit_btn" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<script>
+  function toggleClientForm() {
+    const isNew = document.getElementById('mode_new').checked;
+    const existingForm = document.getElementById('existing_client_form');
+    const newForm = document.getElementById('new_client_form');
+    const submitBtn = document.getElementById('submit_btn');
+
+    if (isNew) {
+      existingForm.classList.add('d-none');
+      newForm.classList.remove('d-none');
+      submitBtn.disabled = false; 
+    } else {
+      existingForm.classList.remove('d-none');
+      newForm.classList.add('d-none');
+    
+      const isPreviewVisible = !document.getElementById('client_preview').classList.contains('d-none');
+      submitBtn.disabled = !isPreviewVisible;
+    }
+  }
+
+ 
+  function searchClient() {
+    const dni = document.getElementById('dni_input').value;
+    const errorDiv = document.getElementById('search_error');
+    const previewDiv = document.getElementById('client_preview');
+    const submitBtn = document.getElementById('submit_btn');
+    
+    errorDiv.classList.add('d-none');
+    previewDiv.classList.add('d-none');
+    submitBtn.disabled = true;
+
+    if (!dni) return;
+
+    
+    fetch(`/admin/clients/search_by_document?number=${dni}`)
+      .then(response => response.json())
+      .then(data => {
+        if (data.found) {
+          
+          document.getElementById('preview_name').textContent = `${data.name} ${data.lastname}`;
+          document.getElementById('preview_email').textContent = data.email;
+          
+          previewDiv.classList.remove('d-none');
+          submitBtn.disabled = false; 
+        } else {
+          
+          errorDiv.classList.remove('d-none');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert("Ocurrió un error al buscar el cliente.");
+      });
+  }
+  
+  document.addEventListener("turbo:load", function() {
+     const isNew = document.getElementById('mode_new').checked;
+     if (!isNew) document.getElementById('submit_btn').disabled = true;
+  });
+</script>

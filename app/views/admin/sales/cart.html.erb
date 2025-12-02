@@ -53,10 +53,10 @@
               class: "btn btn-outline-secondary",
               data: { confirm: "¿Vaciar todo el carrito?" } %>
           
-          <%= button_to "Confirmar Venta", 
-              admin_sales_path, 
-              method: :post, 
-              class: "btn btn-success btn-lg" %>
+          <button type="button" class="btn btn-success btn-lg" data-bs-toggle="modal" data-bs-target="#clientModal">
+            Confirmar Venta
+          </button>
+          <%= render 'client_modal' %>
         </div>
       </div>
     </div>

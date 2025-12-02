@@ -23,7 +23,7 @@ Rails.application.routes.draw do
         patch :reactivate
       end
     end
-    
+
     resources :sales do
       collection do
         get :cart
@@ -32,18 +32,24 @@ Rails.application.routes.draw do
         delete :clear_cart
       end
     end
-    
-    resources :disks, only: [:index]
+
+    resources :disks, only: [ :index ]
     resources :disks do
       member do
         patch :change_stock
       end
     end
+
+    resources :clients do
+      collection do
+        get :search_by_document
+      end
+    end
   end
 
   namespace :disk do
-    resources :new,  only: [:index, :show]
-    resources :used, only: [:index, :show]
+    resources :new,  only: [ :index, :show ]
+    resources :used, only: [ :index, :show ]
   end
 
   get "up" => "rails/health#show", as: :rails_health_check
