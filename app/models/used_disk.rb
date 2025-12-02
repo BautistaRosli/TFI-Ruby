@@ -22,6 +22,6 @@ class UsedDisk < Disk
     end
   end
 
-  def update_stock_on_delete
-  end
+  # def update_stock_on_delete
+  # end
 end
