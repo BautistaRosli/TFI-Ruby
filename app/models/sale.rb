@@ -3,6 +3,8 @@ class Sale < ApplicationRecord
   # depends indica que si se borra una venta, se borran sus items asociados, como el borrado es lógico, no pongo el destroy
   has_many :items
 
+  has_many :disks, through: :items
+
   # Callbacks
   before_create :validate_and_decrease_stock
   after_update :return_stock, if: :saved_change_to_deleted?
@@ -13,13 +15,6 @@ class Sale < ApplicationRecord
   # relaciones (a implementar)
   belongs_to :user
   # belongs_to :customer
-
-  scope :revenue_by_week, -> {
-    where(deleted: false).
-    group_by_week(:created_at).
-    sum(:total_amount)
-  }
-
 
   private
 
@@ -61,4 +56,39 @@ class Sale < ApplicationRecord
       end
     end
   end
+
+  # Scope para uso en gráficos
+
+  scope :users_by_account_of_sales, -> {
+  joins(:user)
+  .where(deleted: [ false, nil ])
+  .group(" users.id || ' ' || users.name || ' ' || users.lastname")
+  .count
+  .sort_by { |_k, v| -v }
+  .first(10)
+  }
+
+  scope :revenue_by_week, -> {
+    where(deleted: false).
+    group_by_week(:created_at).
+    sum(:total_amount)
+  }
+
+  scope :sales_from_cd, -> {
+    joins(:disks)
+    .where(disks: { format: "CD" })
+    .count
+  }
+
+  scope :sales_from_vinilo, -> {
+    joins(:disks)
+    .where(disks: { format: "vinilo" })
+    .count
+  }
+
+  scope :average_sale_value_by_day, -> {
+  where(deleted: [ false, nil ])
+  .group_by_day(:created_at)
+  .average(:total_amount)
+}
 end

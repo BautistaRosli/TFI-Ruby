@@ -10,6 +10,7 @@ class Ability
       can :read, :all
       can :update, User, role: [ :employee, :manager ]
       can :create, User, role: [ :employee, :manager ]
+      can :analize, :admin_graphics_path
     elsif user.employee?
       can :read, :all
       can :update, User, id: user.id

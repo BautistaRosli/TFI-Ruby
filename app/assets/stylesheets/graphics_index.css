@@ -1,0 +1,182 @@
+:root {
+    --primary-color: #2563eb;
+    --primary-dark: #1e40af;
+    --secondary-color: #64748b;
+    --success-color: #059669;
+    --danger-color: #dc2626;
+    --warning-color: #f59e0b;
+    --info-color: #3b82f6;
+    --light-bg: #f8fafc;
+    --card-bg: #ffffff;
+    --border-color: #e2e8f0;
+    --text-primary: #1e293b;
+    --text-secondary: #64748b;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+
+.admin-header {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+    color: white;
+    padding: 2.5rem 2rem;
+    box-shadow: var(--shadow-lg);
+    margin: 0;
+    width: 100%;
+}
+
+.header-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+.header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 2rem;
+}
+
+.header-buttons {
+    display: flex;
+    gap: 1rem;
+}
+
+.header-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: white;
+    margin: 0;
+}
+
+.header-subtitle {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.9);
+    margin: 0.25rem 0 0 0;
+}
+
+
+.admin-main {
+    max-width: 1200px;
+
+    width: 90%;
+    /* Ocupa el 90% del ancho disponible */
+    margin: 3rem auto;
+    /* Centrado horizontal y margen superior/inferior */
+    padding: 0;
+    /* El padding lo maneja el width */
+
+    /* Grid para separar los gráficos entre sí automáticamente */
+    display: grid;
+    grid-template-columns: 1fr;
+    /* Una columna por defecto */
+    gap: 2.5rem;
+
+}
+
+/* 2. Estilo de las Tarjetas (Cards) */
+.card {
+    background-color: var(--card-bg);
+    border-radius: 16px;
+    /* Bordes redondeados modernos */
+    box-shadow: var(--shadow-md);
+    /* Sombra suave */
+    padding: 2rem;
+    /* Espacio interno para que el gráfico no toque el borde de la tarjeta */
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    /* Borde sutil */
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    /* Pequeño efecto al pasar el mouse */
+    box-shadow: var(--shadow-lg);
+}
+
+.card h3 {
+    color: var(--text-primary);
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+    border-left: 4px solid var(--primary-color);
+    /* Detalle visual al lado del título */
+    padding-left: 1rem;
+}
+
+/* 3. Layout de 2 columnas para pantallas grandes */
+@media (min-width: 992px) {
+    .admin-main {
+        grid-template-columns: repeat(2, 1fr);
+        /* 2 columnas iguales */
+    }
+
+    /* Clases utilitarias si quieres que un gráfico ocupe todo el ancho */
+    .card.full-width {
+        grid-column: span 2;
+    }
+}
+
+/* Flash Messages y Alertas */
+.flash-messages {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    max-width: 400px;
+}
+
+.flash-notifications {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.alert {
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Botones */
+.btn-logout {
+    padding: 0.75rem 1.5rem;
+    background: white;
+    color: var(--primary-dark);
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-logout:hover {
+    background: rgba(255, 255, 255, 0.9);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.3);
+    color: #667eea;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+}

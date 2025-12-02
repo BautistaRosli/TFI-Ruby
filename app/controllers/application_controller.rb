@@ -15,9 +15,11 @@ class ApplicationController < ActionController::Base
 
   rescue_from CanCan::AccessDenied do |exception|
     previous_url = request.referer || root_path
-
-    flash[:alert] = "No tenés permisos para acceder a esa página."
-
+    if current_user # Si no estas logeado no te digo que rutas existen, para mas "seguridad".
+      flash[:alert] = "No tenés permisos para acceder a esa página."
+    else
+      flash[:alert] = "El recurso que estás buscando no existe."
+    end
     redirect_to previous_url
   end
 

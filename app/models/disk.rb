@@ -2,7 +2,7 @@ class Disk < ApplicationRecord
   # Attach images (needs Active Storage tables)
   has_many_attached :images
   has_many :items
-  
+
   has_one_attached :cover
 
   has_many :items
@@ -12,7 +12,7 @@ class Disk < ApplicationRecord
   validates :name, presence: true
   validates :unit_price, numericality: { greater_than_or_equal_to: 0 }
   validates :format, inclusion: { in: %w[vinilo CD], allow_nil: true }
-  
+
 
   scope :active, -> { where(deleted_at: nil) }
   scope :deleted, -> { where.not(deleted_at: nil) }
@@ -36,8 +36,18 @@ class Disk < ApplicationRecord
   end
 
   scope :sold_in_active_sales, -> {
-    joins(:sales)
+    joins(items: :sale)
     .where(sales: { deleted: [ false, nil ] })
-    .distinct
+    .group(:name)
+    .sum("items.units_sold")
+    .sort_by { |_k, v| -v }
+    .first(10)
   }
+
+  scope :category_sold, -> {
+  joins(:items, :sales)
+  .where(sales: { deleted: [ false, nil ] })
+  .group(:category)
+  .sum("items.units_sold")
+}
 end
