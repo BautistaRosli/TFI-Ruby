@@ -64,7 +64,7 @@
                         <div class="card-icon">💿</div>
                         <h2 class="card-title">Administración de Discos</h2>
                         <p class="card-description">Gestiona tu catálogo de música</p>
-                        <a href="#" class="btn btn-primary btn-lg">Acceder</a> <!-- Cambiar a boton usando ruby -->
+                        <%= button_to "Acceder", admin_disks_path, method: :get, class: "btn btn-primary btn-lg" %>
                     </div>
                 </div>
             </div>

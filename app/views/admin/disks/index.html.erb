@@ -1,55 +1,125 @@
-<div class="container mt-4">
-  <div class="d-flex justify-content-between align-items-center mb-4">
+<% content_for :title, "Discos - Disquería" %>
+<% content_for :page_title, "Administración de Discos" %>
+<% content_for :stylesheets do %>
+  <%= stylesheet_link_tag 'disks', media: 'all' %>
+<% end %>
+
+<% is_sale_mode = params[:from] == "sale" %>
+<% disk_list = is_sale_mode ? @sales_disks : @disks %>
+
+<%# Header con botones cuando viene de ventas %>
+<% if is_sale_mode %>
+  <div class="disks-header">
     <h1>Seleccionar Discos para la Venta</h1>
-    <div>
-      <%= link_to cart_admin_sales_path, class: "btn btn-primary me-2" do %>
-        <i class="bi bi-cart3"></i> 
+    <div class="disks-actions">
+      <%= link_to cart_admin_sales_path, class: "btn btn-primary btn-cart" do %>
+          <i class="bi bi-cart3"></i> 
           Ver Carrito
           <% if session[:cart] && session[:cart]['items'] %>
             (<%= session[:cart]['items'].size %>)
           <% end %>    
-      <% end %>
-      <%= link_to "Volver a Ventas", admin_sales_path, class: "btn btn-secondary" %>
+        <% end %>
+        <%= link_to "Volver a Ventas", admin_sales_path, class: "btn btn-outline" %>
+      </div>
     </div>
+<% else %>
+  <div class="disks-header">
+    <h1>Administración de Discos</h1>
   </div>
+<% end %>
 
-  <% if @disks.any? %>
-    <div class="row">
-      <% @disks.each do |disk| %>
-        <div class="col-md-6 col-lg-4 mb-4">
-          <div class="card h-100">
-            <div class="card-body">
-              <h5 class="card-title"><%= disk.name %></h5>
-              <p class="card-text">
-                <strong>Precio:</strong> $<%= number_with_precision(disk.unit_price, precision: 2) %><br>
-                <strong>Stock:</strong> <%= disk.stock %> unidades<br>
-                <strong>Formato:</strong> <span class="badge bg-info"><%= disk.format %></span>
-              </p>
-              
-              <%= form_with url: add_item_admin_sales_path, method: :post, class: "mt-3" do |f| %>
+<%# Grid de discos %>
+<% if disk_list && disk_list.any? %>
+  <div class="container">
+    <div class="disks-grid">
+      <% disk_list.each do |disk| %>
+        <div class="disk-card-wrapper">
+          <%# Botón eliminar solo en modo admin %>
+          <% unless is_sale_mode %>
+            <%= button_to admin_disk_path(disk),
+                  method: :delete,
+                  class: "btn-delete-corner",
+                  form: { data: { confirm: "¿Dar de baja este disco?" } } do %>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+              </svg>
+            <% end %>
+          <% end %>
+
+          <div class="disk-card">
+            <%= link_to admin_disk_path(disk), class: "disk-card-link" do %>
+              <%# Portada %>
+              <div class="disk-media">
+                <% if disk.respond_to?(:cover) && disk.cover.attached? %>
+                  <% if disk.cover.variable? %>
+                    <%= image_tag url_for(disk.cover.variant(resize_to_limit: [180,180])), alt: disk.name, class: "disk-cover-img" %>
+                  <% else %>
+                    <%= image_tag url_for(disk.cover), alt: disk.name, class: "disk-cover-img" %>
+                  <% end %>
+                <% else %>
+                  <%= image_tag "/tony/tony#{rand(1..5)}.png", alt: "Imagen", class: "disk-cover-img fallback-img" %>
+                <% end %>
+              </div>
+
+              <%# Info del disco %>
+              <div class="disk-info">
+                <h3 class="disk-name"><%= disk.name %></h3>
+                <p class="disk-detail"><%= disk.author.presence || '—' %></p>
+                <% if disk.category.present? %>
+                  <span class="disk-date"><%= disk.category %></span>
+                <% end %>
+                <p class="disk-amount">$<%= number_with_precision(disk.unit_price.to_f, precision: 2) %></p>
+                <% units = disk.stock.to_i %>
+                <p class="disk-stock">Stock: <%= units %></p>
+              </div>
+            <% end %>
+
+            <%# Formulario agregar solo en modo venta %>
+            <% if is_sale_mode %>
+              <%= form_with url: add_item_admin_sales_path, method: :post, class: "disk-add-form" do |f| %>
                 <%= f.hidden_field :disk_id, value: disk.id %>
-                <div class="input-group">
-                  <%= f.number_field :units_sold, 
-                      value: 1, 
-                      min: 1, 
-                      max: disk.stock,
-                      class: "form-control", 
-                      placeholder: "Cantidad" %>
-                  <%= f.submit "Agregar", class: "btn btn-success" %>
+                <div class="disk-add-controls">
+                  <% max_units = disk.stock.to_i %>
+                  <%= f.number_field :units_sold,
+                      value: 1,
+                      min: 1,
+                      max: [max_units, 1].max,
+                      class: "disk-quantity" %>
+                  <%= f.submit "Agregar", class: "btn-sale-action btn-add", disabled: max_units <= 0 %>
                 </div>
               <% end %>
-            </div>
+            <% end %>
           </div>
         </div>
       <% end %>
     </div>
 
-    <div class="d-flex justify-content-center mt-4">
-      <%= paginate @disks %>
+    <div class="pagination-wrap">
+      <%= paginate disk_list, param_name: is_sale_mode ? :sales_page : :page %>
     </div>
-  <% else %>
-    <div class="alert alert-info">
-      No hay discos disponibles con stock en este momento.
+  </div>
+<% else %>
+  <div class="container">
+    <div class="no-disks-message">
+      <h4><%= is_sale_mode ? "No hay discos disponibles" : "No hay discos en el catálogo" %></h4>
+      <p>
+        <% if is_sale_mode %>
+          No hay discos con stock disponible.
+          <%= link_to "Volver a Ventas", admin_sales_path, class: "btn btn-outline" %>
+        <% else %>
+          Puedes agregar discos nuevos o usados desde el botón "Nuevo disco".
+        <% end %>
+      </p>
     </div>
-  <% end %>
-</div>
+  </div>
+<% end %>
+
+<%# Botón crear disco solo en modo admin %>
+<% unless is_sale_mode %>
+  <div class="create-disk-button-container">
+    <%= link_to new_admin_disk_path, class: 'btn btn-primary' do %>
+      <i class="bi bi-plus-circle"></i> Nuevo Disco
+    <% end %>
+  </div>
+<% end %>
