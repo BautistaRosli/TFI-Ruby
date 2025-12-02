@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_11_26_181453) do
+ActiveRecord::Schema[8.0].define(version: 2025_11_29_015432) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -71,11 +71,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_26_181453) do
   create_table "sales", force: :cascade do |t|
     t.datetime "datetime"
     t.decimal "total_amount"
-    t.integer "employee_id"
     t.integer "customer_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.boolean "deleted"
+    t.integer "user_id", null: false
+    t.index ["user_id"], name: "index_sales_on_user_id"
   end
 
   create_table "users", force: :cascade do |t|
@@ -97,4 +98,5 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_26_181453) do
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "items", "sales"
+  add_foreign_key "sales", "users"
 end

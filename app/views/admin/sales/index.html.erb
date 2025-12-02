@@ -30,7 +30,7 @@
 
                         <div class="sale-info">
                             <h3 class="sale-name">Venta #<%= sale.id %></h3>
-                            <p class="sale-detail">Empleado ID: <%= sale.employee_id || 'N/A' %></p>
+                            <p class="sale-detail">Empleado ID: <%= sale.user_id || 'N/A' %></p>
                             <p class="sale-detail">Cliente ID: <%= sale.customer_id || 'N/A' %></p>
                             <p class="sale-amount">Total: $<%= number_with_precision(sale.total_amount, precision: 2) %></p>
                             <span class="sale-date"><%= sale.datetime&.strftime("%d/%m/%Y %H:%M") || sale.created_at.strftime("%d/%m/%Y %H:%M") %></span>

@@ -23,8 +23,17 @@ Rails.application.routes.draw do
         patch :reactivate
       end
     end
-
-    resources :sales 
+    
+    resources :sales do
+      collection do
+        get :cart
+        post :add_item
+        delete :remove_item
+        delete :clear_cart
+      end
+    end
+    
+    resources :disks, only: [:index]
     resources :disks do
       member do
         patch :change_stock
