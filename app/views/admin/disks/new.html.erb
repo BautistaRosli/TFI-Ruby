@@ -1,0 +1,10 @@
+<% content_for :title, "Nuevo disco - Disquería" %>
+<% content_for :page_title, "Nuevo disco" %>
+<% content_for :stylesheets do %>
+  <%= stylesheet_link_tag 'disks', media: 'all' %>
+<% end %>
+
+<div class="admin-page admin-disks-new">
+  <h1>Nuevo disco</h1>
+  <%= render 'form' %>
+</div>

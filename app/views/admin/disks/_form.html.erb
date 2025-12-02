@@ -1,0 +1,190 @@
+<% form_url = @disk.persisted? ? admin_disk_path(@disk) : admin_disks_path %>
+<% form_method = @disk.persisted? ? :patch : :post %>
+
+<%= form_with model: [:admin, @disk], url: form_url, method: form_method, local: true, html: { multipart: true } do |f| %>
+  <div id="attachment_errors" class="errors" style="display:none; color: #a94442; margin-bottom:8px;"></div>
+
+  <% if @disk.errors.any? %>
+    <div class="errors">
+      <h3><%= pluralize(@disk.errors.count, "error") %> impiden guardar</h3>
+      <ul>
+        <% @disk.errors.full_messages.each do |m| %>
+          <li><%= m %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :type, "Estado" %>
+    <%= f.select :type, options_for_select([['Nuevo', 'NewDisk'], ['Usado', 'UsedDisk']], @disk.type), {}, { class: 'form-control', id: 'disk_type_select' } %>
+  </div>
+
+  <div class="field">
+    <%= f.label :name, "Nombre" %>
+    <%= f.text_field :name, class: 'form-control' %>
+  </div>
+
+  <div class="field">
+    <%= f.label :author, "Autor / Artista" %>
+    <%= f.text_field :author, class: 'form-control' %>
+  </div>
+
+  <div class="field">
+    <%= f.label :description, "Descripción" %>
+    <%= f.text_area :description, class: 'form-control' %>
+  </div>
+
+  <div class="field">
+    <%= f.label :unit_price, "Precio unitario" %>
+    <%= f.number_field :unit_price, step: 0.01, class: 'form-control' %>
+  </div>
+
+  <% genres = ['Rock', 'Pop', 'Jazz', 'Blues', 'Metal', 'Folk', 'Reggae', 'Electronic', 'Hip-Hop', 'Classical', 'Country', 'Latino'] %>
+  <div class="field">
+    <%= f.label :category, "Género" %>
+    <%= f.select :category,
+          options_for_select(genres, @disk.category),
+          { include_blank: 'Seleccionar género' },
+          { class: 'form-control' } %>
+  </div>
+
+  <div class="field">
+    <%= f.label :format, "Formato" %>
+    <%= f.select :format, options_for_select([['vinilo','vinilo'], ['CD','CD']], @disk.format), {}, class: 'form-control' %>
+  </div>
+
+  <div class="field">
+    <%= f.label :date_ingreso, "Fecha de ingreso" %>
+    <%= f.datetime_field :date_ingreso, value: (@disk.date_ingreso || Time.current), class: 'form-control' %>
+  </div>
+
+  <% stock_style = (@disk.is_a?(NewDisk) || @disk.type == 'NewDisk') ? '' : 'display:none;' %>
+  <div id="stock_field_wrapper" class="field" style="<%= stock_style %>">
+    <%= f.label :stock, "Stock" %>
+    <%= f.number_field :stock, class: 'form-control', min: 0 %>
+  </div>
+
+  <div class="field">
+    <%= f.label :cover, "Portada (cover)" %>
+    <%= f.file_field :cover, accept: 'image/*' %>
+    <% if @disk.cover.attached? %>
+      <div class="current-cover">
+        <%= image_tag @disk.cover.variant(resize_to_limit: [200,200]), alt: 'cover' %>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="field">
+    <%= f.label :images, "Imágenes (puede subir varias)" %>
+    <%= f.file_field :images, multiple: true, accept: 'image/*' %>
+    <% if @disk.images.attached? %>
+      <div class="current-images">
+        <% @disk.images.each do |img| %>
+          <%= image_tag img.variant(resize_to_limit: [100,100]), alt: 'img' %>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+
+  <% audio_style = (@disk.is_a?(UsedDisk) || @disk.type == 'UsedDisk') ? '' : 'display:none;' %>
+  <div id="audio_field_wrapper" class="field" style="<%= audio_style %>">
+    <%= f.label :audio, "Audio de muestra (solo usados)" %>
+    <%= f.file_field :audio, accept: 'audio/*' %>
+    <% if @disk.respond_to?(:audio) && @disk.audio.attached? %>
+      <audio controls>
+        <source src="<%= url_for(@disk.audio) %>" type="<%= @disk.audio.blob.content_type %>">
+      </audio>
+    <% end %>
+  </div>
+
+  <div class="actions">
+    <%= f.submit 'Crear Disco', class: 'btn-primary', id: 'disk_form_submit' %>
+    <%= link_to 'Volver', admin_disks_path, class: 'btn-outline' %>
+  </div>
+<% end %>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  var typeSelect = document.getElementById('disk_type_select');
+  if (typeSelect) {
+    var stockWrapper = document.getElementById('stock_field_wrapper');
+    var audioWrapper = document.getElementById('audio_field_wrapper');
+    function updateFields() {
+      if (typeSelect.value === 'NewDisk') {
+        if (stockWrapper) stockWrapper.style.display = '';
+        if (audioWrapper) audioWrapper.style.display = 'none';
+      } else if (typeSelect.value === 'UsedDisk') {
+        if (stockWrapper) stockWrapper.style.display = 'none';
+        if (audioWrapper) audioWrapper.style.display = '';
+      }
+    }
+    updateFields();
+    typeSelect.addEventListener('change', updateFields);
+  }
+
+  // frontend attachment validation
+  var form = document.querySelector('form');
+  if (!form) return;
+
+  var allowedImageTypes = ['image/png','image/jpeg','image/jpg','image/webp','image/gif'];
+  var allowedAudioTypes = ['audio/mpeg','audio/mp3','audio/wav','audio/ogg','audio/flac'];
+  var maxImageSize = 5 * 1024 * 1024; // 5MB
+  var maxAudioSize = 10 * 1024 * 1024; // 10MB
+  var errorsDiv = document.getElementById('attachment_errors');
+
+  function validateFiles() {
+    var errs = [];
+    var coverInput = document.querySelector('input[type="file"][name*="[cover]"]');
+    var imagesInput = document.querySelector('input[type="file"][name*="[images]"]');
+    var audioInput = document.querySelector('input[type="file"][name*="[audio]"]');
+
+    function checkFile(file, allowedTypes, maxSize, label) {
+      if (!file) return;
+      if (allowedTypes.indexOf(file.type) === -1) {
+        errs.push(label + ": formato no permitido (" + file.type + ")");
+      }
+      if (file.size > maxSize) {
+        errs.push(label + ": tamaño mayor a " + (maxSize/1024/1024) + "MB");
+      }
+    }
+
+    if (coverInput && coverInput.files.length > 0) {
+      checkFile(coverInput.files[0], allowedImageTypes, maxImageSize, 'Portada');
+    }
+
+    if (imagesInput && imagesInput.files.length > 0) {
+      Array.from(imagesInput.files).forEach(function(f, idx){
+        if (f.size === 0) return; // ignore empty placeholders
+        checkFile(f, allowedImageTypes, maxImageSize, 'Imagen #' + (idx+1));
+      });
+    }
+
+    if (audioInput && audioInput.files.length > 0) {
+      checkFile(audioInput.files[0], allowedAudioTypes, maxAudioSize, 'Audio');
+    }
+
+    // require at least one image if neither cover nor images provided
+    var hasCover = coverInput && coverInput.files.length > 0;
+    var hasImages = imagesInput && Array.from(imagesInput.files).some(function(f){ return f.size > 0; });
+    if (!hasCover && !hasImages) {
+      errs.push('Debe adjuntar al menos una imagen (portada o imágenes)');
+    }
+
+    return errs;
+  }
+
+  form.addEventListener('submit', function (e) {
+    var errs = validateFiles();
+    if (errs.length > 0) {
+      e.preventDefault();
+      errorsDiv.style.display = 'block';
+      errorsDiv.innerHTML = '<ul><li>' + errs.join('</li><li>') + '</li></ul>';
+      window.scrollTo({ top: errorsDiv.getBoundingClientRect().top + window.scrollY - 20, behavior: 'smooth' });
+      return false;
+    } else {
+      errorsDiv.style.display = 'none';
+    }
+  });
+});
+</script>

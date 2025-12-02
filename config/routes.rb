@@ -34,6 +34,11 @@ Rails.application.routes.draw do
     end
     
     resources :disks, only: [:index]
+    resources :disks do
+      member do
+        patch :change_stock
+      end
+    end
   end
 
   namespace :disk do
