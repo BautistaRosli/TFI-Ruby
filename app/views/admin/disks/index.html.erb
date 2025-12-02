@@ -29,17 +29,22 @@
               <h5 class="card-title"><%= disk.name %></h5>
               <p class="card-text">
                 <strong>Precio:</strong> $<%= number_with_precision(disk.unit_price.to_f, precision: 2) %><br>
-                <strong>Stock:</strong> <%= disk.stock.to_i %> unidades<br>
+                <% if disk.is_a?(NewDisk) %>
+                  <strong>Stock:</strong> <%= disk.stock.to_i %> unidades<br>
+                <% else %>
+                  <strong>Disponibles:</strong> 1 (usado)<br>
+                <% end %>
                 <strong>Formato:</strong> <span class="badge bg-info"><%= disk.format.presence || '—' %></span>
               </p>
 
               <%= form_with url: add_item_admin_sales_path, method: :post, class: "mt-3", local: true do |f| %>
                 <%= f.hidden_field :disk_id, value: disk.id %>
                 <div class="input-group">
+                  <% max_qty = disk.is_a?(NewDisk) ? disk.stock.to_i : 1 %>
                   <%= f.number_field :units_sold,
                       value: 1,
                       min: 1,
-                      max: [disk.stock.to_i, 1].max,
+                      max: [max_qty, 1].max,
                       class: "form-control",
                       placeholder: "Cantidad" %>
                   <%= f.submit "Agregar", class: "btn btn-success" %>

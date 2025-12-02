@@ -12,9 +12,13 @@ class Admin::DisksController < ApplicationController
     @disks = Disk.with_attached_cover.with_attached_images.where(deleted_at: nil)
                .order(:name).page(params[:page]).per(10)
 
-    # Colección separada para la sección "Seleccionar Discos para la Venta"
-    @sales_disks = Disk.with_attached_cover.with_attached_images.where(deleted_at: nil)
-                     .where('stock > 0').order(:name).page(params[:sales_page]).per(12)
+    # incluir discos usados (stock IS NULL) y discos nuevos con stock > 0
+    @sales_disks = Disk.with_attached_cover.with_attached_images
+                     .where(deleted_at: nil)
+                     .where("stock IS NULL OR stock > 0")
+                     .order(:name)
+                     .page(params[:sales_page])
+                     .per(12)
 
     # Info del carrito para la vista (provista por el concern)
     @cart_items_count = cart_items_count
