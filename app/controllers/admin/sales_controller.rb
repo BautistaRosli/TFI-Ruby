@@ -1,5 +1,7 @@
 class Admin::SalesController < ApplicationController
   include CartManagement
+  before_action :authenticate_user!
+  
   # alias al método del concern antes de definir la acción con el mismo nombre
   alias_method :clear_cart_session, :clear_cart
 
@@ -28,7 +30,7 @@ class Admin::SalesController < ApplicationController
   
   def new
     initialize_cart
-    redirect_to admin_disks_path, notice: "Selecciona discos para agregar a la venta"
+    redirect_to admin_disks_path(from: "sale"), notice: "Selecciona discos para agregar a la venta"
   end
 
   def cart
@@ -43,14 +45,14 @@ class Admin::SalesController < ApplicationController
     # Validar stock usando el concern (ya considera unidades en carrito)
     validation = validate_stock(disk, units)
     unless validation[:valid]
-      redirect_to admin_disks_path, alert: validation[:message]
+      redirect_to admin_disks_path(from: "sale"), alert: validation[:message]
       return
     end
     
     # Agregar al carrito usando el concern
     add_to_cart(disk, units)
     
-    redirect_to admin_disks_path, notice: "#{disk.name} agregado al carrito"
+    redirect_to admin_disks_path(from: "sale"), notice: "#{disk.name} agregado al carrito"
   end
 
   def remove_item

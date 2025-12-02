@@ -11,6 +11,8 @@
   --shadow: 0 6px 18px rgba(2,6,23,0.6);
   --glass-border: rgba(255,255,255,0.06);
   --transition: 220ms cubic-bezier(.2, .9, .3, 1);
+  --primary-color: #2563eb;
+  --primary-dark: #1e40af;
 }
 
 html, body {
@@ -314,6 +316,16 @@ body.disks-layout {
 .btn-primary:hover {
   transform: translateY(-3px);
   box-shadow: 0 10px 28px rgba(255,107,107,0.12);
+}
+
+/* Estilo azul para el botón del carrito */
+.btn-cart {
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+}
+
+.btn-cart:hover {
+  background: linear-gradient(135deg, var(--primary-dark), #1e3a8a) ;
+  box-shadow: 0 10px 28px rgba(37, 99, 235, 0.3) ;
 }
 
 /* outline button style (links styled as buttons) */
