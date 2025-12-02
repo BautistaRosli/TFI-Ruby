@@ -1,39 +1,46 @@
-<div class="container mt-4">
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>Seleccionar Discos para la Venta</h1>
-    <div>
-      <%= link_to cart_admin_sales_path, class: "btn btn-primary me-2" do %>
-        <i class="bi bi-cart3"></i> 
+<% content_for :title, "Discos - Disquería" %>
+<% content_for :page_title, "Administración de Discos" %>
+<% content_for :stylesheets do %>
+  <%= stylesheet_link_tag 'disks', media: 'all' %>
+<% end %>
+
+<%# --- Sección: seleccionar discos para la venta (muestra sólo con stock) --- %>
+<% if @sales_disks.present? && @sales_disks.any? %>
+  <div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h1>Seleccionar Discos para la Venta</h1>
+      <div>
+        <%= link_to cart_admin_sales_path, class: "btn btn-primary me-2" do %>
+          <i class="bi bi-cart3"></i> 
           Ver Carrito
           <% if session[:cart] && session[:cart]['items'] %>
             (<%= session[:cart]['items'].size %>)
           <% end %>    
-      <% end %>
-      <%= link_to "Volver a Ventas", admin_sales_path, class: "btn btn-secondary" %>
+        <% end %>
+        <%= link_to "Volver a Ventas", admin_sales_path, class: "btn btn-secondary" %>
+      </div>
     </div>
-  </div>
 
-  <% if @disks.any? %>
     <div class="row">
-      <% @disks.each do |disk| %>
+      <% @sales_disks.each do |disk| %>
         <div class="col-md-6 col-lg-4 mb-4">
           <div class="card h-100">
             <div class="card-body">
               <h5 class="card-title"><%= disk.name %></h5>
               <p class="card-text">
-                <strong>Precio:</strong> $<%= number_with_precision(disk.unit_price, precision: 2) %><br>
-                <strong>Stock:</strong> <%= disk.stock %> unidades<br>
-                <strong>Formato:</strong> <span class="badge bg-info"><%= disk.format %></span>
+                <strong>Precio:</strong> $<%= number_with_precision(disk.unit_price.to_f, precision: 2) %><br>
+                <strong>Stock:</strong> <%= disk.stock.to_i %> unidades<br>
+                <strong>Formato:</strong> <span class="badge bg-info"><%= disk.format.presence || '—' %></span>
               </p>
-              
-              <%= form_with url: add_item_admin_sales_path, method: :post, class: "mt-3" do |f| %>
+
+              <%= form_with url: add_item_admin_sales_path, method: :post, class: "mt-3", local: true do |f| %>
                 <%= f.hidden_field :disk_id, value: disk.id %>
                 <div class="input-group">
-                  <%= f.number_field :units_sold, 
-                      value: 1, 
-                      min: 1, 
-                      max: disk.stock,
-                      class: "form-control", 
+                  <%= f.number_field :units_sold,
+                      value: 1,
+                      min: 1,
+                      max: [disk.stock.to_i, 1].max,
+                      class: "form-control",
                       placeholder: "Cantidad" %>
                   <%= f.submit "Agregar", class: "btn btn-success" %>
                 </div>
@@ -45,20 +52,12 @@
     </div>
 
     <div class="d-flex justify-content-center mt-4">
-      <%= paginate @disks %>
+      <%= paginate @sales_disks, param_name: :sales_page %>
     </div>
-  <% else %>
-    <div class="alert alert-info">
-      No hay discos disponibles con stock en este momento.
-    </div>
-  <% end %>
-</div>
-<% content_for :title, "Discos - Disquería" %>
-<% content_for :page_title, "Administración de Discos" %>
-<% content_for :stylesheets do %>
-  <%= stylesheet_link_tag 'disks', media: 'all' %>
+  </div>
 <% end %>
 
+<%# --- Sección: administración de discos (grid) --- %>
 <div class="container">
   <div class="disks-hero">
     <div>
@@ -84,8 +83,12 @@
 
           <%= link_to admin_disk_path(disk), class: "card-link" do %>
             <div class="disk-media">
-              <% if disk.cover.attached? %>
-                <%= image_tag disk.cover.variant(resize_to_limit: [180,180]), alt: disk.name %>
+              <% if disk.respond_to?(:cover) && disk.cover.attached? %>
+                <% if disk.cover.variable? %>
+                  <%= image_tag url_for(disk.cover.variant(resize_to_limit: [180,180])), alt: disk.name %>
+                <% else %>
+                  <%= image_tag url_for(disk.cover), alt: disk.name %>
+                <% end %>
               <% else %>
                 <%= image_tag "/tony/tony#{rand(1..5)}.png", alt: "Imagen provisional", class: "fallback-img" %>
               <% end %>
@@ -100,7 +103,7 @@
             </div>
 
             <div class="disk-footer">
-              <div class="price">$<%= number_with_precision(disk.unit_price || 0, precision: 2) %></div>
+              <div class="price">$<%= number_with_precision(disk.unit_price.to_f || 0, precision: 2) %></div>
               <div class="actions">
                 <%= link_to 'Ver detalles', admin_disk_path(disk), class: 'btn-primary' %>
               </div>

@@ -1,28 +1,24 @@
 class Admin::DisksController < ApplicationController
   include CartManagement
-  
-  layout 'admin'
-  
-  def index
-    @disks = Disk.where(deleted_at: nil)
-                 .where('stock > ?', 0)
-                 .order(:name)
-                 .page(params[:page])
-                 .per(10)
-    
-    # Info del carrito para mostrar en la vista usando el concern
-    @cart_items_count = cart_items_count
-    @cart_total = cart_total
-  end
-end
-class Admin::DisksController < ApplicationController
+
   layout 'admin'
   before_action :set_disk, only: %i[show edit update destroy change_stock]
 
   ALLOWED_TYPES = %w[NewDisk UsedDisk].freeze
 
+  # index: por defecto muestra discos con stock > 0 ordenados por nombre (admin view),
+  # si se pasa ?view=recent muestra por creación (desc) con paginado diferente.
   def index
-    @disks = Disk.order(created_at: :desc).page(params[:page]).per(12)
+    @disks = Disk.with_attached_cover.with_attached_images.where(deleted_at: nil)
+               .order(:name).page(params[:page]).per(10)
+
+    # Colección separada para la sección "Seleccionar Discos para la Venta"
+    @sales_disks = Disk.with_attached_cover.with_attached_images.where(deleted_at: nil)
+                     .where('stock > 0').order(:name).page(params[:sales_page]).per(12)
+
+    # Info del carrito para la vista (provista por el concern)
+    @cart_items_count = cart_items_count
+    @cart_total = cart_total
   end
 
   def show; end
@@ -36,6 +32,7 @@ class Admin::DisksController < ApplicationController
     klass = ALLOWED_TYPES.include?(disk_type_param) ? disk_type_param.constantize : Disk
     @disk = klass.new(disk_params)
 
+    # attach BEFORE save so model validations can check attachments
     attach_optional_files(@disk)
 
     if @disk.save
@@ -49,19 +46,20 @@ class Admin::DisksController < ApplicationController
 
   def update
     if @disk.update(disk_params)
-      attach_optional_files(@disk)
+      attach_optional_files(@disk) # permitir agregar/actualizar attachments
       redirect_to admin_disk_path(@disk), notice: 'Disco actualizado correctamente'
     else
       render :edit, status: :unprocessable_entity
     end
   end
 
-  # Borrado lógico
+  # borrado lógico
   def destroy
-    @disk.soft_delete!
+    @disk.soft_delete! if @disk.respond_to?(:soft_delete!)
     redirect_to admin_disks_path, notice: 'Disco dado de baja (borrado lógico)'
   end
 
+  # cambiar stock (solo NewDisk)
   def change_stock
     unless @disk.is_a?(NewDisk)
       redirect_to admin_disk_path(@disk), alert: 'Solo se puede cambiar stock de discos nuevos' and return
@@ -78,13 +76,15 @@ class Admin::DisksController < ApplicationController
   private
 
   def set_disk
-    @disk = Disk.find(params[:id])
+    @disk = Disk.with_attached_cover.with_attached_images.find(params[:id])
   end
 
+  # Detectamos el tipo incluso si los params vienen como :new_disk / :used_disk
   def disk_type_param
     params.dig(:disk, :type) || params.dig(:new_disk, :type) || params.dig(:used_disk, :type)
   end
 
+  # Encuentra la key correcta (disk, new_disk, used_disk) para strong params/attachments
   def param_key
     key = params.keys.find { |k| k.to_s.match?(/(?:^|_)disk$/) } || 'disk'
     key.to_sym
@@ -111,7 +111,6 @@ class Admin::DisksController < ApplicationController
       disk.images.attach(imgs) if imgs.any?
     end
 
-    # audio
     if disk.is_a?(UsedDisk) && params.dig(pk, :audio).present?
       disk.audio.attach(params[pk][:audio])
     end

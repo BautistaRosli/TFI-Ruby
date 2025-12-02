@@ -55,7 +55,11 @@
 
     <div class="disk-show-media">
       <% if @disk.cover.attached? %>
-        <%= image_tag @disk.cover.variant(resize_to_limit: [400,400]), alt: @disk.name, class: 'disk-large-img' %>
+        <% if @disk.cover.variable? %>
+          <%= image_tag url_for(@disk.cover.variant(resize_to_limit: [400,400])), alt: @disk.name, class: 'disk-large-img' %>
+        <% else %>
+          <%= image_tag url_for(@disk.cover), alt: @disk.name, class: 'disk-large-img' %>
+        <% end %>
       <% else %>
         <%= image_tag '/tony/tony1.png', alt: 'Portada provisional', class: 'disk-large-img' %>
       <% end %>
@@ -63,7 +67,7 @@
       <% if @disk.images.attached? %>
         <div class="gallery">
           <% @disk.images.each do |img| %>
-            <%= image_tag img.variant(resize_to_limit: [120,120]) %>
+            <%= image_tag url_for(img.variant(resize_to_limit: [120,120])) %>
           <% end %>
         </div>
       <% end %>
