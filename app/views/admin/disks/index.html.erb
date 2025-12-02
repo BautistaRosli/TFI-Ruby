@@ -4,11 +4,18 @@
   <%= stylesheet_link_tag 'disks', media: 'all' %>
 <% end %>
 
-<div class="disks-container">
+<div class="container">
+  <div class="disks-hero">
+    <div>
+      <h1>Administración de Discos</h1>
+      <p class="muted">Gestiona el catálogo — nuevo y usado</p>
+    </div>
+  </div>
+
   <div class="disks-grid">
     <% if @disks && @disks.any? %>
       <% @disks.each do |disk| %>
-        <div class="disk-card-wrapper">
+        <div class="disk-card">
           <%= button_to admin_disk_path(disk),
                 method: :delete,
                 class: "btn-delete-corner",
@@ -20,21 +27,28 @@
             </svg>
           <% end %>
 
-          <%= link_to admin_disk_path(disk), class: "disk-card" do %>
-            <div class="disk-avatar">
+          <%= link_to admin_disk_path(disk), class: "card-link" do %>
+            <div class="disk-media">
               <% if disk.cover.attached? %>
-                <%= image_tag disk.cover.variant(resize_to_limit: [140,140]), alt: disk.name %>
+                <%= image_tag disk.cover.variant(resize_to_limit: [180,180]), alt: disk.name %>
               <% else %>
-                <%= image_tag '/tony/tony1.png', alt: 'sin portada', class: 'fallback-img' %>
+                <%= image_tag "/tony/tony#{rand(1..5)}.png", alt: "Imagen provisional", class: "fallback-img" %>
               <% end %>
             </div>
 
-            <div class="disk-info">
-              <h3 class="disk-name"><%= disk.name %></h3>
-              <p class="disk-meta"><%= disk.author.presence || '—' %> • <%= disk.category.presence || '—' %></p>
-              <p class="disk-price">Precio: $<%= number_with_precision(disk.unit_price, precision: 2) %></p>
-              <p class="disk-stock">Stock: <%= disk.stock.present? ? disk.stock : 'N/A' %></p>
-              <span class="disk-date">Ingresado: <%= disk.date_ingreso&.strftime("%d/%m/%Y") || disk.created_at.strftime("%d/%m/%Y") %></span>
+            <div class="disk-body">
+              <h3 class="disk-title"><%= disk.name %></h3>
+              <div class="disk-meta"><%= disk.author.presence || '—' %></div>
+              <% if disk.category.present? %>
+                <div class="tags"><span class="tag"><%= disk.category %></span></div>
+              <% end %>
+            </div>
+
+            <div class="disk-footer">
+              <div class="price">$<%= number_with_precision(disk.unit_price || 0, precision: 2) %></div>
+              <div class="actions">
+                <%= link_to 'Ver detalles', admin_disk_path(disk), class: 'btn-primary' %>
+              </div>
             </div>
           <% end %>
         </div>
@@ -46,13 +60,12 @@
       </div>
     <% end %>
   </div>
-</div>
 
-<div class="create-disk-buttons">
-  <%= button_to 'Nuevo disco (nuevo)', new_admin_disk_path(type: 'NewDisk'), method: :get, class: 'btn btn-primary' %>
-  <%= button_to 'Nuevo disco (usado)', new_admin_disk_path(type: 'UsedDisk'), method: :get, class: 'btn btn-secondary' %>
-</div>
+  <div class="pagination-wrap">
+    <%= paginate @disks %>
+  </div>
 
-<div class="pagination-container">
-  <%= paginate @disks %>
+  <div class="create-disk-buttons" style="margin-top:16px;">
+    <%= button_to 'Nuevo disco', new_admin_disk_path, method: :get, class: 'btn btn-primary' %>
+  </div>
 </div>

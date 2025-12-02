@@ -8,8 +8,7 @@ class Admin::DisksController < ApplicationController
     @disks = Disk.order(created_at: :desc).page(params[:page]).per(12)
   end
 
-  def show
-  end
+  def show; end
 
   def new
     klass = ALLOWED_TYPES.include?(params[:type]) ? params[:type].constantize : NewDisk
@@ -20,16 +19,16 @@ class Admin::DisksController < ApplicationController
     klass = ALLOWED_TYPES.include?(disk_type_param) ? disk_type_param.constantize : Disk
     @disk = klass.new(disk_params)
 
+    attach_optional_files(@disk)
+
     if @disk.save
-      attach_optional_files(@disk)
       redirect_to admin_disk_path(@disk), notice: 'Disco creado correctamente'
     else
       render :new, status: :unprocessable_entity
     end
   end
 
-  def edit
-  end
+  def edit; end
 
   def update
     if @disk.update(disk_params)
@@ -40,13 +39,12 @@ class Admin::DisksController < ApplicationController
     end
   end
 
-  # Borrado lógico: marca deleted_at y ajusta stock por lógica del modelo
+  # Borrado lógico
   def destroy
     @disk.soft_delete!
     redirect_to admin_disks_path, notice: 'Disco dado de baja (borrado lógico)'
   end
 
-  # Patch para cambiar stock (solo aplicable a NewDisk)
   def change_stock
     unless @disk.is_a?(NewDisk)
       redirect_to admin_disk_path(@disk), alert: 'Solo se puede cambiar stock de discos nuevos' and return
@@ -70,31 +68,33 @@ class Admin::DisksController < ApplicationController
     params.dig(:disk, :type) || params.dig(:new_disk, :type) || params.dig(:used_disk, :type)
   end
 
-  # Detecta la key de parámetros que corresponde al modelo (disk / new_disk / used_disk)
   def param_key
     key = params.keys.find { |k| k.to_s.match?(/(?:^|_)disk$/) } || 'disk'
     key.to_sym
   end
 
-  # Permite aceptar tanto :disk como :new_disk / :used_disk
   def disk_params
     params.require(param_key).permit(
       :type, :name, :description, :author, :unit_price, :stock,
-      :category, :format, :date_ingreso
+      :category, :format, :date_ingreso,
+      :cover, :audio, images: []
     )
   end
 
   def attach_optional_files(disk)
     pk = param_key
+    return unless params[pk].present?
+
     if params.dig(pk, :cover).present?
       disk.cover.attach(params[pk][:cover])
     end
 
     if params.dig(pk, :images).present?
-      disk.images.attach(params[pk][:images])
+      imgs = Array(params[pk][:images]).reject(&:blank?)
+      disk.images.attach(imgs) if imgs.any?
     end
 
-    # audio only for UsedDisk
+    # audio
     if disk.is_a?(UsedDisk) && params.dig(pk, :audio).present?
       disk.audio.attach(params[pk][:audio])
     end
