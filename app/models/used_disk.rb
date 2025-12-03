@@ -1,5 +1,5 @@
 class UsedDisk < Disk
-  validate :stock_must_be_nil
+  before_validation :set_default_stock
   has_one_attached :audio
 
   MAX_AUDIO_SIZE = 10.megabytes
@@ -9,9 +9,6 @@ class UsedDisk < Disk
 
   private
 
-  def stock_must_be_nil
-    errors.add(:stock, "must be blank for used disks") if stock.present?
-  end
 
   def validate_audio_content_type_and_size
     return unless audio.attached? && audio.blob.present?
@@ -25,6 +22,10 @@ class UsedDisk < Disk
     end
   end
 
-  def update_stock_on_delete
+  def set_default_stock
+    self.stock = 1 if stock.nil?
   end
+
+  # def update_stock_on_delete
+  # end
 end
