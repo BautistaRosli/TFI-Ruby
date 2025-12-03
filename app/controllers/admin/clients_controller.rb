@@ -14,4 +14,9 @@ class Admin::ClientsController < ApplicationController
       render json: { found: false }
     end
   end
+
+  def check_email
+    exists = Client.exists?(email: params[:email])
+    render json: { exists: exists }
+  end
 end
