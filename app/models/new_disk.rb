@@ -11,4 +11,13 @@ class NewDisk < Disk
       errors.add(:audio, "no está permitido para discos nuevos")
     end
   end
+
+  # scopes para graficos
+  scope :low_stock, -> {
+    where("stock <= ?", 5)
+    .where("stock > ?", 0)
+    .order(:stock)
+    .limit(10)
+    .pluck(:name, :stock)
+  }
 end

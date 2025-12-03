@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -20,14 +19,12 @@
                 </div>
                 <div class="header-buttons">
                     <%= link_to "Volver a menú de gestión de ventas", admin_sales_path, class: "btn btn-logout" %>
-                    
                     <%= button_to "Salir", destroy_user_session_path, method: :get, class: "btn btn-logout" %>
                 </div>
             </div>
         </div>
     </header>
 
-    <!-- Flash Messages -->
     <div class="flash-messages">
         <% if flash.any? %>
             <div class="flash-notifications">
@@ -49,75 +46,183 @@
             </div>
         <% end %>
     </div>
-    <main class="admin-main">
-      <div class="card">
-        <h3>Ventas por disco</h3>
-        <% series = [
-            {name: "Discos", data: @sales_by_disks}
-          ] %>
-        <% options = {
-          ytitle: "Cantidad Vendido",
-          stacked: true,
-          defer: true 
-        } %>
 
-        <%= column_chart(series, {**options, theme: 'palette4'}) %>
+    <div class="container mt-4 mb-5">
+
+      <div class="card shadow-sm mb-4 bg-light">
+        <div class="card-body py-3">
+          <%= form_with url: admin_graphics_path, method: :get, class: "row g-2 align-items-end" do |f| %>
+            <div class="col-md-3">
+              <label class="fw-bold small text-muted">TIPO DE REPORTE</label>
+              <%= select_tag :report_type, 
+                  options_for_select([
+                    ['Analizar Empleado (Email)', 'employee'], 
+                    ['Analizar Cliente (DNI)', 'client'],
+                    ['Analizar Categoría (Nombre)', 'category']
+                  ], params[:report_type]), 
+                  class: "form-select", 
+                  prompt: "Selecciona una opción..." %>
+            </div>
+            <div class="col-md-6">
+              <label class="fw-bold small text-muted">DATO A BUSCAR</label>
+              <%= text_field_tag :search_query, params[:search_query], class: "form-control", placeholder: "Ej: juan@email.com o 12345678" %>
+            </div>
+            <div class="col-md-3">
+              <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary w-100">🔍 Buscar</button>
+                <% if params[:report_type].present? %>
+                  <%= link_to "❌", admin_graphics_path, class: "btn btn-outline-secondary", title: "Limpiar filtros" %>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+        </div>
       </div>
 
-      <div class="card">
-        <h3>Ingresos por Semana</h3>
-        <%= column_chart @revenue_by_week, {
-          title: "Dinero recaudado",
-          ytitle: "Total ($)",
-          prefix: "$", 
-          stacked: false, # No necesitas stacked si es una sola serie
-          defer: true
-        } %>
-      </div>
-
-
-
-      <div class="card">
-        <h3>🏆 Empleados con más Ventas (Cantidad)</h3>
+      <% if @custom_entity %>
         
-        <%= bar_chart @employee_with_more_sales, {
-          xtitle: "Cantidad de Ventas",
-          ytitle: "Empleado (ID - Nombre Apellido)",
-          height: "400px",
-          colors: ["#3B82F6"], # Un azul queda bien para diferenciarlo del de dinero
-          defer: true          # Para que cargue bien en Rails 8
-        } %>
-      </div>
+        <div class="row g-4 fade-in">
+          <div class="col-12">
+            <div class="alert alert-info d-flex justify-content-between align-items-center">
+              <h3 class="mb-0">
+                📊 Resultados para: 
+                <strong>
+                  <% if @custom_entity.is_a?(String) %>
+                    <%= @custom_entity %>
+                  <% else %>
+                    <%= @custom_entity.try(:name) || @custom_entity.try(:email) %>
+                    <%= @custom_entity.try(:lastname) %>
+                  <% end %>
+                </strong>
+              </h3>
+              <span class="badge bg-primary fs-5">
+                <% if @report_type == 'client' %>
+                  Dinero Promedio Gastado: <%= number_to_currency(@custom_kpi) %>
+                <% else %>
+                  Dinero Generado: <%= number_to_currency(@custom_kpi) %>
+                <% end %>
+              </span>
+            </div>
+          </div>
 
-      <div class="card">
-        <h3> Tipos de discos vendidos</h3>
-        <%= pie_chart([
-          {name: "Ventas de CDs", data: @sales_from_cd},
-          {name: "Ventas de vinilos", data: @sales_from_vinilo}
-        ], legend: "left") %>
-      </div>
+          <div class="col-md-8">
+            <div class="card h-100 shadow-sm">
+              <div class="card-body">
+                <h5 class="card-title">
+                  <% if @report_type == 'employee' %> 📈 Evolución de Ventas ($)
+                    <% prefix = "$" %>
+                  <% elsif @report_type == 'client' %> 🛒 Historial de Compras (Cant)
+                    <% prefix = "" %>
+                  <% else %> 🎵 Evolución del Género
+                    <% prefix = "$" %>
+                  <% end %>
+                </h5>
+                <%= line_chart @custom_chart_1, prefix: prefix, defer: true %>
+              </div>
+            </div>
+          </div>
 
-      <div class="card full-width">
-        <h3>Valor Promedio de Venta (AOV) por Día</h3>
-        <%= line_chart @aov_by_day, {
-          title: "Tendencia del Gasto Promedio",
-          ytitle: "Monto Promedio ($)",
-          prefix: "$",
-          defer: true
-        } %>
-      </div>
+          <div class="col-md-4">
+            <div class="card h-100 shadow-sm">
+              <div class="card-body">
+                <h5 class="card-title">
+                  <% if @report_type == 'employee' %> 💿 Formato más vendido
+                    <%= bar_chart @custom_chart_2, colors: ["#F59E0B"], defer: true %>
+                  <% elsif @report_type == 'client' %> 🎧 Géneros Favoritos
+                    <%= bar_chart @custom_chart_2, colors: ["#F59E0B"], defer: true %>
+                  <% else %> ⭐ Top Discos
+                  <% end %>
+                </h5>
+                <% if @report_type == 'category' %>
+                  <%= bar_chart @custom_chart_2, colors: ["#F59E0B"], defer: true %>
+                <% else %>
+                  <%= pie_chart @custom_chart_2, donut: true, defer: true %>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        </div>
 
-      <div class="card">
-        <h3>Unidades Vendidas por Categoría (Género)</h3>
-        <%= column_chart @category_sold, {
-          ytitle: "Unidades Vendidas",
-          colors: ["#60A5FA"],
-          defer: true
-        } %>
-      </div>
+      <% else %>
 
-    </main>
+        <div class="row g-4">
+          <div class="col-md-6">
+            <div class="card h-100">
+              <h3>Ventas por disco</h3>
+              <% series = [{name: "Discos", data: @sales_by_disks}] %>
+              <% options = { ytitle: "Cantidad Vendido", stacked: true, defer: true } %>
+              <%= column_chart(series, {**options, theme: 'palette4'}) %>
+            </div>
+          </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+          <div class="col-md-6">
+            <div class="card h-100">
+              <h3>Ingresos por Semana</h3>
+              <%= column_chart @revenue_by_week, {
+                title: "Dinero recaudado", ytitle: "Total ($)", prefix: "$", 
+                stacked: false, defer: true
+              } %>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="card h-100">
+              <h3>🏆 Empleados con más Ventas (Cantidad)</h3>
+              <%= bar_chart @employee_with_more_sales, {
+                xtitle: "Cantidad de Ventas", ytitle: "Empleado",
+                height: "400px", colors: ["#3B82F6"], defer: true
+              } %>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card h-100">
+              <h3> Tipos de discos vendidos</h3>
+              <%= pie_chart([
+                {name: "Ventas de CDs", data: @sales_from_cd},
+                {name: "Ventas de vinilos", data: @sales_from_vinilo}
+              ], legend: "left") %>
+            </div>
+          </div>
+
+          <div class="card full-width">
+            <div class="card h-100">
+              <h3>Tendencia Gasto Promedio</h3>
+              <%= line_chart @aov_by_day, { ytitle: "Monto ($)", prefix: "$", defer: true } %>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="card h-100">
+              <h3>Ventas por Categoría</h3>
+              <%= column_chart @category_sold, { colors: ["#60A5FA"], defer: true } %>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="card h-100">
+              <h3>⭐ Top Clientes</h3>
+              <%= bar_chart @top_customer, { colors: ["#FBBF24"], prefix: "$", defer: true } %>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="card h-100">
+              <h3>Horario Actividad</h3>
+              <%= column_chart @sales_by_hour, { colors: ["#8B5CF6"], defer: true } %>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="card h-100">
+              <h3>⚠️ Alerta Stock</h3>
+              <% if @low_stock.any? %>
+                <%= bar_chart @low_stock, { colors: ["#EF4444"], defer: true } %>
+              <% else %>
+                <p class="text-success p-3">Stock saludable</p>
+              <% end %>
+            </div>
+          </div>
+        </div> 
+        <% end %> </div> <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

@@ -14,7 +14,7 @@ class Sale < ApplicationRecord
 
   # relaciones (a implementar)
   belongs_to :user
-  # belongs_to :customer
+  belongs_to :customer, class_name: "Client", optional: true
 
   private
 
@@ -90,5 +90,20 @@ class Sale < ApplicationRecord
   where(deleted: [ false, nil ])
   .group_by_day(:created_at)
   .average(:total_amount)
-}
+  }
+
+  scope :top_customer, -> {
+    joins(:customer)
+    .where(deleted: [ false, nil ])
+    .group("clients.document_number || ' ' || clients.name || ' ' || clients.lastname")
+    .sum(:total_amount)
+    .sort_by { |_k, v| -v }
+    .first(5)
+  }
+
+  scope :sales_by_hour, -> {
+    where(deleted: [ false, nil ])
+    .group_by_hour_of_day(:created_at, format: "%H:00")
+    .count
+  }
 end
