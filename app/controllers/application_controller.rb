@@ -29,6 +29,12 @@ class ApplicationController < ActionController::Base
     redirect_to previous_url
   end
 
+    # agrego esto para manejar error con la session
+    rescue_from ActionController::InvalidAuthenticityToken do |exception|
+      flash[:alert] = "Hubo un problema con la sesión."
+      redirect_to new_user_session_path
+    end
+
   private
   def default_redirect_path
     if current_user

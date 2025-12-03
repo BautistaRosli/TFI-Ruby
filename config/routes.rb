@@ -41,6 +41,13 @@ Rails.application.routes.draw do
         patch :change_stock
       end
     end
+
+    resources :clients do
+      collection do
+        get :search_by_document
+        get :check_email
+      end
+    end
   end
 
   namespace :disk do
