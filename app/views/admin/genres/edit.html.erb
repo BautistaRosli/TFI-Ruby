@@ -1,0 +1,17 @@
+<% content_for :stylesheets do %>
+  <%= stylesheet_link_tag 'admin_layout', media: 'all' %>
+<% end %>
+
+<div class="container" style="max-width:700px; margin:24px auto;">
+  <h2>Editar Género</h2>
+  <%= form_with model: [:admin, @genre], local: true do |f| %>
+    <div class="field">
+      <%= f.label :name, "Nombre" %>
+      <%= f.text_field :name, required: true, class: "form-control" %>
+    </div>
+    <div class="actions" style="display:flex; gap:8px;">
+      <%= f.submit "Guardar", class: "btn-primary" %>
+      <%= link_to "Volver", admin_genres_path, class: "btn-outline" %>
+    </div>
+  <% end %>
+</div>
