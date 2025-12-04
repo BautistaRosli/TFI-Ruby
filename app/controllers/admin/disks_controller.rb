@@ -1,46 +1,30 @@
 class Admin::DisksController < ApplicationController
-  include CartManagement
-
   layout 'admin'
-  before_action :set_disk, only: %i[show edit update destroy change_stock]
+  before_action :set_disk, only: %i[
+    show edit update destroy
+    set_cover images add_image remove_image
+  ]
 
-  ALLOWED_TYPES = %w[NewDisk UsedDisk].freeze
-
-  # index: por defecto muestra discos con stock > 0 ordenados por nombre (admin view),
-  # si se pasa ?view=recent muestra por creación (desc) con paginado diferente.
   def index
-    @disks = Disk.with_attached_cover.with_attached_images.where(deleted_at: nil)
-               .order(:name).page(params[:page]).per(10)
-
-    # incluir discos usados (stock IS NULL) y discos nuevos con stock > 0
-    @sales_disks = Disk.with_attached_cover.with_attached_images
-                     .where(deleted_at: nil)
-                     .where("stock IS NULL OR stock > 0")
-                     .order(:name)
-                     .page(params[:sales_page])
-                     .per(12)
-
-    # Info del carrito para la vista (provista por el concern)
-    @cart_items_count = cart_items_count
-    @cart_total = cart_total
+    @new_disks  = Disk.with_attached_cover.with_attached_images.where(type: 'NewDisk').order(:name).page(params[:new_page]).per(10)
+    @used_disks = Disk.with_attached_cover.with_attached_images.where(type: 'UsedDisk').order(:name).page(params[:used_page]).per(10)
   end
 
   def show; end
 
   def new
-    klass = ALLOWED_TYPES.include?(params[:type]) ? params[:type].constantize : NewDisk
-    @disk = klass.new(date_ingreso: Time.current)
+    @disk = (params[:type] == 'UsedDisk' ? UsedDisk : NewDisk).new
   end
 
   def create
-    klass = ALLOWED_TYPES.include?(disk_type_param) ? disk_type_param.constantize : Disk
-    @disk = klass.new(disk_params)
+    klass = type_from_params == 'UsedDisk' ? UsedDisk : NewDisk
+    @disk = klass.new(disk_params(:create))
 
-    # attach BEFORE save so model validations can check attachments
-    attach_optional_files(@disk)
+    # adjuntar audio solo si es UsedDisk
+    attach_audio(@disk)
 
     if @disk.save
-      redirect_to admin_disk_path(@disk), notice: 'Disco creado correctamente'
+      redirect_to images_admin_disk_path(@disk), notice: "Disco creado. Ahora podés cargar imágenes."
     else
       render :new, status: :unprocessable_entity
     end
@@ -49,32 +33,81 @@ class Admin::DisksController < ApplicationController
   def edit; end
 
   def update
-    if @disk.update(disk_params)
-      attach_optional_files(@disk) # permitir agregar/actualizar attachments
-      redirect_to admin_disk_path(@disk), notice: 'Disco actualizado correctamente'
+    # no permitir cambiar :type en update
+    @disk.assign_attributes(disk_params(:update))
+
+    # adjuntar audio solo si es UsedDisk
+    attach_audio(@disk)
+
+    if @disk.save
+      redirect_to admin_disk_path(@disk), notice: "Disco actualizado"
     else
       render :edit, status: :unprocessable_entity
     end
   end
 
-  # borrado lógico
   def destroy
-    @disk.soft_delete! if @disk.respond_to?(:soft_delete!)
-    redirect_to admin_disks_path, notice: 'Disco dado de baja (borrado lógico)'
+    @disk.destroy
+    redirect_to admin_disks_path, notice: "Disco eliminado"
   end
 
-  # cambiar stock (solo NewDisk)
-  def change_stock
-    unless @disk.is_a?(NewDisk)
-      redirect_to admin_disk_path(@disk), alert: 'Solo se puede cambiar stock de discos nuevos' and return
+  # Portada desde show: adjunta el blob elegido a cover
+  def set_cover
+    attachment_id = params[:cover_image_id].to_i
+    img = @disk.images.attachments.find { |a| a.id == attachment_id }
+    unless img
+      redirect_to admin_disk_path(@disk), alert: "Imagen no encontrada" and return
+    end
+    @disk.cover.attach(img.blob)
+    redirect_to admin_disk_path(@disk), notice: "Portada actualizada"
+  end
+
+  # Gestión de imágenes
+  def images
+    # Vista para subir y previsualizar (sin tocar otros campos del disco)
+  end
+
+  def add_image
+    file = params[:image]
+    if file.blank?
+      redirect_to images_admin_disk_path(@disk), alert: "Seleccioná un archivo de imagen" and return
     end
 
-    new_stock = params.require(:disk).permit(:stock)[:stock]
-    if @disk.update(stock: new_stock)
-      redirect_to admin_disk_path(@disk), notice: 'Stock actualizado'
-    else
-      redirect_to admin_disk_path(@disk), alert: 'No se pudo actualizar el stock'
+    # Límite 10
+    current_count = @disk.images.attachments.size
+    if current_count >= 10
+      redirect_to images_admin_disk_path(@disk), alert: "Máximo 10 imágenes" and return
     end
+
+    @disk.images.attach(file)
+
+    # Si no hay portada, usar la primera imagen
+    @disk.cover.attach(@disk.images.first.blob) unless @disk.cover.attached?
+
+    redirect_to images_admin_disk_path(@disk), notice: "Imagen subida"
+  end
+
+  def remove_image
+    attachment_id = params[:id].to_i
+    img = @disk.images.attachments.find { |a| a.id == attachment_id }
+    unless img
+      redirect_to images_admin_disk_path(@disk), alert: "Imagen no encontrada" and return
+    end
+
+    # Si era la portada, despegarla y volver a setear portada con la primera restante
+    was_cover = (@disk.cover&.attached? && @disk.cover.blob_id == img.blob_id)
+    img.purge
+
+    if was_cover
+      first = @disk.images.first
+      if first
+        @disk.cover.attach(first.blob)
+      else
+        @disk.cover.purge if @disk.cover&.attached?
+      end
+    end
+
+    redirect_to images_admin_disk_path(@disk), notice: "Imagen eliminada"
   end
 
   private
@@ -83,40 +116,32 @@ class Admin::DisksController < ApplicationController
     @disk = Disk.with_attached_cover.with_attached_images.find(params[:id])
   end
 
-  # Detectamos el tipo incluso si los params vienen como :new_disk / :used_disk
-  def disk_type_param
-    params.dig(:disk, :type) || params.dig(:new_disk, :type) || params.dig(:used_disk, :type)
-  end
-
-  # Encuentra la key correcta (disk, new_disk, used_disk) para strong params/attachments
   def param_key
-    key = params.keys.find { |k| k.to_s.match?(/(?:^|_)disk$/) } || 'disk'
-    key.to_sym
+    %i[disk new_disk used_disk].find { |k| params.key?(k) } || :disk
   end
 
-  def disk_params
-    params.require(param_key).permit(
-      :type, :name, :description, :author, :unit_price, :stock,
-      :category, :format, :date_ingreso,
-      :cover, :audio, images: []
-    )
+  def type_from_params
+    params.dig(param_key, :type)
   end
 
-  def attach_optional_files(disk)
-    pk = param_key
-    return unless params[pk].present?
-
-    if params.dig(pk, :cover).present?
-      disk.cover.attach(params[pk][:cover])
+  def disk_params(context = :create)
+    permitted = [
+      :name, :author, :description, :unit_price, :stock,
+      :format, :date_ingreso,
+      genre_ids: []
+    ]
+    permitted << :type if context == :create
+    # permitir :audio solo para UsedDisk
+    if (context == :create && type_from_params == 'UsedDisk') || (context == :update && @disk.is_a?(UsedDisk))
+      permitted << :audio
     end
+    params.require(param_key).permit(*permitted)
+  end
 
-    if params.dig(pk, :images).present?
-      imgs = Array(params[pk][:images]).reject(&:blank?)
-      disk.images.attach(imgs) if imgs.any?
-    end
-
-    if disk.is_a?(UsedDisk) && params.dig(pk, :audio).present?
-      disk.audio.attach(params[pk][:audio])
-    end
+  def attach_audio(disk)
+    return unless disk.is_a?(UsedDisk)
+    file = params.dig(param_key, :audio)
+    return if file.blank?
+    disk.audio.attach(file)
   end
 end

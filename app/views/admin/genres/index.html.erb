@@ -1,0 +1,41 @@
+<% content_for :stylesheets do %>
+  <%= stylesheet_link_tag 'admin_layout', media: 'all' %>
+<% end %>
+
+<div class="container" style="max-width:900px; margin:24px auto;">
+  <div class="disks-header">
+    <h2>Gestión de Géneros</h2>
+    <%= link_to 'Volver a Discos', admin_disks_path, class: 'btn-outline' %>
+  </div>
+
+  <div class="module-card" style="padding:1.5rem; margin-bottom:16px;">
+    <h3>Crear nuevo género</h3>
+    <%= form_with model: [:admin, @genre], local: true do |f| %>
+      <div style="display:flex; gap:8px; align-items:center;">
+        <%= f.text_field :name, placeholder: "Nombre de género", required: true, class: "form-control" %>
+        <%= f.submit "Crear", class: "btn-primary" %>
+      </div>
+      <% if @genre.errors.any? %>
+        <ul class="muted" style="margin-top:8px;">
+          <% @genre.errors.full_messages.each do |m| %><li><%= m %></li><% end %>
+        </ul>
+      <% end %>
+    <% end %>
+  </div>
+
+  <div class="module-card" style="padding:1.5rem;">
+    <h3>Listado de géneros</h3>
+    <ul style="list-style:none; padding:0; margin:12px 0;">
+      <% @genres.each do |g| %>
+        <li style="display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid #e2e8f0;">
+          <span><%= g.name %></span>
+          <div style="display:flex; gap:8px;">
+            <%= link_to 'Editar', edit_admin_genre_path(g), class: 'btn-outline' %>
+            <%= button_to 'Eliminar', admin_genre_path(g), method: :delete, class: 'btn-outline', form: { data: { turbo: false } } %>
+          </div>
+        </li>
+      <% end %>
+    </ul>
+    <%= paginate @genres %>
+  </div>
+</div>
