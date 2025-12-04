@@ -21,8 +21,12 @@
           <div class="disk-body">
             <h3 class="disk-title"><%= disk.name %></h3>
             <div class="disk-meta"><%= disk.author %></div>
-            <% if disk.category.present? %>
-              <div class="tags"><span class="tag"><%= disk.category %></span></div>
+            <% if disk.genres.any? %>
+              <div class="tags">
+                <% disk.genres.each do |g| %>
+                  <span class="tag"><%= g.name %></span>
+                <% end %>
+              </div>
             <% end %>
           </div>
 
