@@ -18,7 +18,7 @@
                     <p class="header-subtitle">Disquería - Sistema de Gestión</p>
                 </div>
                 <div class="header-buttons">
-                    <%= link_to "Volver a menú de gestión de ventas", admin_sales_path, class: "btn btn-logout" %>
+                    <%= link_to "Volver a gestión de ventas", admin_sales_path, class: "btn btn-logout" %>
                     <%= button_to "Salir", destroy_user_session_path, method: :get, class: "btn btn-logout" %>
                 </div>
             </div>
@@ -114,10 +114,10 @@
                   <% elsif @report_type == 'client' %> 🛒 Historial de Compras (Cant)
                     <% prefix = "" %>
                   <% else %> 🎵 Evolución del Género
-                    <% prefix = "$" %>
+                   <% prefix = "" %>
                   <% end %>
                 </h5>
-                <%= line_chart @custom_chart_1, prefix: prefix, defer: true %>
+                <%= line_chart @custom_chart_1, prefix: "$", defer: true %>
               </div>
             </div>
           </div>

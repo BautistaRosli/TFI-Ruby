@@ -26,7 +26,7 @@ class Admin::GraphicsController < ApplicationController
         if @custom_entity
           sales = Sale.where(user_id: @custom_entity.id, deleted: [ false, nil ]) # Cambiar
 
-          @custom_chart_1 = sales.group_by_week(:datetime).sum(:total_amount)
+          @custom_chart_1 = sales.group_by_week(:created_at).sum(:total_amount)
           @custom_chart_2 = Disk.joins(items: :sale).where(sales: { id: sales.ids }).group(:format).count
           @custom_kpi = sales.sum(:total_amount)
         else
@@ -36,10 +36,6 @@ class Admin::GraphicsController < ApplicationController
       when "client"
         # Buscamos cliente por DNI
         @custom_entity = Client.find_by(document_number: query)
-        puts "HOLAAAAAAAAAAAAAA"
-        puts @custom_entity
-        puts @custom_entity.id
-        puts query
         if @custom_entity
           sales = Sale.where(customer_id: @custom_entity.id, deleted: [ false, nil ])
 
