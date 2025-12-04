@@ -7,22 +7,32 @@
 #   ["Action", "Comedy", "Drama", "Horror"].each do |genre_name|
 #     MovieGenre.find_or_create_by!(name: genre_name)
 #   end
-puts "Eliminando discos previos..."
-Disk.delete_all
+puts "Eliminando datos previos..."
+Disk.destroy_all
+Genre.destroy_all
+
+puts "Creando géneros..."
+genre_names = [
+  "Rock", "Pop", "Jazz", "Metal", "Hip-Hop",
+  "Country", "Electronic", "R&B", "Reggae", "Soul",
+  "Blues", "Classical", "Punk", "Folk", "Latin",
+  "Funk", "Gospel", "Indie", "Alternative", "Experimental"
+]
+genres = genre_names.map { |g| Genre.find_or_create_by!(name: g) }
 
 puts "Creando discos nuevos..."
 
 20.times do |i|
-  NewDisk.create!(
+  disk = NewDisk.create!(
     name: "Disco generico",
     description: "Descripción del disco #{i + 1}",
     author: ["Pink Floyd", "Queen", "AC/DC", "The Beatles", "Metallica"].sample,
     unit_price: rand(5000..20000),
     stock: rand(1..20),
-    category: ["Rock", "Pop", "Jazz", "Metal"].sample,
     format: ["vinilo", "CD"].sample,
     date_ingreso: Time.now - rand(1..100).days
   )
+  disk.genres << genres.sample(2)
 end
 
 puts "Listo! Se crearon 20 NewDisks 🎵"
@@ -30,15 +40,15 @@ puts "Listo! Se crearon 20 NewDisks 🎵"
 puts "Creando discos usados..."
 
 20.times do |i|
-  UsedDisk.create!(
+  disk = UsedDisk.create!(
     name: "Disco usado generico",
     description: "Descripción del disco usado #{i + 1}",
     author: ["Pink Floyd", "Queen", "AC/DC", "The Beatles", "Metallica"].sample,
     unit_price: rand(2000..12000),
-    category: ["Rock", "Pop", "Jazz", "Metal"].sample,
     format: ["vinilo", "CD"].sample,
     date_ingreso: Time.now - rand(1..100).days
   )
+  disk.genres << genres.sample(2)
 end
 
 puts "Listo! Se crearon 20 UsedDisks 🎶"

@@ -8,6 +8,16 @@
         <li><strong>Año:</strong> <span class="muted"><%= @disk.year if @disk.respond_to?(:year) %></span></li>
         <li><strong>Formato:</strong> <span class="muted"><%= @disk.format %></span></li>
         <li><strong>Precio:</strong> <span class="price">$<%= @disk.unit_price %></span></li>
+        <% if @disk.genres.any? %>
+          <li>
+            <strong>Géneros:</strong>
+            <span class="muted">
+              <% @disk.genres.each do |g| %>
+                <span class="tag"><%= g.name %></span>
+              <% end %>
+            </span>
+          </li>
+        <% end %>
       </ul>
 
       <div class="disk-description">
