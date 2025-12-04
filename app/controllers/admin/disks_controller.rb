@@ -20,6 +20,9 @@ class Admin::DisksController < ApplicationController
     klass = type_from_params == 'UsedDisk' ? UsedDisk : NewDisk
     @disk = klass.new(disk_params(:create))
 
+    # adjuntar audio solo si es UsedDisk
+    attach_audio(@disk)
+
     if @disk.save
       redirect_to images_admin_disk_path(@disk), notice: "Disco creado. Ahora podés cargar imágenes."
     else
@@ -31,7 +34,12 @@ class Admin::DisksController < ApplicationController
 
   def update
     # no permitir cambiar :type en update
-    if @disk.update(disk_params(:update))
+    @disk.assign_attributes(disk_params(:update))
+
+    # adjuntar audio solo si es UsedDisk
+    attach_audio(@disk)
+
+    if @disk.save
       redirect_to admin_disk_path(@disk), notice: "Disco actualizado"
     else
       render :edit, status: :unprocessable_entity
@@ -123,6 +131,17 @@ class Admin::DisksController < ApplicationController
       genre_ids: []
     ]
     permitted << :type if context == :create
+    # permitir :audio solo para UsedDisk
+    if (context == :create && type_from_params == 'UsedDisk') || (context == :update && @disk.is_a?(UsedDisk))
+      permitted << :audio
+    end
     params.require(param_key).permit(*permitted)
+  end
+
+  def attach_audio(disk)
+    return unless disk.is_a?(UsedDisk)
+    file = params.dig(param_key, :audio)
+    return if file.blank?
+    disk.audio.attach(file)
   end
 end

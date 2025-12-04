@@ -27,6 +27,24 @@
         <% if @disk.is_a?(NewDisk) %>
           <div class="disk-meta"><strong>Stock:</strong> <%= @disk.stock.to_i %></div>
         <% end %>
+
+        <%# Audio de muestra para usados %>
+        <% if @disk.is_a?(UsedDisk) %>
+          <div class="disk-audio" style="margin-top:14px;">
+            <h3 style="margin:0 0 6px 0;">Audio de muestra</h3>
+            <% if @disk.audio&.attached? %>
+              <audio id="admin-sample-audio" preload="none" style="width:100%; max-width:420px; border:1px solid #e2e8f0; border-radius:10px; padding:6px;">
+                <source src="<%= url_for(@disk.audio) %>" type="<%= @disk.audio.blob.content_type %>">
+                Tu navegador no soporta audio.
+              </audio>
+              <div style="margin-top:10px;">
+                <button id="admin-play-sample" type="button" class="btn-primary">Reproducir audio</button>
+              </div>
+            <% else %>
+              <div class="no-cover-text">Sin audio cargado</div>
+            <% end %>
+          </div>
+        <% end %>
       </div>
 
       <div class="disk-actions" style="margin-top:16px; display:flex; gap:8px;">
@@ -61,3 +79,25 @@
     </div>
   </div>
 </div>
+
+<script>
+  (function(){
+    function setupAudio(){
+      var btn = document.getElementById('admin-play-sample');
+      var audio = document.getElementById('admin-sample-audio');
+      if(!btn || !audio) return;
+      btn.addEventListener('click', function(){
+        if(audio.paused){
+          audio.play();
+          btn.textContent = 'Pausar audio';
+        } else {
+          audio.pause();
+          btn.textContent = 'Reproducir audio';
+        }
+      });
+      audio.addEventListener('ended', function(){ btn.textContent = 'Reproducir audio'; });
+    }
+    document.addEventListener('DOMContentLoaded', setupAudio);
+    document.addEventListener('turbo:load', setupAudio);
+  })();
+</script>

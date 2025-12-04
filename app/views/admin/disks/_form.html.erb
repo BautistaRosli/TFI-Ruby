@@ -102,7 +102,7 @@
   <div class="field" id="stock_field">
     <%= f.label :stock, "Stock" %>
     <%= f.number_field :stock, min: 0, step: 1, class: 'form-control',
-          inputmode: "numeric", required: (@disk.is_a?(NewDisk)) %>
+          inputmode: "numeric", id: 'disk_stock' %>
   </div>
 
   <!-- Audio (solo Usado) -->
@@ -144,25 +144,30 @@
       var type = currentType();
       var stockField = document.getElementById('stock_field');
       var audioField = document.getElementById('audio_field');
+      var stockInput = document.getElementById('disk_stock');
       if (!stockField || !audioField) return;
+
       if (type === 'NewDisk') {
         stockField.style.display = '';
         audioField.style.display = 'none';
+        if (stockInput) stockInput.setAttribute('required', 'required');
       } else {
         stockField.style.display = 'none';
         audioField.style.display = '';
+        if (stockInput) stockInput.removeAttribute('required');
       }
     }
-    // Sanitizar inputs de texto
+
+    // Sanitizar inputs de texto y números (sin cambios)
     function sanitizeText(e) {
       var allowed = /[A-Za-z0-9 \.\,\-\!\?\:\;]/;
       var v = e.target.value;
       e.target.value = v.split('').filter(function(ch){ return allowed.test(ch); }).join('');
     }
     function sanitizeNumber(e) {
-      var isPrice = e.target.name.endsWith('[unit_price]');
+      var isPrice = e.target.name && e.target.name.endsWith('[unit_price]');
       var allowed = isPrice ? /[0-9\.]/ : /[0-9]/;
-      var v = e.target.value;
+      var v = e.target.value || '';
       e.target.value = v.split('').filter(function(ch){ return allowed.test(ch); }).join('');
     }
 
