@@ -18,7 +18,6 @@ Rails.application.routes.draw do
   namespace :admin do
     root to: "dashboard#index", as: :dashboard
 
-<<<<<<< HEAD
     resources :users do
       member do
         patch :reactivate
@@ -28,10 +27,8 @@ Rails.application.routes.draw do
     resources :graphics
 
     resources :sales do
-=======
     resources :genres, except: [:show]
     resources :sales, only: [:index, :show, :new, :create] do
->>>>>>> development
       collection do
         get  :cart
         post :add_item
@@ -40,12 +37,7 @@ Rails.application.routes.draw do
       end
     end
 
-<<<<<<< HEAD
     resources :disks, only: [ :index ]
-=======
-    resources :users
-
->>>>>>> development
     resources :disks do
       member do
         patch :change_stock

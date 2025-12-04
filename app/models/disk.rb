@@ -53,7 +53,6 @@ class Disk < ApplicationRecord
       end
     end
   end
-<<<<<<< HEAD
 
   def update_stock_on_delete
     update_column(:stock, 0) if has_attribute?(:stock)
@@ -74,6 +73,4 @@ class Disk < ApplicationRecord
   .group(:category)
   .sum("items.units_sold")
 }
-=======
->>>>>>> development
 end
