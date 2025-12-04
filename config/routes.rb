@@ -26,9 +26,8 @@ Rails.application.routes.draw do
 
     resources :graphics
 
-    resources :sales do
-    resources :genres, except: [:show]
-    resources :sales, only: [:index, :show, :new, :create] do
+    resources :genres, except: [ :show ]
+    resources :sales, only: [ :index, :show, :new, :create ] do
       collection do
         get  :cart
         post :add_item
