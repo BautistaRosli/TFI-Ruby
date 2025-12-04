@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_11_29_015432) do
+ActiveRecord::Schema[8.0].define(version: 2025_12_04_001000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -46,7 +46,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_29_015432) do
     t.string "author"
     t.decimal "unit_price", precision: 10, scale: 2, default: "0.0", null: false
     t.integer "stock"
-    t.string "category"
     t.string "format"
     t.datetime "date_ingreso"
     t.datetime "deleted_at"
@@ -54,6 +53,21 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_29_015432) do
     t.datetime "updated_at", null: false
     t.index ["deleted_at"], name: "index_disks_on_deleted_at"
     t.index ["type"], name: "index_disks_on_type"
+  end
+
+  create_table "disks_genres", id: false, force: :cascade do |t|
+    t.integer "disk_id", null: false
+    t.integer "genre_id", null: false
+    t.index ["disk_id", "genre_id"], name: "index_disks_genres_on_disk_id_and_genre_id", unique: true
+    t.index ["disk_id"], name: "index_disks_genres_on_disk_id"
+    t.index ["genre_id"], name: "index_disks_genres_on_genre_id"
+  end
+
+  create_table "genres", force: :cascade do |t|
+    t.string "name", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_genres_on_name", unique: true
   end
 
   create_table "items", force: :cascade do |t|
@@ -97,6 +111,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_29_015432) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "disks_genres", "disks"
+  add_foreign_key "disks_genres", "genres"
   add_foreign_key "items", "sales"
   add_foreign_key "sales", "users"
 end

@@ -2,74 +2,61 @@
   <%= stylesheet_link_tag 'disks', media: 'all' %>
 <% end %>
 
-<div class="container">
-  <div class="disk-show-card">
-    <div class="disk-show-info">
-      <h1 class="disk-show-title"><%= @disk.name %></h1>
+<div class="container" style="max-width:980px; margin:24px auto;">
+  <div class="disks-header"><h1><%= @disk.name %></h1></div>
 
-      <ul class="disk-details">
-        <li><strong>Artista:</strong> <span class="muted"><%= @disk.author %></span></li>
-        <% if @disk.respond_to?(:year) && @disk.year.present? %>
-          <li><strong>Año:</strong> <span class="muted"><%= @disk.year %></span></li>
+  <div class="disk-show-card" style="display:flex; gap:24px;">
+    <div style="flex:1;">
+      <div class="disk-media" style="margin-bottom:16px;">
+        <% cover = @disk.cover&.attached? ? @disk.cover : @disk.images.first %>
+        <% if cover.present? && cover.blob.present? %>
+          <%= image_tag cover, alt: @disk.name, class: "disk-large-img" %>
+        <% else %>
+          <div class="no-cover-text">No hay imagen cargada</div>
         <% end %>
-        <li><strong>Formato:</strong> <span class="muted"><%= @disk.format %></span></li>
+      </div>
+
+      <div class="disk-body">
+        <div class="disk-meta"><strong>Artista:</strong> <%= @disk.author.presence || '—' %></div>
+        <div class="disk-meta"><strong>Formato:</strong> <%= @disk.format.presence || '—' %></div>
+        <div class="disk-meta">
+          <strong>Géneros:</strong>
+          <%= @disk.genres.any? ? @disk.genres.map(&:name).join(', ') : '—' %>
+        </div>
+        <div class="price" style="margin-top:8px;">$<%= number_with_precision(@disk.unit_price.to_f, precision: 2) %></div>
         <% if @disk.is_a?(NewDisk) %>
-          <li><strong>Stock:</strong> <span class="muted"><%= @disk.stock %></span></li>
+          <div class="disk-meta"><strong>Stock:</strong> <%= @disk.stock.to_i %></div>
         <% end %>
-        <li><strong>Precio:</strong> <span class="price">$<%= @disk.unit_price %></span></li>
-      </ul>
-
-      <div class="disk-description">
-        <h2>Descripción</h2>
-        <div class="description-body">
-          <%= simple_format(@disk.description || 'Sin descripción disponible') %>
-        </div>
       </div>
 
-      <% if @disk.is_a?(UsedDisk) %>
-        <div class="disk-audio">
-          <h3>Audio de muestra</h3>
-          <audio id="sample-audio" preload="none" controls>
-            <source src="<%= (@disk.respond_to?(:audio) && @disk.audio.attached?) ? url_for(@disk.audio) : '/samsung-sound.mp3' %>"
-                    type="<%= (@disk.respond_to?(:audio) && @disk.audio.attached?) ? @disk.audio.blob.content_type : 'audio/mpeg' %>">
-            Tu navegador no soporta audio.
-          </audio>
-        </div>
-      <% end %>
-
-      <div class="disk-actions">
-        <%= link_to 'Editar', edit_admin_disk_path(@disk), class: 'btn-outline btn-gold' %>
-        <%= link_to 'Volver al catálogo', admin_disks_path, class: 'btn-outline' %>
+      <div class="disk-actions" style="margin-top:16px; display:flex; gap:8px;">
+        <%= link_to 'Editar', edit_admin_disk_path(@disk), class: 'btn-primary' %>
+        <%= link_to 'Imágenes', images_admin_disk_path(@disk), class: 'btn-outline' %>
+        <%= link_to 'Volver', admin_disks_path, class: 'btn-outline' %>
       </div>
-
-      <% if @disk.is_a?(NewDisk) %>
-        <div class="change-stock">
-          <h3>Cambiar stock</h3>
-          <%= form_with url: change_stock_admin_disk_path(@disk), method: :patch, local: true do %>
-            <%= number_field_tag 'disk[stock]', @disk.stock || 0, min: 0 %>
-            <%= submit_tag 'Actualizar stock', class: 'btn-primary' %>
-          <% end %>
-        </div>
-      <% end %>
     </div>
 
-    <div class="disk-show-media">
-      <% if @disk.cover.attached? %>
-        <% if @disk.cover.variable? %>
-          <%= image_tag url_for(@disk.cover.variant(resize_to_limit: [400,400])), alt: @disk.name, class: 'disk-large-img' %>
-        <% else %>
-          <%= image_tag url_for(@disk.cover), alt: @disk.name, class: 'disk-large-img' %>
+    <div style="flex:0 0 360px;">
+      <h3 style="margin-bottom:8px;">Imágenes del disco</h3>
+
+      <% if @disk.images.attached? && @disk.images.any? %>
+        <% cover_blob_id = @disk.cover&.attached? ? @disk.cover.blob_id : nil %>
+        <%= form_with url: set_cover_admin_disk_path(@disk), method: :patch, local: true do %>
+          <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:10px;">
+            <% @disk.images.each do |img| %>
+              <label style="position:relative; cursor:pointer;">
+                <% checked = (cover_blob_id.present? && cover_blob_id == img.blob_id) %>
+                <%= radio_button_tag :cover_image_id, img.id, checked, style: 'position:absolute; top:6px; left:6px; z-index:2;' %>
+                <%= image_tag img, alt: 'Imagen', style: 'width:100%; border-radius:8px; border:1px solid rgba(0,0,0,0.08);' %>
+              </label>
+            <% end %>
+          </div>
+          <div style="margin-top:10px;">
+            <%= submit_tag 'Cambiar portada', class: 'btn-primary', data: { turbo: false } %>
+          </div>
         <% end %>
       <% else %>
-        <%= image_tag '/tony/tony1.png', alt: 'Portada provisional', class: 'disk-large-img' %>
-      <% end %>
-
-      <% if @disk.images.attached? %>
-        <div class="gallery">
-          <% @disk.images.each do |img| %>
-            <%= image_tag url_for(img.variant(resize_to_limit: [120,120])) %>
-          <% end %>
-        </div>
+        <div class="no-cover-text">No hay imágenes cargadas</div>
       <% end %>
     </div>
   </div>

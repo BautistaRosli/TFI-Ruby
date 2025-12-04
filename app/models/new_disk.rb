@@ -1,6 +1,7 @@
 class NewDisk < Disk
+  # Stock obligatorio y entero >= 0
   validates :stock, presence: true
-  validates :stock, numericality: { only_integer: true, greater_than_or_equal_to: 0 }, allow_blank: true
+  validates :stock, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
 
   validate :audio_must_be_absent_for_new
 
