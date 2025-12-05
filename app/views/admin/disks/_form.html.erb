@@ -2,137 +2,135 @@
 <% form_method = @disk.persisted? ? :patch : :post %>
 
 <%= form_with model: @disk, url: form_url, method: form_method, local: true, html: { multipart: true }, scope: :disk do |f| %>
-  <% if @disk.errors.any? %>
-    <div class="errors">
-      <h3><%= pluralize(@disk.errors.count, "error") %> impiden guardar</h3>
-      <ul><% @disk.errors.full_messages.each { |m| %><li><%= m %></li><% } %></ul>
+  <div class="module-card-body">
+    <% if @disk.errors.any? %>
+      <div class="alert alert-danger">
+        <div class="alert-message"><%= pluralize(@disk.errors.count, "error") %> impiden guardar</div>
+        <ul>
+          <% @disk.errors.full_messages.each do |m| %><li><%= m %></li><% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <% if @disk.new_record? %>
+      <div class="form-group bordered">
+        <%= f.label :type, "Estado", class: "form-label top-label" %>
+        <%= f.select :type,
+          options_for_select([['Nuevo','NewDisk'],['Usado','UsedDisk']], @disk.type.presence || 'NewDisk'),
+          { include_blank: false },
+          class: 'form-control', id: 'disk_type_select' %>
+      </div>
+    <% else %>
+      <input type="hidden" name="disk[type]" value="<%= @disk.type %>">
+    <% end %>
+
+    <div class="form-group bordered">
+      <%= f.label :name, "Nombre", class: "form-label top-label" %>
+      <%= f.text_field :name, class: 'form-control', required: true,
+            pattern: "[A-Za-z0-9 \\.,\\-!\\?:;]+", title: "Evitar caracteres especiales no permitidos", id: 'disk_name' %>
     </div>
-  <% end %>
 
-  <% if @disk.new_record? %>
-    <div class="field">
-      <%= f.label :type, "Estado" %>
-      <%= f.select :type,
-        options_for_select([['Nuevo','NewDisk'],['Usado','UsedDisk']], @disk.type.presence || 'NewDisk'),
-        { include_blank: false },
-        class: 'form-control', id: 'disk_type_select' %>
+    <div class="form-group bordered">
+      <%= f.label :author, "Autor/Artista", class: "form-label top-label" %>
+      <%= f.text_field :author, class: 'form-control', required: true,
+            pattern: "[A-Za-z0-9 \\.,\\-!\\?:;]+", title: "Evitar caracteres especiales no permitidos", id: 'disk_author' %>
     </div>
-  <% else %>
-    <input type="hidden" name="disk[type]" value="<%= @disk.type %>">
-  <% end %>
 
-  <div class="field">
-    <%= f.label :name, "Nombre" %>
-    <%= f.text_field :name, class: 'form-control', required: true,
-          pattern: "[A-Za-z0-9 \\.,\\-!\\?:;]+", title: "Evitar caracteres especiales no permitidos" %>
-  </div>
+    <div class="form-group bordered">
+      <%= f.label :description, "Descripción", class: "form-label top-label" %>
+      <%= f.text_area :description, class: 'form-control', required: true,
+            pattern: "[A-Za-z0-9 \\.,\\-!\\?:;]+", title: "Evitar caracteres especiales no permitidos", id: 'disk_description' %>
+    </div>
 
-  <div class="field">
-    <%= f.label :author, "Autor/Artista" %>
-    <%= f.text_field :author, class: 'form-control', required: true,
-          pattern: "[A-Za-z0-9 \\.,\\-!\\?:;]+", title: "Evitar caracteres especiales no permitidos" %>
-  </div>
+    <div class="form-row two-cols">
+      <div class="form-group bordered">
+        <%= f.label :unit_price, "Precio", class: "form-label top-label" %>
+        <%= f.number_field :unit_price, step: 0.01, min: 0.01, class: 'form-control', required: true,
+              inputmode: "decimal", id: 'disk_unit_price' %>
+      </div>
 
-  <div class="field">
-    <%= f.label :description, "Descripción" %>
-    <%= f.text_area :description, class: 'form-control', required: true,
-          pattern: "[A-Za-z0-9 \\.,\\-!\\?:;]+", title: "Evitar caracteres especiales no permitidos" %>
-  </div>
+      <div class="form-group bordered">
+        <%= f.label :format, "Formato", class: "form-label top-label" %>
+        <%= f.select :format,
+          options_for_select([['Vinilo','vinilo'],['CD','CD']], @disk.format),
+          { prompt: 'Seleccionar formato' },
+          class: 'form-control', required: true %>
+      </div>
+    </div>
 
-  <div class="field">
-    <%= f.label :unit_price, "Precio" %>
-    <%= f.number_field :unit_price, step: 0.01, min: 0.01, class: 'form-control', required: true,
-          inputmode: "decimal" %>
-  </div>
+    <div class="form-group bordered">
+      <%= f.label :year, "Año de lanzamiento", class: "form-label top-label" %>
+      <%= f.number_field :year,
+            min: 1900, max: Time.current.year, step: 1,
+            class: 'form-control', required: true, inputmode: "numeric" %>
+    </div>
 
-  <div class="field">
-    <%= f.label :format, "Formato" %>
-    <%= f.select :format,
-      options_for_select([['Vinilo','vinilo'],['CD','CD']], @disk.format),
-      { prompt: 'Seleccionar formato' },
-      class: 'form-control', required: true %>
-  </div>
-
-  <div class="field" style="display:flex; gap:8px; align-items:flex-start;">
-    <div style="flex:1;">
-      <label for="genre_select_control">Géneros</label>
-
-      <!-- Contenedor del control custom -->
+    <div class="form-group bordered">
+      <label class="form-label top-label" for="genre_select_control">Géneros</label>
       <div id="genre_select_control" class="genre-select">
-        <button type="button" id="genre_dropdown_btn" class="btn-outline" style="width:100%; justify-content:space-between;">
+        <button type="button" id="genre_dropdown_btn" class="btn btn-outline-secondary full-width">
           <span>Seleccionar géneros</span>
           <span>▾</span>
         </button>
 
-        <!-- Dropdown -->
-        <div id="genre_dropdown" class="genre-dropdown" style="display:none; position:absolute; z-index:20; background:#fff; border:1px solid #e2e8f0; border-radius:8px; width:100%; max-height:220px; overflow:auto; margin-top:6px;">
+        <div id="genre_dropdown" class="genre-dropdown">
           <% Genre.order(:name).each do |g| %>
             <% selected = @disk.genre_ids.include?(g.id) %>
-            <button type="button"
-                    class="genre-option"
-                    data-id="<%= g.id %>"
-                    data-name="<%= g.name %>"
-                    style="display:flex; justify-content:space-between; align-items:center; width:100%; padding:8px 12px; border:none; background:<%= selected ? '#f1f5f9' : 'transparent' %>; cursor:pointer;">
+            <button type="button" class="genre-option" data-id="<%= g.id %>" data-name="<%= g.name %>">
               <span><%= g.name %></span>
-              <% if selected %><span class="muted">✓</span><% end %>
+              <% if selected %><span class="text-secondary">✓</span><% end %>
             </button>
           <% end %>
         </div>
 
-        <!-- Chips seleccionados -->
-        <div id="genre_selected_chips" class="chips" style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;">
+        <div id="genre_selected_chips" class="chips">
           <% @disk.genres.each do |g| %>
-            <span class="chip" data-id="<%= g.id %>" style="display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:16px; border:1px solid #e2e8f0; background:#fff;">
+            <span class="badge text-bg-secondary" data-id="<%= g.id %>">
               <%= g.name %>
-              <button type="button" class="chip-remove" data-id="<%= g.id %>" style="border:none; background:none; cursor:pointer;">✕</button>
+              <button type="button" class="chip-remove btn btn-sm btn-outline-danger" data-id="<%= g.id %>">✕</button>
             </span>
             <input type="hidden" name="disk[genre_ids][]" value="<%= g.id %>">
           <% end %>
         </div>
+        <small class="text-secondary">Podés seleccionar uno o varios géneros del listado. Usá ✕ para quitar.</small>
       </div>
-      <small class="muted">Podés seleccionar uno o varios géneros del listado. Usá ✕ para quitar.</small>
     </div>
 
-    <div>
-      <%= link_to '⚙️', admin_genres_path, class: 'btn-outline', title: 'Gestionar géneros' %>
-    </div>
-  </div>
-
-  <!-- Stock (solo Nuevo) -->
-  <div class="field" id="stock_field">
-    <%= f.label :stock, "Stock" %>
-    <%= f.number_field :stock, min: 0, step: 1, class: 'form-control',
-          inputmode: "numeric", id: 'disk_stock' %>
-  </div>
-
-  <!-- Audio (solo Usado) -->
-  <div class="field" id="audio_field">
-    <%= f.label :audio, "Audio opcional (muestra)" %>
-    <%= f.file_field :audio, accept: 'audio/*', class: 'form-control' %>
-    <% if @disk.respond_to?(:audio) && @disk.audio.attached? %>
-      <div style="margin-top:8px;">
-        <audio controls style="width:100%; max-width:360px;">
-          <source src="<%= url_for(@disk.audio) %>" type="<%= @disk.audio.blob.content_type %>">
-          Tu navegador no soporta audio.
-        </audio>
+    <div class="form-row two-cols align-start">
+      <div class="form-group bordered" id="stock_field">
+        <%= f.label :stock, "Stock", class: "form-label top-label" %>
+        <%= f.number_field :stock, min: 0, step: 1, class: 'form-control', inputmode: "numeric", id: 'disk_stock' %>
       </div>
-    <% end %>
-  </div>
 
-  <div class="actions" style="display:flex; gap:8px; align-items:center;">
-    <%= f.submit (@disk.persisted? ? 'Guardar' : 'Crear Disco'), class: 'btn-primary' %>
-    <% if @disk.persisted? %>
-      <%= link_to 'Gestionar imágenes', images_admin_disk_path(@disk), class: 'btn-outline' %>
-    <% end %>
-    <%= link_to 'Volver', admin_disks_path, class: 'btn-outline' %>
+      <div class="form-group bordered" id="audio_field">
+        <%= f.label :audio, "Audio opcional (muestra)", class: "form-label top-label" %>
+        <%= f.file_field :audio, accept: 'audio/*', class: 'form-control' %>
+        <% if @disk.respond_to?(:audio) && @disk.audio.attached? %>
+          <div class="audio-preview-wrap">
+            <audio controls class="audio-preview">
+              <source src="<%= url_for(@disk.audio) %>" type="<%= @disk.audio.blob.content_type %>">
+              Tu navegador no soporta audio.
+            </audio>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="d-flex gap-2 mt-3">
+      <%= f.submit (@disk.persisted? ? 'Guardar' : 'Crear Disco'), class: 'btn btn-primary' %>
+      <% if @disk.persisted? %>
+        <%= link_to 'Gestionar imágenes', images_admin_disk_path(@disk), class: 'btn btn-outline-secondary' %>
+      <% end %>
+      <%= link_to 'Volver', admin_disks_path, class: 'btn btn-outline-secondary' %>
+    </div>
   </div>
 <% end %>
 
-<style>
-  .genre-select { position: relative; }
-  .chip-remove:hover { color: #dc2626; }
-</style>
-
+<% content_for :stylesheets do %>
+  <%= stylesheet_link_tag 'admin_layout', media: 'all' %>
+  <%= stylesheet_link_tag 'admin_index', media: 'all' %>
+  <%= stylesheet_link_tag 'admin_disks', media: 'all' %>
+<% end %>
 <script>
   (function() {
     function currentType() {

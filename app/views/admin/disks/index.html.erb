@@ -1,155 +1,241 @@
-<% content_for :title, "Discos - Disquería" %>
-<% content_for :page_title, "Administración de Discos" %>
+<% content_for :title, "Catálogo - Admin" %>
 <% content_for :stylesheets do %>
   <%= stylesheet_link_tag 'admin_layout', media: 'all' %>
-  <%= stylesheet_link_tag 'disks', media: 'all' %>
+  <%= stylesheet_link_tag 'admin_index', media: 'all' %>
+  <%= stylesheet_link_tag 'admin_disks', media: 'all' %>
 <% end %>
 
 <% from_sale = (params[:from] == 'sale') %>
-<body class="disks-layout">
-<div class="container">
-  <div class="disks-hero">
-    <div>
-      <h1 class="title">Administración de Discos</h1>
-      <p class="subtitle"><%= from_sale ? "Agregá discos al carrito de la venta" : "Gestioná discos nuevos y usados" %></p>
-    </div>
-  </div>
 
-  <section class="disks-section new-disks-section">
-    <div class="disks-header">
-      <h2>Discos Nuevos</h2>
-      <% if from_sale %>
-        <div class="disks-actions">
-          <%= link_to "Ver carrito", cart_admin_sales_path, class: "btn-primary" %>
+<div class="dashboard-container">
+  <header class="admin-header">
+    <div class="header-content">
+      <div class="header-top">
+        <div>
+          <h1 class="header-title">Administración de Discos</h1>
+          <p class="header-subtitle"><%= from_sale ? "Agregá discos al carrito de la venta" : "Gestioná discos nuevos y usados" %></p>
         </div>
-      <% end %>
+        <% if from_sale %>
+          <%= link_to "Ver carrito", cart_admin_sales_path, class: "btn-logout" %>
+        <% end %>
+      </div>
     </div>
-    <div class="disks-grid">
-      <% @new_disks.each do |disk| %>
-        <div class="disk-card">
-          <% if from_sale %>
-            <div class="disk-media">
-              <% cover = disk.cover&.attached? ? disk.cover : disk.images.first %>
-              <% if cover.present? && cover.blob.present? %>
-                <%= image_tag cover, alt: disk.name, class: "disk-large-img" %>
-              <% else %>
-                <div class="placeholder-img">No hay imagen cargada</div>
-              <% end %>
-            </div>
-            <div class="disk-body">
-              <h3 class="disk-title"><%= disk.name %></h3>
-              <div class="disk-meta"><%= disk.author.presence || '—' %></div>
-              <div class="disk-meta">Stock: <%= disk.stock.to_i %></div>
-            </div>
-            <div class="disk-footer">
-              <div class="price">$<%= number_with_precision(disk.unit_price.to_f, precision: 2) %></div>
-              <div class="actions">
-                <%= form_with url: add_item_admin_sales_path, method: :post, local: true, class: "disk-add-controls" do %>
-                  <%= hidden_field_tag :disk_id, disk.id %>
-                  <%= number_field_tag :units_sold, 1, min: 1, max: (disk.is_a?(NewDisk) ? disk.stock.to_i : 1), class: "filter-input" %>
-                  <%= submit_tag "Agregar al carrito", class: "btn-primary", data: { turbo: false } %>
-                <% end %>
-              </div>
-            </div>
-          <% else %>
-            <%= link_to admin_disk_path(disk), class: "card-link" do %>
-              <div class="disk-media">
-                <% cover = disk.cover&.attached? ? disk.cover : disk.images.first %>
-                <% if cover.present? && cover.blob.present? %>
-                  <%= image_tag cover, alt: disk.name, class: "disk-large-img" %>
-                <% else %>
-                  <div class="placeholder-img">No hay imagen cargada</div>
-                <% end %>
-              </div>
-              <div class="disk-body">
-                <h3 class="disk-title"><%= disk.name %></h3>
-                <div class="disk-meta"><%= disk.author.presence || '—' %></div>
-              </div>
-              <div class="disk-footer">
-                <div class="price">$<%= number_with_precision(disk.unit_price.to_f, precision: 2) %></div>
-                <div class="actions">
-                  <span class="btn-outline">Ver detalles</span>
+  </header>
+  <main class="admin-main">
+
+    <section class="module-card">
+     <%= turbo_frame_tag :new_disks, data: { turbo_preserve_scroll: true } do %>
+        <div class="disks-header">
+          <h2 class="card-title">Discos Nuevos</h2>
+          <p class="card-description">Catálogo de discos nuevos</p>
+        </div>
+
+        <div class="row g-3">
+          <% @new_disks.each do |disk| %>
+            <div class="col-12 col-md-6 col-lg-4">
+              <div class="card shadow-sm">
+                <div class="card-body">
+                  <% if from_sale %>
+                   <div class="mb-3 d-flex justify-content-center">
+                      <% cover = disk.cover&.attached? ? disk.cover : disk.images.first %>
+                      <% if cover.present? && cover.blob.present? %>
+                        <div class="disk-thumb-wrap">
+                          <%= image_tag cover, alt: disk.name, class: "disk-thumb-img" %>
+                        </div>
+                      <% else %>
+                        <div class="text-muted text-center">No hay imagen cargada</div>
+                      <% end %>
+                    </div>
+
+                   <div>
+                      <h3 class="h5 mb-1"><%= disk.name %></h3>
+                      <div class="text-muted mb-2"><%= disk.author.presence || '—' %></div>
+                      <% if disk.genres.any? %>
+                       <div class="mb-2">
+                          <% disk.genres.each do |g| %>
+                           <span class="badge text-bg-secondary me-1"><%= g.name %></span>
+                          <% end %>
+                        </div>
+                      <% end %>
+                      <div class="text-muted">Stock: <%= disk.stock.to_i %></div>
+                    </div>
+
+                   <div class="d-flex justify-content-between align-items-center mt-3">
+                     <div class="fw-bold">$<%= number_with_precision(disk.unit_price.to_f, precision: 2) %></div>
+                       <%= form_with url: add_item_admin_sales_path, method: :post, local: true, class: "d-flex align-items-center gap-2" do %>
+                         <%= hidden_field_tag :disk_id, disk.id %>
+                        <%= number_field_tag :units_sold, 1, min: 1, max: disk.stock.to_i, class: "form-control", style: "max-width:90px" %>
+                        <%= submit_tag "Agregar", class: "btn btn-primary", data: { turbo: false } %>
+                       <% end %>
+                    </div>
+                  <% else %>
+                   <%= link_to admin_disk_path(disk), class: "text-decoration-none" do %>
+                      <div class="mb-3 d-flex justify-content-center">
+                        <% cover = disk.cover&.attached? ? disk.cover : disk.images.first %>
+                        <% if cover.present? && cover.blob.present? %>
+                         <div class="disk-thumb-wrap">
+                           <%= image_tag cover, alt: disk.name, class: "disk-thumb-img" %>
+                         </div>
+                        <% else %>
+                         <div class="text-muted text-center">No hay imagen cargada</div>
+                        <% end %>
+                      </div>
+
+                      <div>
+                        <h3 class="h5 mb-1"><%= disk.name %></h3>
+                        <div class="text-muted mb-2"><%= disk.author.presence || '—' %></div>
+                        <% if disk.genres.any? %>
+                         <div class="mb-2">
+                            <% disk.genres.each do |g| %>
+                             <span class="badge text-bg-secondary me-1"><%= g.name %></span>
+                            <% end %>
+                          </div>
+                        <% end %>
+                      </div>
+
+                     <div class="d-flex justify-content-between align-items-center mt-3">
+                       <div class="fw-bold">$<%= number_with_precision(disk.unit_price.to_f, precision: 2) %></div>
+                       <span class="btn btn-outline-secondary">Ver detalles</span>
+                     </div>
+                    <% end %>
+                  <% end %>
                 </div>
               </div>
-            <% end %>
-          <% end %>
-        </div>
-      <% end %>
-    </div>
-    <div class="pagination-wrap"><%= paginate @new_disks, param_name: :new_page %></div>
-  </section>
+            </div>
+           <% end %>
+         </div>
 
-  <section class="disks-section used-disks-section" style="margin-top:32px;">
-    <div class="disks-header">
-      <h2>Discos Usados</h2>
-      <% if from_sale %>
-        <div class="disks-actions">
-          <%= link_to "Ver carrito", cart_admin_sales_path, class: "btn-primary" %>
-        </div>
-      <% end %>
-    </div>
-    <div class="disks-grid">
-      <% @used_disks.each do |disk| %>
-        <div class="disk-card">
-          <% if from_sale %>
-            <div class="disk-media">
-              <% cover = disk.cover&.attached? ? disk.cover : disk.images.first %>
-              <% if cover.present? && cover.blob.present? %>
-                <%= image_tag cover, alt: disk.name, class: "disk-large-img" %>
-              <% else %>
-                <div class="placeholder-img">No hay imagen cargada</div>
-              <% end %>
-            </div>
-            <div class="disk-body">
-              <h3 class="disk-title"><%= disk.name %></h3>
-              <div class="disk-meta"><%= disk.author.presence || '—' %></div>
-            </div>
-            <div class="disk-footer">
-              <div class="price">$<%= number_with_precision(disk.unit_price.to_f, precision: 2) %></div>
-              <div class="actions">
-                <%= form_with url: add_item_admin_sales_path, method: :post, local: true, class: "disk-add-controls" do %>
-                  <%= hidden_field_tag :disk_id, disk.id %>
-                  <%= number_field_tag :units_sold, 1, min: 1, max: 1, class: "filter-input" %>
-                  <%= submit_tag "Agregar al carrito", class: "btn-primary", data: { turbo: false } %>
-                <% end %>
-              </div>
-            </div>
-          <% else %>
-            <%= link_to admin_disk_path(disk), class: "card-link" do %>
-              <div class="disk-media">
-                <% cover = disk.cover&.attached? ? disk.cover : disk.images.first %>
-                <% if cover.present? && cover.blob.present? %>
-                  <%= image_tag cover, alt: disk.name, class: "disk-large-img" %>
+         <div class="pagination-wrap"><%= paginate @new_disks, param_name: :new_page %></div>
+       <% end %>
+    </section>
+
+    <section class="module-card" style="margin-top:24px;">
+     <%= turbo_frame_tag :used_disks, data: { turbo_preserve_scroll: true } do %>
+       <div class="disks-header">
+         <h2 class="card-title">Discos Usados</h2>
+         <p class="card-description">Catálogo de discos usados</p>
+       </div>
+
+       <div class="row g-3">
+         <% @used_disks.each do |disk| %>
+          <div class="col-12 col-md-6 col-lg-4">
+            <div class="card shadow-sm">
+              <div class="card-body">
+                <% if from_sale %>
+                 <!-- igual a bloque de nuevos, sin stock y max=1 -->
+                 <div class="mb-3 d-flex justify-content-center">
+                    <% cover = disk.cover&.attached? ? disk.cover : disk.images.first %>
+                    <% if cover.present? && cover.blob.present? %>
+                      <div class="disk-thumb-wrap">
+                        <%= image_tag cover, alt: disk.name, class: "disk-thumb-img" %>
+                      </div>
+                    <% else %>
+                      <div class="text-muted text-center">No hay imagen cargada</div>
+                    <% end %>
+                  </div>
+
+                 <div>
+                    <h3 class="h5 mb-1"><%= disk.name %></h3>
+                    <div class="text-muted mb-2"><%= disk.author.presence || '—' %></div>
+                    <% if disk.genres.any? %>
+                     <div class="mb-2">
+                        <% disk.genres.each do |g| %>
+                         <span class="badge text-bg-secondary me-1"><%= g.name %></span>
+                        <% end %>
+                      </div>
+                    <% end %>
+                  </div>
+
+                 <div class="d-flex justify-content-between align-items-center mt-3">
+                   <div class="fw-bold">$<%= number_with_precision(disk.unit_price.to_f, precision: 2) %></div>
+                     <%= form_with url: add_item_admin_sales_path, method: :post, local: true, class: "d-flex align-items-center gap-2" do %>
+                       <%= hidden_field_tag :disk_id, disk.id %>
+                      <%= number_field_tag :units_sold, 1, min: 1, max: 1, class: "form-control", style: "max-width:90px" %>
+                      <%= submit_tag "Agregar", class: "btn btn-primary", data: { turbo: false } %>
+                     <% end %>
+                  </div>
                 <% else %>
-                  <div class="placeholder-img">No hay imagen cargada</div>
+                 <%= link_to admin_disk_path(disk), class: "text-decoration-none" do %>
+                    <div class="mb-3 d-flex justify-content-center">
+                      <% cover = disk.cover&.attached? ? disk.cover : disk.images.first %>
+                      <% if cover.present? && cover.blob.present? %>
+                       <div class="disk-thumb-wrap">
+                         <%= image_tag cover, alt: disk.name, class: "disk-thumb-img" %>
+                       </div>
+                      <% else %>
+                       <div class="text-muted text-center">No hay imagen cargada</div>
+                      <% end %>
+                    </div>
+
+                    <div>
+                      <h3 class="h5 mb-1"><%= disk.name %></h3>
+                      <div class="text-muted mb-2"><%= disk.author.presence || '—' %></div>
+                      <% if disk.genres.any? %>
+                       <div class="mb-2">
+                          <% disk.genres.each do |g| %>
+                           <span class="badge text-bg-secondary me-1"><%= g.name %></span>
+                          <% end %>
+                        </div>
+                      <% end %>
+                    </div>
+
+                   <div class="d-flex justify-content-between align-items-center mt-3">
+                     <div class="fw-bold">$<%= number_with_precision(disk.unit_price.to_f, precision: 2) %></div>
+                     <span class="btn btn-outline-secondary">Ver detalles</span>
+                   </div>
+                  <% end %>
                 <% end %>
               </div>
-              <div class="disk-body">
-                <h3 class="disk-title"><%= disk.name %></h3>
-                <div class="disk-meta"><%= disk.author.presence || '—' %></div>
-              </div>
-              <div class="disk-footer">
-                <div class="price">$<%= number_with_precision(disk.unit_price.to_f, precision: 2) %></div>
-                <div class="actions">
-                  <span class="btn-outline">Ver detalles</span>
-                </div>
-              </div>
-            <% end %>
-          <% end %>
-        </div>
-      <% end %>
-    </div>
-    <div class="pagination-wrap"><%= paginate @used_disks, param_name: :used_page %></div>
-  </section>
+            </div>
+          </div>
+         <% end %>
+       </div>
 
-  <div class="disks-hero" style="margin-top:22px;">
-    <div class="actions">
-      <% unless from_sale %>
-        <%= link_to 'Nuevo disco', new_admin_disk_path, class: 'btn-primary' %>
-      <% else %>
-        <%= link_to 'Ver carrito', cart_admin_sales_path, class: 'btn-gold' %>
-      <% end %>
+       <div class="pagination-wrap"><%= paginate @used_disks, param_name: :used_page %></div>
+     <% end %>
+    </section>
+
+    <div class="d-flex justify-content-end mt-3">
+         <% unless from_sale %>
+          <%= link_to 'Nuevo disco', new_admin_disk_path, class: 'btn btn-primary' %>
+         <% else %>
+          <%= link_to 'Ver carrito', cart_admin_sales_path, class: 'btn btn-warning' %>
+         <% end %>
     </div>
-  </div>
-</div>
-</body>
+   </main>
+ </div>
+
+<script>
+(function(){
+  function enhancePagination(frameId){
+    var frame = document.getElementById(frameId);
+    if(!frame) return;
+
+    frame.addEventListener('click', function(e){
+      var a = e.target.closest('.pagination a');
+      if(!a) return;
+      e.preventDefault();
+      var url = a.href;
+
+      fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' }})
+        .then(function(res){ return res.text(); })
+        .then(function(html){
+          var tmp = document.createElement('div');
+          tmp.innerHTML = html;
+          var incomingFrame = tmp.querySelector('#' + frameId);
+          if(incomingFrame){
+            frame.innerHTML = incomingFrame.innerHTML;
+          }
+        })
+        .catch(function(err){ console.error('Pagination fetch error:', err); });
+    });
+  }
+
+  function setup(){
+    enhancePagination('new_disks');
+    enhancePagination('used_disks');
+  }
+  document.addEventListener('DOMContentLoaded', setup);
+  document.addEventListener('turbo:load', setup);
+})();
+</script>

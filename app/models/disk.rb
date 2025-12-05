@@ -7,6 +7,8 @@ class Disk < ApplicationRecord
   has_many :sales, through: :items
 
   validates :name, :author, :description, :format, :unit_price, presence: true
+  validates :year, presence: true,
+                  numericality: { only_integer: true, greater_than_or_equal_to: 1900, less_than_or_equal_to: Time.current.year }
 
   # Precio > 0
   validates :unit_price,
