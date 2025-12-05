@@ -6,11 +6,11 @@ class Admin::DisksController < ApplicationController
   ]
 
   def index
-    @new_disks = NewDisk.order(created_at: :desc)
+    @new_disks = NewDisk.order(stock: :desc, created_at: :desc)
                       .page(params[:new_page] || params[:page])
                       .per(6)
 
-    @used_disks = UsedDisk.order(created_at: :desc)
+    @used_disks = UsedDisk.order(stock: :desc, created_at: :desc)
                         .page(params[:used_page] || params[:page])
                         .per(6)
   end

@@ -45,6 +45,11 @@
             <% if @disk.is_a?(NewDisk) %>
               <div class="disk-meta"><strong>Stock:</strong> <%= @disk.stock.to_i %></div>
             <% end %>
+            <% if @disk.stock.to_i == 0 %>
+              <div class="alert alert-warning" style="margin-top:10px;">
+                <strong>Sin stock:</strong> Este disco no tiene unidades disponibles.
+              </div>
+            <% end %>
 
             <% if @disk.is_a?(UsedDisk) %>
               <div class="disk-audio" style="margin-top:14px;">

@@ -33,7 +33,10 @@
         <div class="row g-3">
           <% @new_disks.each do |disk| %>
             <div class="col-12 col-md-6 col-lg-4">
-              <div class="card shadow-sm">
+              <div class="card shadow-sm <%= 'card-out-of-stock' if disk.stock.to_i == 0 %>">
+                <% if disk.stock.to_i == 0 %>
+                  <span class="card-badge">Sin stock</span>
+                <% end %>
                 <div class="card-body">
                   <% if from_sale %>
                    <div class="mb-3 d-flex justify-content-center">
@@ -119,7 +122,10 @@
        <div class="row g-3">
          <% @used_disks.each do |disk| %>
           <div class="col-12 col-md-6 col-lg-4">
-            <div class="card shadow-sm">
+            <div class="card shadow-sm <%= 'card-out-of-stock' if disk.stock.to_i == 0 %>">
+              <% if disk.stock.to_i == 0 %>
+                <span class="card-badge">Sin stock</span>
+              <% end %>
               <div class="card-body">
                 <% if from_sale %>
                  <!-- igual a bloque de nuevos, sin stock y max=1 -->
