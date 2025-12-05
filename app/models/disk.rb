@@ -3,6 +3,9 @@ class Disk < ApplicationRecord
   has_one_attached :cover
   has_and_belongs_to_many :genres
 
+  has_many :items
+  has_many :sales, through: :items
+
   validates :name, :author, :description, :format, :unit_price, presence: true
 
   # Precio > 0
@@ -50,4 +53,44 @@ class Disk < ApplicationRecord
       end
     end
   end
+
+  def update_stock_on_delete
+    update_column(:stock, 0) if has_attribute?(:stock)
+  end
+
+  scope :sold_in_active_sales, -> {
+    joins(items: :sale)
+    .where(sales: { deleted: [ false, nil ] })
+    .group(:name)
+    .sum("items.units_sold")
+    .sort_by { |_k, v| -v }
+    .first(10)
+  }
+
+  scope :category_sold, -> {
+    joins(:items, :sales, :genres)
+    .where(sales: { deleted: [ false, nil ] })
+    .group("genres.name")
+    .sum("items.units_sold")
+  }
+
+  scope :format_in_sales, ->(sales) {
+    joins(items: :sale)
+    .where(sales: { id: sales.ids })
+    .group(:format).count
+  }
+
+  scope :gender_sold, ->(sales) {
+    joins(:genres, items: :sale)
+    .where(sales: { id: sales.ids })
+    .group("genres.name").count
+  }
+
+  scope :ranking_by_gender, ->(gender) {
+    joins(:genres, :items)
+    .where(genres: { name: gender })
+    .group(:name)
+    .sum("items.units_sold")
+    .sort_by { |_, v| -v }.first(5)
+  }
 end

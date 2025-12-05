@@ -3,6 +3,8 @@ class User < ApplicationRecord
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable
 
+  has_many :sales
+
   validates :name, presence: true, length: { minimum: 2, maximum: 50 }
   validates :lastname, presence: true, length: { minimum: 2, maximum: 50 }
   validates :is_active, inclusion: { in: [ true, false ] }
@@ -13,4 +15,10 @@ class User < ApplicationRecord
   def active_for_authentication?
     super && is_active?
   end
+
+  scope :get_sales, -> {
+    joins(:sales)
+    .where(sales: { deleted: [ false, nil ] })
+    .distinct
+  }
 end

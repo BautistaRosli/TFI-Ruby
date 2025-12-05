@@ -9,6 +9,16 @@
         <li><strong>Formato:</strong> <span class="muted"><%= @disk.format %></span></li>
         <li><strong>Stock:</strong> <span class="muted"><%= @disk.stock if @disk.respond_to?(:stock) %></span></li>
         <li><strong>Precio:</strong> <span class="price">$<%= @disk.unit_price %></span></li>
+        <% if @disk.genres.any? %>
+          <li>
+            <strong>Géneros:</strong>
+            <span class="muted">
+              <% @disk.genres.each do |g| %>
+                <span class="tag"><%= g.name + ", " %> </span>
+              <% end %>
+            </span>
+          </li>
+        <% end %>
       </ul>
 
         <div class="disk-description">
@@ -34,5 +44,30 @@
     
   </div>
 
-
+  <!-- Sección de Recomendaciones -->
+  <% if @recommended_disks.any? %>
+    <div class="recommendations-section">
+      <h2 class="recommendations-title">Discos que podrían interesarte</h2>
+      <div class="recommendations-grid">
+        <% @recommended_disks.each do |disk| %>
+          <div class="recommendation-card">
+            <%= link_to disk_new_path(disk), class: "recommendation-link" do %>
+              <div class="recommendation-media">
+                <% if disk.cover.present? %>
+                  <%= image_tag disk.cover, alt: disk.name, class: "recommendation-img" %>
+                <% else %>
+                  <%= image_tag "/tony/tony#{rand(1..5)}.png", alt: "Portada", class: "recommendation-img" %>
+                <% end %>
+              </div>
+              <div class="recommendation-body">
+                <h3 class="recommendation-title"><%= disk.name %></h3>
+                <p class="recommendation-author"><%= disk.author %></p>
+                <p class="recommendation-price">$<%= disk.unit_price %></p>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
 </div>

@@ -39,6 +39,18 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_04_001000) do
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
+  create_table "clients", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "name"
+    t.string "lastname"
+    t.string "email"
+    t.string "document_type", limit: 10, default: "DNI", null: false
+    t.string "document_number", limit: 30, null: false
+    t.index ["document_type", "document_number"], name: "index_clients_on_document_type_and_document_number", unique: true
+    t.index ["email"], name: "index_clients_on_email", unique: true
+  end
+
   create_table "disks", force: :cascade do |t|
     t.string "type"
     t.string "name", null: false

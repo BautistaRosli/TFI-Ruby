@@ -70,5 +70,8 @@ gem "kaminari"
 
 gem "wicked_pdf", "~> 2.8"
 
-#wkhtmltopdf, el programa que convierte HTML a PDF.
+# wkhtmltopdf, el programa que convierte HTML a PDF.
 gem "wkhtmltopdf-binary", "~> 0.12.6"
+
+gem "groupdate" # optional para apexcharts
+gem "apexcharts"

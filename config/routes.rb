@@ -18,8 +18,18 @@ Rails.application.routes.draw do
   namespace :admin do
     root to: "dashboard#index", as: :dashboard
 
-    resources :genres, except: [:show]
-    resources :sales, only: [:index, :show, :new, :create] do
+    resources :users do
+      member do
+        patch :reactivate
+        put :change_password
+        get :see_password
+      end
+    end
+
+    resources :graphics
+
+    resources :genres, except: [ :show ]
+    resources :sales, only: [ :index, :show, :new, :create, :destroy ] do
       collection do
         get  :cart
         post :add_item
@@ -28,7 +38,6 @@ Rails.application.routes.draw do
       end
     end
 
-    resources :users
 
     resources :disks do
       member do
@@ -39,11 +48,18 @@ Rails.application.routes.draw do
         delete :remove_image
       end
     end
+
+    resources :clients do
+      collection do
+        get :search_by_document
+        get :check_email
+      end
+    end
   end
 
   namespace :disk do
-    resources :new,  only: [:index, :show]
-    resources :used, only: [:index, :show]
+    resources :new,  only: [ :index, :show ]
+    resources :used, only: [ :index, :show ]
   end
 
   get "up" => "rails/health#show", as: :rails_health_check

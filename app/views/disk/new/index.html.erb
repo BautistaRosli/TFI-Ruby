@@ -6,42 +6,77 @@
     </div>
   </div>
 
-  <div class="disks-grid">
-    <% @disks.each do |disk| %>
-      <div class="disk-card">
-        <%= link_to disk_new_path(disk), class: "card-link" do %>
-          <div class="disk-media">
-            <% if disk.cover.present? %>
-              <%= image_tag disk.cover, alt: disk.name %>
-            <% else %>
-              <%= image_tag "/tony/tony#{rand(1..5)}.png", alt: "Imagen provisional", class: "fallback-img" %>
-            <% end %>
-          </div>
-
-          <div class="disk-body">
-            <h3 class="disk-title"><%= disk.name %></h3>
-            <div class="disk-meta"><%= disk.author %></div>
-            <% if disk.genres.any? %>
-              <div class="tags">
-                <% disk.genres.each do |g| %>
-                  <span class="tag"><%= g.name %></span>
-                <% end %>
-              </div>
-            <% end %>
-          </div>
-
-          <div class="disk-footer">
-            <div class="price">$<%= disk.unit_price %></div>
-            <div class="actions">
-              <%= link_to 'Ver detalles', disk_new_path(disk), class: 'btn-primary' %>
-            </div>
-          </div>
-        <% end %>
+  <div class="filters-bar">
+    <%= form_with url: disk_new_index_path, method: :get, local: true, class: "filters-form" do |f| %>
+      <div class="filter-group">
+        <%= f.text_field :name, placeholder: "Buscar por nombre...", value: params[:name], class: "filter-input" %>
       </div>
+      
+      <div class="filter-group">
+        <%= f.text_field :author, placeholder: "Buscar por autor...", value: params[:author], class: "filter-input" %>
+      </div>
+      
+      <div class="filter-group">
+        <%= f.select :genre_id, 
+            options_for_select([["Todos los géneros", ""]] + @genres.map { |g| [g.name, g.id] }, params[:genre_id]),
+            { include_blank: false },
+            class: "filter-select" %>
+      </div>
+
+      <div class="filter-group">
+        <%= f.number_field :min_price, placeholder: "Precio mín...", value: params[:min_price], class: "filter-input", min: 0 %>
+      </div>
+
+      <div class="filter-group">
+        <%= f.number_field :max_price, placeholder: "Precio máx...", value: params[:max_price], class: "filter-input", min: 0 %>
+      </div>
+      
+      <div class="filter-group">
+        <%= f.submit "Buscar", class: "btn-filter" %>
+        <%= link_to "Limpiar", disk_new_index_path, class: "btn-filter-clear" %>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="disks-grid">
+    <% if @disks.any? %>
+      <% @disks.each do |disk| %>
+        <div class="disk-card">
+          <%= link_to disk_new_path(disk), class: "card-link" do %>
+            <div class="disk-media">
+              <% if disk.cover.present? %>
+                <%= image_tag disk.cover, alt: disk.name %>
+              <% else %>
+                <%= image_tag "/tony/tony#{rand(1..5)}.png", alt: "Imagen provisional", class: "fallback-img" %>
+              <% end %>
+            </div>
+
+            <div class="disk-body">
+              <h3 class="disk-title"><%= disk.name %></h3>
+              <div class="disk-meta"><%= disk.author %></div>
+              <% if disk.genres.any? %>
+                <div class="tags">
+                  <% disk.genres.each do |g| %>
+                    <span class="tag"><%= g.name + ", "%></span>
+                  <% end %>
+                </div>
+              <% end %>
+            </div>
+
+            <div class="disk-footer">
+              <div class="price">$<%= disk.unit_price %></div>
+              <div class="actions">
+                <%= link_to 'Ver detalles', disk_new_path(disk), class: 'btn-primary' %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+    <% else %>
+      <p class="no-results">No se encontraron discos con esos criterios de búsqueda.</p>
     <% end %>
   </div>
   <div class="pagination-wrap">
     <%= paginate @disks %>
   </div>
 </div>
-
