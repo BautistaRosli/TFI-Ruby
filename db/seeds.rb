@@ -29,6 +29,8 @@ puts "✅ #{Genre.count} géneros creados."
 puts "💿 Creando discos NUEVOS..."
 
 20.times do |i|
+  release_year = rand(1970..Time.current.year)
+
   disk = NewDisk.new(
     name: "Disco Nuevo #{i + 1}",
     description: "Edición de lujo del disco nuevo #{i + 1}.",
@@ -36,7 +38,7 @@ puts "💿 Creando discos NUEVOS..."
     unit_price: rand(15000..35000),
     stock: rand(5..50),
     format: [ "vinilo", "CD" ].sample,
-    date_ingreso: Time.now - rand(1..100).days
+    year: release_year       # solo el año de lanzamiento
   )
 
   # Asignar Género e Imagen
@@ -56,14 +58,16 @@ end
 puts "\n💿 Creando discos USADOS (Stock fijo en 1)..."
 
 20.times do |i|
+  release_year = rand(1970..Time.current.year)
+
   disk = UsedDisk.new(
     name: "Disco Usado #{i + 1}",
     description: "Disco usado en buen estado #{i + 1}.",
     author: [ "Nirvana", "Soda Stereo", "Charly García", "Radiohead" ].sample,
     unit_price: rand(5000..12000),
-    stock: 1, # SIEMPRE 1
+    stock: 1,
     format: [ "vinilo", "CD" ].sample,
-    date_ingreso: Time.now - rand(1..100).days
+    year: release_year       # solo el año de lanzamiento
   )
 
   disk.genres << all_genres.sample(rand(1..2))

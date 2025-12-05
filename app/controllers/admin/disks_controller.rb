@@ -6,8 +6,13 @@ class Admin::DisksController < ApplicationController
   ]
 
   def index
-    @new_disks  = Disk.with_attached_cover.with_attached_images.where(type: 'NewDisk').order(:name).page(params[:new_page]).per(10)
-    @used_disks = Disk.with_attached_cover.with_attached_images.where(type: 'UsedDisk').order(:name).page(params[:used_page]).per(10)
+    @new_disks = NewDisk.order(created_at: :desc)
+                      .page(params[:new_page] || params[:page])
+                      .per(6)
+
+    @used_disks = UsedDisk.order(created_at: :desc)
+                        .page(params[:used_page] || params[:page])
+                        .per(6)
   end
 
   def show; end
@@ -127,7 +132,7 @@ class Admin::DisksController < ApplicationController
   def disk_params(context = :create)
     permitted = [
       :name, :author, :description, :unit_price, :stock,
-      :format, :date_ingreso,
+      :format, :date_ingreso, :year,
       genre_ids: []
     ]
     permitted << :type if context == :create

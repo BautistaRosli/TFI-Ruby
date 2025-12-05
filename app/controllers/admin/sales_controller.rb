@@ -121,6 +121,17 @@ class Admin::SalesController < ApplicationController
 
     # Ahora guardar todo junto (sale + items)
     if @sale.save
+      # Actualizar stock de los discos vendidos
+      @sale.items.each do |item|
+        disk = item.disk
+        if disk.is_a?(NewDisk)
+          new_stock = disk.stock.to_i - item.units_sold.to_i
+          disk.update!(stock: [new_stock, 0].max)
+        else # UsedDisk
+          disk.update!(stock: 0)
+        end
+      end
+
       # llamar al método del concern (no a la acción)
       clear_cart_session
       redirect_to admin_sale_path(@sale), notice: "Venta creada exitosamente"
