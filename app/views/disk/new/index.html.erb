@@ -22,6 +22,14 @@
             { include_blank: false },
             class: "filter-select" %>
       </div>
+
+      <div class="filter-group">
+        <%= f.number_field :min_price, placeholder: "Precio mín...", value: params[:min_price], class: "filter-input", min: 0 %>
+      </div>
+
+      <div class="filter-group">
+        <%= f.number_field :max_price, placeholder: "Precio máx...", value: params[:max_price], class: "filter-input", min: 0 %>
+      </div>
       
       <div class="filter-group">
         <%= f.submit "Buscar", class: "btn-filter" %>

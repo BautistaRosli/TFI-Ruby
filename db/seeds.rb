@@ -24,7 +24,7 @@ puts "Creando discos nuevos..."
 
 20.times do |i|
   disk = NewDisk.create!(
-    name: "Disco generico",
+    name: "Disco generico" + (i + 1).to_s,
     description: "Descripción del disco #{i + 1}",
     author: ["Pink Floyd", "Queen", "AC/DC", "The Beatles", "Metallica"].sample,
     unit_price: rand(5000..20000),
