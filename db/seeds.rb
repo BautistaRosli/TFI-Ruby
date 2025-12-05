@@ -1,44 +1,87 @@
-# This file should ensure the existence of records required to run the application in every environment (production,
-# development, test). The code here should be idempotent so that it can be executed at any point in every environment.
-# The data can then be loaded with the bin/rails db:seed command (or created alongside the database with db:setup).
-#
-# Example:
-#
-#   ["Action", "Comedy", "Drama", "Horror"].each do |genre_name|
-#     MovieGenre.find_or_create_by!(name: genre_name)
-#   end
-puts "Eliminando discos previos..."
+# db/seeds.rb
+require 'open-uri'
+
+puts "🗑️  Limpiando base de datos..."
+# Borramos en orden para mantener integridad
+Item.delete_all
+Sale.delete_all
+# Borramos la tabla intermedia y luego los modelos
+Disk.all.each { |d| d.genres.clear }
 Disk.delete_all
+Genre.delete_all
 
-puts "Creando discos nuevos..."
+# URL de imagen genérica
+PLACEHOLDER_URL = "https://placehold.co/400x400/png"
+
+# -----------------------------------------------------------------------------
+# 1. CREACIÓN DE GÉNEROS (NUEVA LÓGICA)
+# -----------------------------------------------------------------------------
+puts "🎵 Creando géneros musicales..."
+genre_names = [ "Rock", "Pop", "Jazz", "Metal", "Indie", "Clásica", "Hip hop", "Electrónica" ]
+all_genres = genre_names.map do |name|
+  Genre.find_or_create_by!(name: name)
+end
+puts "✅ #{Genre.count} géneros creados."
+
+# -----------------------------------------------------------------------------
+# 2. CREACIÓN DE DISCOS NUEVOS
+# -----------------------------------------------------------------------------
+puts "💿 Creando discos NUEVOS (con imágenes y géneros)..."
 
 20.times do |i|
-  NewDisk.create!(
-    name: "Disco generico",
-    description: "Descripción del disco #{i + 1}",
-    author: ["Pink Floyd", "Queen", "AC/DC", "The Beatles", "Metallica"].sample,
-    unit_price: rand(5000..20000),
-    stock: rand(1..20),
-    category: ["Rock", "Pop", "Jazz", "Metal"].sample,
-    format: ["vinilo", "CD"].sample,
+  disk = NewDisk.new(
+    name: "Disco Nuevo #{i + 1}",
+    description: "Edición de lujo del disco nuevo #{i + 1}.",
+    author: [ "Pink Floyd", "Queen", "AC/DC", "The Beatles", "Metallica" ].sample,
+    unit_price: rand(15000..35000),
+    stock: rand(5..50), # Stock variado para nuevos
+    format: [ "vinilo", "CD" ].sample,
     date_ingreso: Time.now - rand(1..100).days
   )
+
+  # ASIGNAR GÉNERO (Relación has_and_belongs_to_many)
+  # Le asignamos 1 o 2 géneros al azar
+  disk.genres << all_genres.sample(rand(1..2))
+
+  # ADJUNTAR IMAGEN
+  begin
+    file = URI.open(PLACEHOLDER_URL)
+    disk.cover.attach(io: file, filename: "new_cover_#{i}.png", content_type: "image/png")
+    disk.save!
+    print "."
+  rescue StandardError => e
+    puts "\n❌ Error al crear NewDisk #{i+1}: #{e.message}"
+  end
 end
+puts "\n✅ 20 NewDisks creados."
 
-puts "Listo! Se crearon 20 NewDisks 🎵"
-
-puts "Creando discos usados..."
+# -----------------------------------------------------------------------------
+# 3. CREACIÓN DE DISCOS USADOS
+# -----------------------------------------------------------------------------
+puts "💿 Creando discos USADOS (Stock fijo en 1)..."
 
 20.times do |i|
-  UsedDisk.create!(
-    name: "Disco usado generico",
-    description: "Descripción del disco usado #{i + 1}",
-    author: ["Pink Floyd", "Queen", "AC/DC", "The Beatles", "Metallica"].sample,
-    unit_price: rand(2000..12000),
-    category: ["Rock", "Pop", "Jazz", "Metal"].sample,
-    format: ["vinilo", "CD"].sample,
+  disk = UsedDisk.new(
+    name: "Disco Usado #{i + 1}",
+    description: "Disco usado en buen estado #{i + 1}.",
+    author: [ "Nirvana", "Soda Stereo", "Charly García", "Radiohead" ].sample,
+    unit_price: rand(5000..12000),
+    stock: 1, # <--- REGLA DE NEGOCIO: SIEMPRE 1
+    format: [ "vinilo", "CD" ].sample,
     date_ingreso: Time.now - rand(1..100).days
   )
-end
 
-puts "Listo! Se crearon 20 UsedDisks 🎶"
+  # ASIGNAR GÉNERO
+  disk.genres << all_genres.sample(rand(1..2))
+
+  # ADJUNTAR IMAGEN
+  begin
+    file = URI.open(PLACEHOLDER_URL)
+    disk.cover.attach(io: file, filename: "used_cover_#{i}.png", content_type: "image/png")
+    disk.save!
+    print "."
+  rescue StandardError => e
+    puts "\n❌ Error al crear UsedDisk #{i+1}: #{e.message}"
+  end
+end
+puts "\n✅ 20 UsedDisks creados."

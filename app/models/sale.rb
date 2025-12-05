@@ -106,4 +106,26 @@ class Sale < ApplicationRecord
     .group_by_hour_of_day(:created_at, format: "%H:00")
     .count
   }
+
+  scope :sales_by_employee, ->(employee_id) {
+    where(user_id: employee_id, deleted: [ false, nil ])
+  }
+
+  scope :sales_by_customer, ->(customer_id) {
+    where(customer_id: customer_id, deleted: [ false, nil ])
+  }
+
+  scope :sales_by_gender, ->(genero) {
+    joins(items: { disk: :genres })
+    .where(genres: { name: genero })
+    .where(sales: { deleted: [ false, nil ] })
+  }
+
+  scope :anonymous_sales, ->(anonymous_id) {
+    where(customer_id: anonymous_id, deleted: [ false, nil ])
+  }
+
+  scope :deleted_sales, -> {
+    where(deleted: true)
+  }
 end

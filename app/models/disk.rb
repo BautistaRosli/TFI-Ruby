@@ -68,9 +68,29 @@ class Disk < ApplicationRecord
   }
 
   scope :category_sold, -> {
-  joins(:items, :sales)
-  .where(sales: { deleted: [ false, nil ] })
-  .group(:category)
-  .sum("items.units_sold")
-}
+    joins(:items, :sales, :genres)
+    .where(sales: { deleted: [ false, nil ] })
+    .group("genres.name")
+    .sum("items.units_sold")
+  }
+
+  scope :format_in_sales, ->(sales) {
+    joins(items: :sale)
+    .where(sales: { id: sales.ids })
+    .group(:format).count
+  }
+
+  scope :gender_sold, ->(sales) {
+    joins(:genres, items: :sale)
+    .where(sales: { id: sales.ids })
+    .group("genres.name").count
+  }
+
+  scope :ranking_by_gender, ->(gender) {
+    joins(:genres, :items)
+    .where(genres: { name: gender })
+    .group(:name)
+    .sum("items.units_sold")
+    .sort_by { |_, v| -v }.first(5)
+  }
 end

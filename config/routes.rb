@@ -21,6 +21,8 @@ Rails.application.routes.draw do
     resources :users do
       member do
         patch :reactivate
+        put :change_password
+        get :see_password
       end
     end
 

@@ -48,6 +48,20 @@ class Admin::UsersController < ApplicationController
     redirect_to admin_users_path, notice: "Usuario reactivado correctamente."
   end
 
+  def see_password(method: :get)
+  end
+
+  def change_password(method: :put)
+    @user = User.find(params[:id])
+    if @user.update(password_params)
+      redirect_to admin_user_path(@user), notice: "Contraseña actualizada correctamente"
+    else
+      flash.now[:alert] = "El usuario no pudo ser actualizado. Revisa los errores."
+      render :show, status: :unprocessable_entity
+    end
+  end
+
+
   private
 
   def creation_params
@@ -56,5 +70,9 @@ class Admin::UsersController < ApplicationController
 
   def user_params
     params.require(:user).permit(:email, :name, :lastname, :role, :is_active)
+  end
+
+  def password_params
+    params.require(:user).permit(:password, :password_confirmation)
   end
 end

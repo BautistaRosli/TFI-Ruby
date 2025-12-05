@@ -13,6 +13,19 @@ class Admin::GraphicsController < ApplicationController
     @top_customer = Sale.top_customer
     @sales_by_hour = Sale.sales_by_hour
     @low_stock = NewDisk.low_stock
+    @deleted_sales = Sale.deleted_sales
+    @anonymous = Client.find_by(document_number: "000000", document_type: "DNI")
+
+    if @anonymous
+      anon_sales = Sale.anonymous_sales(@anonymous.id)
+      @anonymous_qty_chart = anon_sales.group_by_week(:created_at).count
+      @anonymous_money_chart = anon_sales.group_by_week(:created_at).sum(:total_amount)
+      @total_anonymous_revenue = anon_sales.sum(:total_amount)
+    else
+      @anonymous_qty_chart = {}
+      @anonymous_money_chart = {}
+      @total_anonymous_revenue = 0
+    end
 
     # Reportes personalizados
     if params[:report_type].present? && params[:search_query].present?
@@ -24,38 +37,48 @@ class Admin::GraphicsController < ApplicationController
       when "employee"
         @custom_entity = User.find_by(email: query)
         if @custom_entity
-          sales = Sale.where(user_id: @custom_entity.id, deleted: [ false, nil ]) # Cambiar
+          sales = Sale.sales_by_employee(@custom_entity.id)
 
           @custom_chart_1 = sales.group_by_week(:created_at).sum(:total_amount)
-          @custom_chart_2 = Disk.joins(items: :sale).where(sales: { id: sales.ids }).group(:format).count
+          @custom_chart_2 = Disk.format_in_sales(sales)
           @custom_kpi = sales.sum(:total_amount)
         else
           flash.now[:alert] = "No se encontró empleado con email: #{query}"
         end
 
       when "client"
-        # Buscamos cliente por DNI
-        @custom_entity = Client.find_by(document_number: query)
+        @custom_entity = Client.find_by(
+          document_number: query,
+          document_type: params[:document_type]
+        )
         if @custom_entity
-          sales = Sale.where(customer_id: @custom_entity.id, deleted: [ false, nil ])
+          sales = Sale.sales_by_customer(@custom_entity.id)
 
           @custom_chart_1 = sales.group_by_day(:created_at).count
 
-          @custom_chart_2 = Disk.joins(items: :sale).where(sales: { id: sales.ids }).group(:category).count
+          @custom_chart_2 = Disk.gender_sold(sales)
           @custom_kpi = sales.average(:total_amount)
         else
-          flash.now[:alert] = "No se encontró cliente con DNI: #{query}"
+          flash.now[:alert] = "No se encontró al cliente"
         end
 
       when "category"
-        query = query.downcase.capitalize # Paso a min y despues pongo la primer letra en mayus
-        if Disk.exists?(category: query)
-          @custom_entity = query
-          sales = Sale.joins(items: :disk).where(disks: { category: query }, deleted: [ false, nil ])
+        query = query.downcase.capitalize
 
 
-          @custom_chart_1 = sales.group_by_month(:datetime).sum(:total_amount)
-          @custom_chart_2 = Disk.where(category: query).joins(:items).group(:name).sum("items.units_sold").sort_by { |_, v| -v }.first(5)
+        genre = Genre.find_by(name: query)
+
+        if genre
+          @custom_entity = genre.name
+
+
+          sales = Sale.sales_by_gender(query)
+
+          @custom_chart_1 = sales.group_by_month(:created_at).sum(:total_amount)
+
+
+          @custom_chart_2 = Disk.ranking_by_gender(query)
+
           @custom_kpi = sales.sum(:total_amount)
         else
           flash.now[:alert] = "No existe la categoría: #{query}"

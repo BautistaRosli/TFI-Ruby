@@ -52,22 +52,38 @@
       <div class="card shadow-sm mb-4 bg-light">
         <div class="card-body py-3">
           <%= form_with url: admin_graphics_path, method: :get, class: "row g-2 align-items-end" do |f| %>
-            <div class="col-md-3">
+            
+            <div class="col-12 col-md-3 mb-2 mb-md-0">
               <label class="fw-bold small text-muted">TIPO DE REPORTE</label>
               <%= select_tag :report_type, 
                   options_for_select([
                     ['Analizar Empleado (Email)', 'employee'], 
-                    ['Analizar Cliente (DNI)', 'client'],
+                    ['Analizar Cliente (DNI)', 'client'], 
                     ['Analizar Categoría (Nombre)', 'category']
                   ], params[:report_type]), 
                   class: "form-select", 
+                  id: "report_type",
                   prompt: "Selecciona una opción..." %>
             </div>
-            <div class="col-md-6">
+
+            <div class="col-12 col-md-6 mb-2 mb-md-0">
               <label class="fw-bold small text-muted">DATO A BUSCAR</label>
-              <%= text_field_tag :search_query, params[:search_query], class: "form-control", placeholder: "Ej: juan@email.com o 12345678" %>
+              
+              <div class="input-group flex-nowrap"> 
+                <%= select_tag :document_type, 
+                    options_for_select(['DNI', 'PASAPORTE', 'LE', 'LC'], params[:document_type]), 
+                    class: "form-select d-none", 
+                    id: "document_type_select",
+                    style: "max-width: 110px; background-color: #f8f9fa;" %>
+
+                <%= text_field_tag :search_query, params[:search_query], 
+                    class: "form-control", 
+                    id: "search_input", 
+                    placeholder: "Selecciona una opción..." %>
+              </div>
             </div>
-            <div class="col-md-3">
+
+            <div class="col-12 col-md-3">
               <div class="d-flex gap-2">
                 <button type="submit" class="btn btn-primary w-100">🔍 Buscar</button>
                 <% if params[:report_type].present? %>
@@ -81,43 +97,53 @@
 
       <% if @custom_entity %>
         
-        <div class="row g-4 fade-in">
-          <div class="col-12">
-            <div class="alert alert-info d-flex justify-content-between align-items-center">
-              <h3 class="mb-0">
-                📊 Resultados para: 
-                <strong>
-                  <% if @custom_entity.is_a?(String) %>
-                    <%= @custom_entity %>
-                  <% else %>
-                    <%= @custom_entity.try(:name) || @custom_entity.try(:email) %>
-                    <%= @custom_entity.try(:lastname) %>
-                  <% end %>
-                </strong>
-              </h3>
-              <span class="badge bg-primary fs-5">
-                <% if @report_type == 'client' %>
-                  Dinero Promedio Gastado: <%= number_to_currency(@custom_kpi) %>
+        <div class="col-12 mb-4">
+          <div class="alert alert-info d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+            <h3 class="mb-0 text-center text-md-start">
+              📊 Resultados para: 
+              <strong>
+                <% if @custom_entity.is_a?(String) %>
+                  <%= @custom_entity %>
                 <% else %>
-                  Dinero Generado: <%= number_to_currency(@custom_kpi) %>
+                  <%= @custom_entity.try(:name) || @custom_entity.try(:email) %>
+                  <%= @custom_entity.try(:lastname) %>
                 <% end %>
-              </span>
-            </div>
-          </div>
+              </strong>
+            </h3>
 
+            <span class="badge bg-primary fs-5 text-wrap text-break text-center">
+              <% if @report_type == 'client' %>
+                Dinero Promedio Gastado: <%= number_to_currency(@custom_kpi) %>
+              <% else %>
+                Dinero Generado: <%= number_to_currency(@custom_kpi) %>
+              <% end %>
+            </span>
+          </div>
+        </div>
+
+        <div class="row g-4">
           <div class="col-md-8">
             <div class="card h-100 shadow-sm">
               <div class="card-body">
-                <h5 class="card-title">
-                  <% if @report_type == 'employee' %> 📈 Evolución de Ventas ($)
-                    <% prefix = "$" %>
-                  <% elsif @report_type == 'client' %> 🛒 Historial de Compras (Cant)
-                    <% prefix = "" %>
-                  <% else %> 🎵 Evolución del Género
-                   <% prefix = "" %>
-                  <% end %>
-                </h5>
-                <%= line_chart @custom_chart_1, prefix: "$", defer: true %>
+                <% 
+                  # Lógica limpia de título y prefijo antes de pintar el gráfico
+                  chart1_title = "Gráfico"
+                  chart1_prefix = "$"
+                  
+                  if @report_type == 'employee'
+                    chart1_title = "📈 Evolución de Ventas ($)"
+                    chart1_prefix = "$"
+                  elsif @report_type == 'client'
+                    chart1_title = "🛒 Historial de Compras (Cant)"
+                    chart1_prefix = "" # Cantidad, sin signo pesos
+                  else
+                    chart1_title = "🎵 Evolución del Género"
+                    chart1_prefix = "" 
+                  end 
+                %>
+                
+                <h5 class="card-title"><%= chart1_title %></h5>
+                <%= line_chart @custom_chart_1, prefix: chart1_prefix, defer: true, height: "350px" %>
               </div>
             </div>
           </div>
@@ -125,18 +151,22 @@
           <div class="col-md-4">
             <div class="card h-100 shadow-sm">
               <div class="card-body">
-                <h5 class="card-title">
-                  <% if @report_type == 'employee' %> 💿 Formato más vendido
-                    <%= bar_chart @custom_chart_2, colors: ["#F59E0B"], defer: true %>
-                  <% elsif @report_type == 'client' %> 🎧 Géneros Favoritos
-                    <%= bar_chart @custom_chart_2, colors: ["#F59E0B"], defer: true %>
-                  <% else %> ⭐ Top Discos
-                  <% end %>
-                </h5>
+                <% 
+                   chart2_title = "Distribución"
+                   if @report_type == 'employee'
+                     chart2_title = "💿 Formato más vendido"
+                   elsif @report_type == 'client'
+                     chart2_title = "🎧 Géneros Favoritos"
+                   else 
+                     chart2_title = "⭐ Top Discos"
+                   end 
+                %>
+                <h5 class="card-title"><%= chart2_title %></h5>
+                
                 <% if @report_type == 'category' %>
-                  <%= bar_chart @custom_chart_2, colors: ["#F59E0B"], defer: true %>
+                  <%= bar_chart @custom_chart_2, colors: ["#F59E0B"], defer: true, height: "350px" %>
                 <% else %>
-                  <%= pie_chart @custom_chart_2, donut: true, defer: true %>
+                  <%= pie_chart @custom_chart_2, donut: true, defer: true, height: "350px", legend: "bottom" %>
                 <% end %>
               </div>
             </div>
@@ -222,7 +252,67 @@
               <% end %>
             </div>
           </div>
+          
+          <div class="col-md-6">
+            <div class="card h-100 shadow-sm"> <div class="card-body">
+                <h3>Cantidad de ventas anónimas (Semanal)</h3>
+                <%= bar_chart @anonymous_qty_chart, { colors: ["#EF4444"], defer: true } %>
+              </div>
+            </div>
+          </div>
+          
+          <div class="col-md-6">
+            <div class="card h-100 shadow-sm">
+              <div class="card-body">
+                <h3>Dinero recaudado anónimo (Semanal)</h3>
+                
+                <% if @total_anonymous_revenue > 0 %>
+                  <%= line_chart @anonymous_money_chart, prefix: "$", defer: true, colors: ["#10B981"] %>
+                <% else %>
+                  <div class="text-center py-5 text-muted">
+                    <h4>No hay datos de ventas anónimas</h4>
+                  </div>
+                <% end %>
+              </div>
+            </div>
+          </div>
+          
         </div> 
         <% end %> </div> <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() { 
+  const reportTypeSelect = document.getElementById('report_type');
+  const docSelect = document.getElementById('document_type_select');
+  const searchInput = document.getElementById('search_input');
+
+  function updateFormState() {
+    const selectedValue = reportTypeSelect.value;
+    
+    // Lógica visual: Mostrar/Ocultar el selector de documento
+    if (selectedValue === 'client') {
+      docSelect.classList.remove('d-none'); 
+      searchInput.classList.add('border-start-0');
+      searchInput.placeholder = "Número de documento...";
+    } else {
+      docSelect.classList.add('d-none');
+      searchInput.classList.remove('border-start-0');
+      
+      if (selectedValue === 'employee') {
+        searchInput.placeholder = "Ingrese el Email del empleado...";
+      } else if (selectedValue === 'category') {
+        searchInput.placeholder = "Ingrese el nombre del Género...";
+      } else {
+        searchInput.placeholder = "Selecciona una opción...";
+      }
+    }
+  }
+
+  if(reportTypeSelect) {
+    reportTypeSelect.addEventListener('change', updateFormState);
+    updateFormState();
+  }
+});
+</script>
