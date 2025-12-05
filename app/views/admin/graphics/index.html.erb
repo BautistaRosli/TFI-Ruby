@@ -163,11 +163,10 @@
                 %>
                 <h5 class="card-title"><%= chart2_title %></h5>
                 
-                <% if @report_type == 'category' %>
+                
                   <%= bar_chart @custom_chart_2, colors: ["#F59E0B"], defer: true, height: "350px" %>
-                <% else %>
-                  <%= pie_chart @custom_chart_2, donut: true, defer: true, height: "350px", legend: "bottom" %>
-                <% end %>
+                
+                 
               </div>
             </div>
           </div>
@@ -273,6 +272,13 @@
                     <h4>No hay datos de ventas anónimas</h4>
                   </div>
                 <% end %>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-12">
+            <div class="card h-100 shadow-sm"> <div class="card-body">
+                <h3>Cantidad de ventas canceladas (Mensual)</h3>
+                <%= bar_chart @deleted_sales, { colors: ["#EF4444"], defer: true } %>
               </div>
             </div>
           </div>

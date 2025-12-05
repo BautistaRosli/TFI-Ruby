@@ -29,7 +29,7 @@ Rails.application.routes.draw do
     resources :graphics
 
     resources :genres, except: [ :show ]
-    resources :sales, only: [ :index, :show, :new, :create ] do
+    resources :sales, only: [ :index, :show, :new, :create, :destroy ] do
       collection do
         get  :cart
         post :add_item
@@ -38,7 +38,7 @@ Rails.application.routes.draw do
       end
     end
 
-    resources :disks, only: [ :index ]
+
     resources :disks do
       member do
         patch :change_stock

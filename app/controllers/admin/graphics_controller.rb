@@ -13,7 +13,7 @@ class Admin::GraphicsController < ApplicationController
     @top_customer = Sale.top_customer
     @sales_by_hour = Sale.sales_by_hour
     @low_stock = NewDisk.low_stock
-    @deleted_sales = Sale.deleted_sales
+    @deleted_sales = Sale.deleted_sales.group_by_month(:created_at).count
     @anonymous = Client.find_by(document_number: "000000", document_type: "DNI")
 
     if @anonymous
