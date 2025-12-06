@@ -60,7 +60,9 @@
                           <% end %>
                         </div>
                       <% end %>
-                      <div class="text-muted">Stock: <%= disk.stock.to_i %></div>
+                      <% if disk.stock.to_i > 0 %>
+                        <div class="text-muted">Stock: <%= disk.stock.to_i %></div>
+                      <% end %>
                     </div>
 
                    <div class="card-footer-fixed mt-3">
@@ -93,6 +95,9 @@
                              <span class="badge text-bg-secondary me-1"><%= g.name %></span>
                             <% end %>
                           </div>
+                        <% end %>
+                        <% if disk.stock.to_i > 0 %>
+                          <div class="text-muted">Stock: <%= disk.stock.to_i %></div>
                         <% end %>
                       </div>
 

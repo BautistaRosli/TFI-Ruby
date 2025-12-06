@@ -41,7 +41,7 @@ Rails.application.routes.draw do
 
     resources :disks do
       member do
-        patch :change_stock
+        patch :soft_delete
         patch :set_cover
         get  :images
         post :add_image

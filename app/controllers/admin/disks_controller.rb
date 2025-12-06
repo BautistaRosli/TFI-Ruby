@@ -1,8 +1,9 @@
 class Admin::DisksController < ApplicationController
-  layout 'admin'
+  layout "admin"
   before_action :set_disk, only: %i[
     show edit update destroy
     set_cover images add_image remove_image
+    soft_delete
   ]
 
   def index
@@ -18,11 +19,11 @@ class Admin::DisksController < ApplicationController
   def show; end
 
   def new
-    @disk = (params[:type] == 'UsedDisk' ? UsedDisk : NewDisk).new
+    @disk = (params[:type] == "UsedDisk" ? UsedDisk : NewDisk).new
   end
 
   def create
-    klass = type_from_params == 'UsedDisk' ? UsedDisk : NewDisk
+    klass = type_from_params == "UsedDisk" ? UsedDisk : NewDisk
     @disk = klass.new(disk_params(:create))
 
     # adjuntar audio solo si es UsedDisk
@@ -115,6 +116,16 @@ class Admin::DisksController < ApplicationController
     redirect_to images_admin_disk_path(@disk), notice: "Imagen eliminada"
   end
 
+  def soft_delete
+    @disk.transaction do
+      @disk.update!(deleted_at: Time.current)
+      @disk.update!(stock: 0) if @disk.has_attribute?(:stock)
+    end
+    redirect_to admin_disk_path(@disk), notice: "Disco dado de baja (borrado lógico)"
+  rescue => e
+    redirect_to admin_disk_path(@disk), alert: "No se pudo dar de baja: #{e.message}"
+  end
+
   private
 
   def set_disk
@@ -137,7 +148,7 @@ class Admin::DisksController < ApplicationController
     ]
     permitted << :type if context == :create
     # permitir :audio solo para UsedDisk
-    if (context == :create && type_from_params == 'UsedDisk') || (context == :update && @disk.is_a?(UsedDisk))
+    if (context == :create && type_from_params == "UsedDisk") || (context == :update && @disk.is_a?(UsedDisk))
       permitted << :audio
     end
     params.require(param_key).permit(*permitted)

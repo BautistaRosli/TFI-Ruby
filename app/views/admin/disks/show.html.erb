@@ -35,16 +35,19 @@
 
           <div class="disk-body">
             <div class="disk-meta"><strong>Artista:</strong> <%= @disk.author.presence || '—' %></div>
-            <div class="disk-meta"><strong>Formato:</strong> <%= @disk.format.presence || '—' %></div>
-            <div class="disk-meta"><strong>Año:</strong> <%= @disk.year %></div>
+            <div class="disk-meta"><strong>Formato:</strong> <%= @disk.format.present? ? @disk.format.to_s.capitalize : '—' %></div>
+            <div class="disk-meta"><strong>Año:</strong> <%= @disk.year.presence || '—' %></div>
+            <div class="disk-meta"><strong>Descripción:</strong> <%= @disk.description.presence || '—' %></div>
             <div class="disk-meta">
               <strong>Géneros:</strong>
               <%= @disk.genres.any? ? @disk.genres.map(&:name).join(', ') : '—' %>
             </div>
+            <div class="disk-meta"><strong>Tipo:</strong> <%= @disk.is_a?(UsedDisk) ? 'Usado' : 'Nuevo' %></div>
+            <div class="disk-meta"><strong>Fecha de ingreso:</strong> <%= @disk.date_ingreso.present? ? l(@disk.date_ingreso, format: :short) : '—' %></div>
+            <div class="disk-meta"><strong>Última modificación:</strong> <%= @disk.updated_at.present? ? l(@disk.updated_at, format: :short) : '—' %></div>
+            <div class="disk-meta"><strong>Fecha de baja:</strong> <%= @disk.deleted_at.present? ? l(@disk.deleted_at, format: :short) : '—' %></div>
             <div class="price" style="margin-top:8px;">$<%= number_with_precision(@disk.unit_price.to_f, precision: 2) %></div>
-            <% if @disk.is_a?(NewDisk) %>
-              <div class="disk-meta"><strong>Stock:</strong> <%= @disk.stock.to_i %></div>
-            <% end %>
+            <div class="disk-meta"><strong>Stock:</strong> <%= @disk.stock.present? ? @disk.stock.to_i : '—' %></div>
             <% if @disk.stock.to_i == 0 %>
               <div class="alert alert-warning" style="margin-top:10px;">
                 <strong>Sin stock:</strong> Este disco no tiene unidades disponibles.
@@ -73,6 +76,12 @@
             <%= link_to 'Editar', edit_admin_disk_path(@disk), class: 'btn btn-primary' %>
             <%= link_to 'Imágenes', images_admin_disk_path(@disk), class: 'btn btn-outline-secondary' %>
             <%= link_to 'Volver', admin_disks_path, class: 'btn btn-outline-secondary' %>
+
+            <% unless @disk.deleted_at.present? %>
+              <%= button_to 'Dar de baja', soft_delete_admin_disk_path(@disk), method: :patch,
+                    form: { data: { turbo_confirm: '¿Confirmás dar de baja este disco?' } },
+                    class: 'btn btn-warning' %>
+            <% end %>
           </div>
         </div>
 
