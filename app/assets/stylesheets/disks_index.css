@@ -1,0 +1,45 @@
+/* Styles only for index pages (discos index) */
+.recommended-index {
+  padding: 22px;
+  border-radius: 14px;
+  background: rgba(6,10,18,0.76);
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 10px 30px rgba(2,6,23,0.6);
+  margin-bottom: 22px;
+  backdrop-filter: blur(6px);
+}
+
+.recommended-index h2 {
+  margin: 0 0 14px 0;
+  font-size: 1.25rem;
+  color: #f4f8fb;
+  letter-spacing: 0.2px;
+}
+
+/* make recommended cards slightly lifted and separated from the main grid */
+.recommended-index .disk-card {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.04);
+}
+
+.recommended-index .disk-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 16px 36px rgba(1,8,20,0.66);
+}
+
+/* keep spacing consistent with existing grids */
+.recommended-index .disks-grid {
+  gap: 18px;
+}
+
+/* small badge on the heading to call attention */
+.recommended-index .badge {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 4px 8px;
+  background: rgba(255,255,255,0.06);
+  color: #f6fbff;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  vertical-align: middle;
+}
