@@ -86,9 +86,6 @@
               </div>
               <div class="recommendation-body">
                 <h3 class="recommendation-title"><%= disk.name %></h3>
-                <% if disk.stock.to_i <= 0 %>
-                  <div class="no-stock-badge">Sin stock</div>
-                <% end %>
                 <% if disk.date_ingreso.present? %>
                   <p class="recommendation-year"><%= disk.date_ingreso.year %></p>
                 <% end %>
