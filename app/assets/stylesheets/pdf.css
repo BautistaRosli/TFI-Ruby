@@ -20,6 +20,26 @@
   font-size: 14px;
 }
 
+/* Sección de información del cliente */
+.customer-info {
+  background-color: #f8f9fa;
+  padding: 15px;
+  border-radius: 5px;
+  margin-bottom: 20px;
+}
+
+.customer-info h2 {
+  color: #2c3e50;
+  margin-bottom: 10px;
+}
+
+.no-customer {
+  color: #6c757d;
+  font-style: italic;
+  text-align: center;
+  padding: 10px;
+}
+
 /* Total destacado */
 .total-section {
   text-align: right;

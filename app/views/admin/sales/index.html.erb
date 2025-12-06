@@ -9,6 +9,44 @@
 <% end %>
 
 <div class="sales-container">
+  <div class="filters-bar">
+    <%= form_with url: admin_sales_path, method: :get, local: true, class: "filters-form" do |f| %>
+      <div class="filter-group">
+        <%= f.number_field :sale_id, placeholder: "ID de venta...", value: params[:sale_id], class: "filter-input", min: 1 %>
+      </div>
+      
+      <div class="filter-group">
+        <%= f.number_field :user_id, placeholder: "ID empleado...", value: params[:user_id], class: "filter-input", min: 1 %>
+      </div>
+      
+      <div class="filter-group">
+        <%= f.number_field :customer_id, placeholder: "ID cliente...", value: params[:customer_id], class: "filter-input", min: 1 %>
+      </div>
+
+      <div class="filter-group">
+        <%= f.number_field :min_amount, placeholder: "Monto mín...", value: params[:min_amount], class: "filter-input", min: 0, step: 0.01 %>
+      </div>
+
+      <div class="filter-group">
+        <%= f.number_field :max_amount, placeholder: "Monto máx...", value: params[:max_amount], class: "filter-input", min: 0, step: 0.01 %>
+      </div>
+
+      <div class="filter-group">
+        <label for="from_date" class="filter-label">Fecha desde:</label>
+        <%= f.date_field :from_date, value: params[:from_date], class: "filter-input", id: "from_date" %>
+      </div>
+
+      <div class="filter-group">
+        <label for="to_date" class="filter-label">Fecha hasta:</label>
+        <%= f.date_field :to_date, value: params[:to_date], class: "filter-input", id: "to_date" %>
+      </div>
+      
+      <div class="filter-group">
+        <%= f.submit "Buscar", class: "btn-filter" %>
+        <%= link_to "Limpiar", admin_sales_path, class: "btn-filter-clear" %>
+      </div>
+    <% end %>
+  </div>
     <div class="sales-grid">
         <% if @sales && @sales.any? %>
             <% @sales.each do |sale| %>
