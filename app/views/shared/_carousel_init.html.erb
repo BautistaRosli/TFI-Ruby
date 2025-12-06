@@ -26,6 +26,13 @@
         if (prev) prev.addEventListener('click', function(e){ e.preventDefault(); show(index-1); });
         if (next) next.addEventListener('click', function(e){ e.preventDefault(); show(index+1); });
 
+        // add class when there are multiple slides and hide controls otherwise
+        if (slides.length > 1) {
+          carousel.classList.add('has-multiple');
+        } else {
+          carousel.classList.remove('has-multiple');
+        }
+
         // autoplay on hover for cards, persistent for show carousel
         var autoplay = carousel.classList.contains('card-carousel');
         var timer = null;

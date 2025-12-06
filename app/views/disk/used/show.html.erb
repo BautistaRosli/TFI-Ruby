@@ -45,31 +45,27 @@
     </div>
 
     <div class="disk-show-media">
-      <div class="show-carousel" data-disk-id="<%= @disk.id %>">
-        <button type="button" class="carousel-btn prev" aria-label="Anterior">‹</button>
-        <div class="carousel-track">
-          <% if @disk.cover.attached? %>
+      <% if @disk.cover.attached? %>
+        <div class="show-carousel" data-disk-id="<%= @disk.id %>">
+          <button type="button" class="carousel-btn prev" aria-label="Anterior">‹</button>
+          <div class="carousel-track">
             <div class="carousel-slide">
               <%= image_tag @disk.cover, alt: @disk.name, class: 'disk-large-img' %>
             </div>
-          <% end %>
 
-          <% if @disk.images.attached? %>
-            <% @disk.images.each do |img| %>
-              <div class="carousel-slide">
-                <%= image_tag img, alt: @disk.name, class: 'disk-large-img' %>
-              </div>
+            <% if @disk.images.attached? %>
+              <% @disk.images.each do |img| %>
+                <div class="carousel-slide">
+                  <%= image_tag img, alt: @disk.name, class: 'disk-large-img' %>
+                </div>
+              <% end %>
             <% end %>
-          <% end %>
-
-          <% if !@disk.cover.attached? && !@disk.images.attached? %>
-            <div class="carousel-slide">
-              <div class="disk-large-placeholder" role="img" aria-label="Disco sin portada">Disco sin portada</div>
-            </div>
-          <% end %>
+          </div>
+          <button type="button" class="carousel-btn next" aria-label="Siguiente">›</button>
         </div>
-        <button type="button" class="carousel-btn next" aria-label="Siguiente">›</button>
-      </div>
+      <% else %>
+        <div class="disk-large-placeholder" role="img" aria-label="Disco sin portada">Disco sin portada</div>
+      <% end %>
     </div>
   </div>
 
@@ -90,7 +86,9 @@
               </div>
               <div class="recommendation-body">
                 <h3 class="recommendation-title"><%= disk.name %></h3>
-                <p class="recommendation-author"><%= disk.author %></p>
+                <% if disk.stock.to_i <= 0 %>
+                  <div class="no-stock-badge">Sin stock</div>
+                <% end %>
                 <% if disk.date_ingreso.present? %>
                   <p class="recommendation-year"><%= disk.date_ingreso.year %></p>
                 <% end %>

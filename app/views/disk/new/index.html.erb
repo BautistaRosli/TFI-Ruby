@@ -52,33 +52,32 @@
     <% if @disks.any? %>
       <% @disks.each do |disk| %>
         <div class="disk-card">
+          <% if disk.stock.to_i <= 0 %>
+            <div class="no-stock-badge">Sin stock</div>
+          <% end %>
           <%= link_to disk_new_path(disk), class: "card-link" do %>
             <div class="disk-media">
-              <div class="card-carousel" data-disk-id="<%= disk.id %>">
-                <button type="button" class="carousel-btn prev" aria-label="Anterior">‹</button>
-                <div class="carousel-track">
-                  <% if disk.cover.attached? %>
+              <% if disk.cover.attached? %>
+                <div class="card-carousel" data-disk-id="<%= disk.id %>">
+                  <button type="button" class="carousel-btn prev" aria-label="Anterior">‹</button>
+                  <div class="carousel-track">
                     <div class="carousel-slide">
                       <%= image_tag disk.cover, alt: disk.name %>
                     </div>
-                  <% end %>
 
-                  <% if disk.images.attached? %>
-                    <% disk.images.each do |img| %>
-                      <div class="carousel-slide">
-                        <%= image_tag img, alt: disk.name %>
-                      </div>
+                    <% if disk.images.attached? %>
+                      <% disk.images.each do |img| %>
+                        <div class="carousel-slide">
+                          <%= image_tag img, alt: disk.name %>
+                        </div>
+                      <% end %>
                     <% end %>
-                  <% end %>
-
-                  <% if !disk.cover.attached? && !disk.images.attached? %>
-                    <div class="carousel-slide">
-                      <div class="cover-placeholder" role="img" aria-label="Disco sin portada">Disco sin portada</div>
-                    </div>
-                  <% end %>
+                  </div>
+                  <button type="button" class="carousel-btn next" aria-label="Siguiente">›</button>
                 </div>
-                <button type="button" class="carousel-btn next" aria-label="Siguiente">›</button>
-              </div>
+              <% else %>
+                <div class="cover-placeholder" role="img" aria-label="Disco sin portada">Disco sin portada</div>
+              <% end %>
             </div>
 
             <div class="disk-body">
