@@ -8,7 +8,12 @@ class Admin::SalesController < ApplicationController
   layout "admin"
 
   def index
-    @sales = Sale.where(deleted: false)
+    # Filtrar por ventas eliminadas o no eliminadas
+    if params[:show_deleted] == "1"
+      @sales = Sale.where(deleted: true)
+    else
+      @sales = Sale.where(deleted: false)
+    end
     
     # Filtrar por ID de venta
     @sales = @sales.where(id: params[:sale_id]) if params[:sale_id].present?
