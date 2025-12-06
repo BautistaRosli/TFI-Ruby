@@ -270,6 +270,7 @@
 .show-carousel .carousel-track {
   display: flex;
   width: 100%;
+  height: 100%;
 }
 
 .carousel-slide img {
@@ -279,6 +280,15 @@
   object-fit: cover;
 }
 
+/* ensure each slide occupies full carousel width even before JS runs */
+.carousel-slide {
+  flex: 0 0 100%;
+  width: 100%;
+  height: 100%;
+}
+
+
+/* carousel controls: hidden by default, shown on hover only when carousel.has-multiple */
 .carousel-btn {
   position: absolute;
   top: 50%;
@@ -294,6 +304,9 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 160ms ease, transform 160ms ease;
 }
 
 .card-carousel .carousel-btn { font-size: 18px; }
@@ -302,9 +315,43 @@
 .carousel-btn.prev { left: 10px; }
 .carousel-btn.next { right: 10px; }
 
+/* show buttons when hovering and the carousel actually has multiple slides */
+.card-carousel.has-multiple:hover .carousel-btn,
+.show-carousel.has-multiple:hover .carousel-btn {
+  opacity: 1;
+  pointer-events: auto;
+}
+
 /* smaller slides in cards to keep consistent heights */
 .card-carousel .carousel-slide { min-height: 120px; display:flex; align-items:center; justify-content:center; }
 .show-carousel .carousel-slide { min-height: 320px; display:flex; align-items:center; justify-content:center; }
+
+/* Ensure placeholder fills the slide area */
+.carousel-slide > .cover-placeholder,
+.carousel-slide > .disk-large-placeholder {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: inherit !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* badge for out-of-stock */
+.disk-card { position: relative; }
+.no-stock-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(220,38,38,0.95);
+  color: #fff;
+  padding: 6px 8px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.75rem;
+  z-index: 6;
+  box-shadow: 0 6px 16px rgba(2,6,23,0.45);
+}
 
 
 @media (max-width: 1200px) {
