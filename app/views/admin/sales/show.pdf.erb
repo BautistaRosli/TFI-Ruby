@@ -24,14 +24,39 @@
         <div class="info-value"><%= @sale.datetime&.strftime("%d/%m/%Y %H:%M") || @sale.created_at.strftime("%d/%m/%Y %H:%M") %></div>
       </div>
       <div class="info-row">
-        <div class="info-label">Empleado ID:</div>
-        <div class="info-value"><%= @sale.user_id || 'N/A' %></div>
-      </div>
-      <div class="info-row">
-        <div class="info-label">Cliente ID:</div>
-        <div class="info-value"><%= @sale.customer_id || 'N/A' %></div>
+        <div class="info-label">Empleado:</div>
+        <div class="info-value">
+          <% if @sale.user %>
+            <%= @sale.user.name %> <%= @sale.user.lastname %>
+          <% else %>
+            N/A
+          <% end %>
+        </div>
       </div>
     </div>
+  </div>
+
+  <!-- Información del Cliente -->
+  <div class="info-section customer-info">
+    <h2>Información del Cliente</h2>
+    <% if @sale.customer %>
+      <div class="info-grid">
+        <div class="info-row">
+          <div class="info-label">Nombre Completo:</div>
+          <div class="info-value"><%= @sale.customer.name %> <%= @sale.customer.lastname %></div>
+        </div>
+        <div class="info-row">
+          <div class="info-label"><%= @sale.customer.document_type %>:</div>
+          <div class="info-value"><%= @sale.customer.document_number %></div>
+        </div>
+        <div class="info-row">
+          <div class="info-label">Email:</div>
+          <div class="info-value"><%= @sale.customer.email %></div>
+        </div>
+      </div>
+    <% else %>
+      <p class="no-customer">No hay cliente asociado a esta venta</p>
+    <% end %>
   </div>
 
   <!-- Items de la Venta -->

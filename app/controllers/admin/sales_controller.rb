@@ -8,7 +8,31 @@ class Admin::SalesController < ApplicationController
   layout "admin"
 
   def index
-    @sales = Sale.where(deleted: false).order(created_at: :asc).page(params[:page]).per(3)
+    @sales = Sale.where(deleted: false)
+    
+    # Filtrar por ID de venta
+    @sales = @sales.where(id: params[:sale_id]) if params[:sale_id].present?
+    
+    # Filtrar por ID de empleado
+    @sales = @sales.where(user_id: params[:user_id]) if params[:user_id].present?
+    
+    # Filtrar por ID de cliente
+    @sales = @sales.where(customer_id: params[:customer_id]) if params[:customer_id].present?
+    
+    # Filtrar por monto mínimo
+    @sales = @sales.where("total_amount >= ?", params[:min_amount]) if params[:min_amount].present?
+    
+    # Filtrar por monto máximo
+    @sales = @sales.where("total_amount <= ?", params[:max_amount]) if params[:max_amount].present?
+    
+    # Filtrar por rango de fechas (ambas fechas requeridas)
+    if params[:from_date].present? && params[:to_date].present?
+      @sales = @sales.where("DATE(datetime) BETWEEN ? AND ?", params[:from_date], params[:to_date])
+    elsif params[:from_date].present? || params[:to_date].present?
+      flash.now[:alert] = "Debes especificar ambas fechas (desde y hasta) para filtrar por período."
+    end
+    
+    @sales = @sales.order(created_at: :desc).page(params[:page]).per(8)
   end
 
   def show
