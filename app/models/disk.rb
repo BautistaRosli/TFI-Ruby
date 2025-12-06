@@ -6,6 +6,8 @@ class Disk < ApplicationRecord
   has_many :items
   has_many :sales, through: :items
 
+  before_create :set_date_ingreso
+
   validates :name, :author, :description, :format, :unit_price, presence: true
   validates :year, presence: true,
                   numericality: { only_integer: true, greater_than_or_equal_to: 1900, less_than_or_equal_to: Time.current.year }
@@ -36,6 +38,10 @@ class Disk < ApplicationRecord
   end
 
   private
+
+  def set_date_ingreso
+    self.date_ingreso = Time.current
+  end
 
   def validate_images_limit
     return unless images.attached?

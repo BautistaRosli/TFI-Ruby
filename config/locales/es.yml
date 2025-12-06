@@ -1,0 +1,9 @@
+es:
+  date:
+    formats:
+      short: "%d/%m/%Y"
+      long: "%A, %d de %B de %Y"
+  time:
+    formats:
+      short: "%d/%m/%Y %H:%M"
+      long: "%A, %d de %B de %Y %H:%M"
