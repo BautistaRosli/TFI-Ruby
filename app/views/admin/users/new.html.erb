@@ -37,7 +37,7 @@
                         <% if current_user.admin? %>
                             <% roles = [['Administrador', 'admin'], ['Gerente', 'manager'], ['Empleado', 'employee']] %>
                         <% elsif current_user.manager? %>
-                            <% roles = [['Gerente', 'manager'], ['Empleado', 'employee']] %>
+                            <% roles = [['Empleado', 'employee']] %>
                         <% end %>
 
                         <%= f.select :role,

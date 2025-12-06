@@ -1,7 +1,7 @@
 class User < ApplicationRecord
   # Devise modules: podés agregar más si querés (ej: :confirmable, :trackable)
   devise :database_authenticatable, :registerable,
-         :recoverable, :rememberable, :validatable
+         :recoverable, :rememberable, :validatable, :timeoutable
 
   has_many :sales
 
