@@ -68,10 +68,13 @@
     <div class="form-group bordered">
       <label class="form-label top-label" for="genre_select_control">Géneros</label>
       <div id="genre_select_control" class="genre-select">
-        <button type="button" id="genre_dropdown_btn" class="btn btn-outline-secondary full-width">
-          <span>Seleccionar géneros</span>
-          <span>▾</span>
-        </button>
+        <div class="d-flex" style="gap:8px;">
+          <button type="button" id="genre_dropdown_btn" class="btn btn-outline-secondary full-width">
+            <span>Seleccionar géneros</span>
+            <span>▾</span>
+          </button>
+          <%= link_to 'Nuevo género', admin_genres_path, class: 'btn btn-primary', title: 'Crear género' %>
+        </div>
 
         <div id="genre_dropdown" class="genre-dropdown">
           <% Genre.order(:name).each do |g| %>
