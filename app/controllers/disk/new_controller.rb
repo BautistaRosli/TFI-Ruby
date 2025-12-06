@@ -22,12 +22,6 @@ def index
 
   @disks = @disks.page(params[:page]).per(8)
   @genres = Genre.order(name: :asc)
-  
-  # Recomendaciones para el índice basadas en cookies de vistas previas
-  viewed = cookies.signed[:viewed_disks]
-  viewed = viewed ? JSON.parse(viewed) : []
-  # pasamos un disco vacío como "current" para no excluir ninguno por id
-  @recommended_disks = recommended_disks(viewed, Disk.new).first(5)
 end
 
   def show
