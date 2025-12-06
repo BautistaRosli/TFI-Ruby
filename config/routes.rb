@@ -68,4 +68,6 @@ Rails.application.routes.draw do
   # Landing page = /disk/new#index
   #
   root to: "disk/new#index"
+
+  match "*path", to: "application#routing_error", via: :all
 end

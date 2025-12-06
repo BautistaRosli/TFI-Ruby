@@ -7,12 +7,16 @@ class Ability
     elsif user.admin?
       can :manage, :all
     elsif user.manager?
-      can :read, :all
-      can :update, User, role: [ :employee, :manager ]
-      can :create, User, role: [ :employee, :manager ]
+      can :index, User
+      can :show, User, role: "employee"
+      can :show, User, id: user.id
+      can :update, User, role: "employee"
+      can :update, User, id: user.id
+      can :create, User, role: [ "employee" ]
       can :analize, :admin_graphics_path
     elsif user.employee?
-      can :read, :all
+      can :index, User
+      can :show, User, id: user.id
       can :update, User, id: user.id
     end
   end

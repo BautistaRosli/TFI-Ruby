@@ -5,6 +5,17 @@ class Admin::UsersController < ApplicationController
   layout "admin_users"
   def index
     @users = can?(:delete, User) ? User.page(params[:page]).per(10) : User.where(is_active: true).page(params[:page]).per(10)
+
+    @users = @users.where("users.name LIKE ?", "%#{params[:name]}%") if params[:name].present?
+
+    @users = @users.where("users.lastname LIKE ?", "%#{params[:lastname]}%") if params[:lastname].present?
+
+    @users = @users.where("users.lastname LIKE ?", "%#{params[:email]}%") if params[:email].present?
+
+    if params[:role].present?
+      normalized_role = params[:role].downcase
+      @users = @users.where(role: normalized_role)
+    end
   end
 
 

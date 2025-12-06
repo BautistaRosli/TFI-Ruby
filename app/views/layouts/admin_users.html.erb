@@ -17,7 +17,12 @@
                 <div>
                     <h1 class="header-title">Gestión de Usuarios</h1>
                     <p class="header-subtitle">Disquería - Sistema de Gestión</p>
+                    
+                    <% if action_name == 'show' %>
+                        <%= link_to "Volver atrás", admin_users_path, class: "btn btn-logout" %>
+                    <% end %>
                     <%= link_to "Volver a menú de gestión", admin_dashboard_path, class: "btn btn-logout" %>
+                    
                 </div>
                 
                 <div class="dropdown">

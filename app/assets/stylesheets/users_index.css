@@ -730,3 +730,102 @@ body {
   margin: 30px 0;
   padding: 20px 0;
 }
+
+/* --- Estilos del Buscador Mejorados --- */
+
+.search-card {
+  background-color: #ffffff;
+  padding: 2rem;
+
+  /* 1. TAMAÑO Y POSICIÓN: */
+  /* Limitamos el ancho para que no toque los bordes y quede centrado */
+  max-width: 1000px;
+  margin: 0 auto 2.5rem auto;
+  /* Centrado horizontal y margen inferior */
+
+  /* 2. CONTRASTE Y PROFUNDIDAD: */
+  /* Borde sutil pero visible */
+  border: 1px solid #cbd5e1;
+  border-radius: 16px;
+  /* Sombra más pronunciada para que "flote" */
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
+}
+
+.search-card h4 {
+  color: var(--primary-dark);
+  /* Título más oscuro y legible */
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid #f1f5f9;
+  /* Línea separadora sutil */
+  padding-bottom: 0.5rem;
+}
+
+/* Inputs con más contraste */
+.search-input {
+  /* Fondo grisáceo para que resalte sobre el blanco de la tarjeta */
+  background-color: #f8fafc;
+  border: 1px solid #94a3b8;
+  /* Borde gris medio (más visible) */
+  border-radius: 8px;
+  padding: 0.7rem 1rem;
+  color: #334155;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+}
+
+.search-input::placeholder {
+  color: #94a3b8;
+  /* Color del placeholder */
+}
+
+.search-input:focus {
+  background-color: #ffffff;
+  border-color: var(--primary-color);
+  /* Sombra de foco para resaltar cual estás escribiendo */
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+  outline: none;
+}
+
+/* Etiquetas más oscuras */
+.form-label {
+  color: #475569;
+  /* Gris oscuro en lugar de gris claro */
+  font-size: 0.85rem;
+  margin-bottom: 0.4rem;
+  display: block;
+}
+
+/* Botón de búsqueda mejorado */
+.btn-search {
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+  color: white;
+  border: none;
+  padding: 0.7rem 1rem;
+  border-radius: 8px;
+  font-weight: 600;
+  box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+  transition: transform 0.1s ease;
+}
+
+.btn-search:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 8px -1px rgba(37, 99, 235, 0.3);
+  color: white;
+}
+
+/* RESPONSIVE: En celular ocupa todo el ancho disponible pero con márgenes */
+@media (max-width: 768px) {
+  .search-card {
+    margin: 0 1rem 2rem 1rem;
+    /* Margen lateral en celular */
+    padding: 1.25rem;
+    max-width: 100%;
+    /* Permitir que ocupe espacio en pantallas chicas */
+  }
+
+  .btn-search {
+    width: 100%;
+    margin-top: 0.5rem;
+  }
+}
