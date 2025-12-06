@@ -37,14 +37,13 @@
       <% if @disk.cover.present? %>
         <%= image_tag @disk.cover, alt: @disk.name, class: 'disk-large-img' %>
       <% else %>
-        <%= image_tag '/tony/tony3.png', alt: 'Portada provisional', class: 'disk-large-img' %>
+        <div class="disk-large-placeholder" role="img" aria-label="Disco sin portada">Disco sin portada</div>
       <% end %>
     </div>
 
     
   </div>
 
-  <!-- Sección de Recomendaciones -->
   <% if @recommended_disks.any? %>
     <div class="recommendations-section">
       <h2 class="recommendations-title">Discos que podrían interesarte</h2>
@@ -56,7 +55,7 @@
                 <% if disk.cover.present? %>
                   <%= image_tag disk.cover, alt: disk.name, class: "recommendation-img" %>
                 <% else %>
-                  <%= image_tag "/tony/tony#{rand(1..5)}.png", alt: "Portada", class: "recommendation-img" %>
+                  <div class="cover-placeholder recommendation-img" role="img" aria-label="Disco sin portada">Disco sin portada</div>
                 <% end %>
               </div>
               <div class="recommendation-body">

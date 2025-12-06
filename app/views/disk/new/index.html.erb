@@ -7,6 +7,7 @@
   </div>
 
   <div class="filters-bar">
+    <%= stylesheet_link_tag "disks_index", media: "all" %>
     <%= form_with url: disk_new_index_path, method: :get, local: true, class: "filters-form" do |f| %>
       <div class="filter-group">
         <%= f.text_field :name, placeholder: "Buscar por nombre...", value: params[:name], class: "filter-input" %>
@@ -30,13 +31,22 @@
       <div class="filter-group">
         <%= f.number_field :max_price, placeholder: "Precio máx...", value: params[:max_price], class: "filter-input", min: 0 %>
       </div>
+
+      <div class="filter-group">
+        <%= f.number_field :min_year, placeholder: "Año mín...", value: params[:min_year], class: "filter-input", min: 1900 %>
+      </div>
+
+      <div class="filter-group">
+        <%= f.number_field :max_year, placeholder: "Año máx...", value: params[:max_year], class: "filter-input", min: 1900, max: Time.now.year %>
+      </div>
       
       <div class="filter-group">
-        <%= f.submit "Buscar", class: "btn-filter" %>
-        <%= link_to "Limpiar", disk_new_index_path, class: "btn-filter-clear" %>
+        <%= link_to "Limpiar", disk_new_index_path, class: "btn-filter" %>
+        <%= f.submit "Buscar", class: "btn-filter-clear" %>
       </div>
     <% end %>
   </div>
+  
 
   <div class="disks-grid">
     <% if @disks.any? %>
@@ -46,9 +56,9 @@
             <div class="disk-media">
               <% if disk.cover.present? %>
                 <%= image_tag disk.cover, alt: disk.name %>
-              <% else %>
-                <%= image_tag "/tony/tony#{rand(1..5)}.png", alt: "Imagen provisional", class: "fallback-img" %>
-              <% end %>
+                <% else %>
+                  <div class="cover-placeholder" role="img" aria-label="Disco sin portada">Disco sin portada</div>
+                <% end %>
             </div>
 
             <div class="disk-body">
