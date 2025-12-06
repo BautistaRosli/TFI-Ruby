@@ -1,17 +1,36 @@
 <% content_for :stylesheets do %>
   <%= stylesheet_link_tag 'admin_layout', media: 'all' %>
+  <%= stylesheet_link_tag 'admin_index', media: 'all' %>
+  <%= stylesheet_link_tag 'admin_disks', media: 'all' %>
 <% end %>
 
-<div class="container" style="max-width:700px; margin:24px auto;">
-  <h2>Editar Género</h2>
-  <%= form_with model: [:admin, @genre], local: true do |f| %>
-    <div class="field">
-      <%= f.label :name, "Nombre" %>
-      <%= f.text_field :name, required: true, class: "form-control" %>
+<div class="dashboard-container">
+  <header class="admin-header">
+    <div class="header-content">
+      <div class="header-top">
+        <div>
+          <h1 class="header-title">Editar Género</h1>
+          <p class="header-subtitle">Actualizá el nombre del género</p>
+        </div>
+        <div class="header-buttons">
+          <%= link_to "Volver a Géneros", admin_genres_path, class: "btn-logout" %>
+        </div>
+      </div>
     </div>
-    <div class="actions" style="display:flex; gap:8px;">
-      <%= f.submit "Guardar", class: "btn-primary" %>
-      <%= link_to "Volver", admin_genres_path, class: "btn-outline" %>
-    </div>
-  <% end %>
+  </header>
+
+  <main class="admin-main">
+    <section class="module-card" style="padding:1.5rem; max-width:700px; margin-inline:auto;">
+      <%= form_with model: [:admin, @genre], local: true do |f| %>
+        <div class="form-group bordered">
+          <%= f.label :name, "Nombre", class: "form-label top-label" %>
+          <%= f.text_field :name, required: true, class: "form-control" %>
+        </div>
+        <div class="d-flex gap-2">
+          <%= f.submit "Guardar", class: "btn btn-primary" %>
+          <%= link_to "Volver", admin_genres_path, class: "btn btn-outline-secondary" %>
+        </div>
+      <% end %>
+    </section>
+  </main>
 </div>

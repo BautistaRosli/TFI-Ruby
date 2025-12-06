@@ -20,15 +20,43 @@
                         <span class="info-value sale-total">$<%= number_with_precision(@sale.total_amount, precision: 2) %></span>
                     </div>
                     <div class="info-item">
-                        <span class="info-label">Empleado ID:</span>
-                        <span class="info-value"><%= @sale.user_id || 'N/A' %></span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">Cliente ID:</span>
-                        <span class="info-value"><%= @sale.customer_id || 'N/A' %></span>
+                        <span class="info-label">Empleado:</span>
+                        <span class="info-value">
+                            <% if @sale.user %>
+                                <%= @sale.user.name %> <%= @sale.user.lastname %> (ID: <%= @sale.user.id %>)
+                            <% else %>
+                                N/A
+                            <% end %>
+                        </span>
                     </div>
                 </div>
             </div>
+
+            <% if @sale.customer %>
+                <div class="sale-info-section customer-section">
+                    <h3>Información del Cliente</h3>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label">Nombre:</span>
+                            <span class="info-value"><%= @sale.customer.name %> <%= @sale.customer.lastname %></span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label"><%= @sale.customer.document_type %>:</span>
+                            <span class="info-value"><%= @sale.customer.document_number %></span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Email:</span>
+                            <span class="info-value"><%= @sale.customer.email %></span>
+                        </div>
+                       
+                    </div>
+                </div>
+            <% else %>
+                <div class="sale-info-section customer-section">
+                    <h3>Información del Cliente</h3>
+                    <p class="no-customer">No hay cliente asociado a esta venta</p>
+                </div>
+            <% end %>
         </div>
 
         <!-- Items de la venta -->
