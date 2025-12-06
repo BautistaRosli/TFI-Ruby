@@ -38,6 +38,46 @@
     <% end %>
   </div>
 
+
+  <% if defined?(@recommended_disks) && @recommended_disks.present? %>
+    <section class="recommended-index">
+      <h2>Discos pensados para vos</h2>
+      <div class="disks-grid">
+        <% @recommended_disks.each do |disk| %>
+          <div class="disk-card">
+            <%= link_to disk_used_path(disk), class: "card-link" do %>
+              <div class="disk-media">
+                <% if disk.cover.present? %>
+                  <%= image_tag disk.cover, alt: disk.name %>
+                <% else %>
+                  <%= image_tag "/tony/tony#{rand(1..5)}.png", alt: "Imagen provisional", class: "fallback-img" %>
+                <% end %>
+              </div>
+
+              <div class="disk-body">
+                <h3 class="disk-title"><%= disk.name %></h3>
+                <div class="disk-meta"><%= disk.author %></div>
+                <% if disk.genres.any? %>
+                  <div class="tags">
+                    <% disk.genres.each do |g| %>
+                      <span class="tag"><%= g.name %></span>
+                    <% end %>
+                  </div>
+                <% end %>
+              </div>
+
+              <div class="disk-footer">
+                <div class="price">$<%= disk.unit_price %></div>
+                <div class="actions">
+                  <%= link_to 'Ver detalles', disk_used_path(disk), class: 'btn-primary' %>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    </section>
+
   <div class="disks-grid">
     <% if @disks.any? %>
       <% @disks.each do |disk| %>
