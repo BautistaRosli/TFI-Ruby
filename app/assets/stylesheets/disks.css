@@ -219,6 +219,15 @@
   margin: 0;
 }
 
+/* Year labels inside cards */
+.disk-year,
+.recommendation-year {
+  display: inline-block;
+  color: rgba(255,255,255,0.62);
+  font-size: 0.9rem;
+  margin-left: 6px;
+}
+
 /* Placeholder for missing covers */
 .cover-placeholder {
   width: 100%;
@@ -249,6 +258,54 @@
   text-align: center;
   padding: 18px;
 }
+
+/* Carousel styles */
+.card-carousel,
+.show-carousel {
+  position: relative;
+  overflow: hidden;
+}
+
+.card-carousel .carousel-track,
+.show-carousel .carousel-track {
+  display: flex;
+  width: 100%;
+}
+
+.carousel-slide img {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: cover;
+}
+
+.carousel-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 3;
+  background: rgba(0,0,0,0.45);
+  color: #fff;
+  border: none;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.card-carousel .carousel-btn { font-size: 18px; }
+.show-carousel .carousel-btn { width: 44px; height: 44px; font-size: 22px; }
+
+.carousel-btn.prev { left: 10px; }
+.carousel-btn.next { right: 10px; }
+
+/* smaller slides in cards to keep consistent heights */
+.card-carousel .carousel-slide { min-height: 120px; display:flex; align-items:center; justify-content:center; }
+.show-carousel .carousel-slide { min-height: 320px; display:flex; align-items:center; justify-content:center; }
+
 
 @media (max-width: 1200px) {
   .recommendations-grid {
