@@ -8,15 +8,21 @@ class ApplicationController < ActionController::Base
   end
 
   def authenticate_user!
-    unless user_signed_in?
+    # Permitir recursos estáticos y blobs de Active Storage sin autenticación
+    path = request.path.chomp("/")
 
-      path = request.path.chomp("/") # Quita la barra final si existe (/admin/ -> /admin)
+    if path.start_with?("/rails/active_storage") || path.start_with?("/assets") || path.start_with?("/packs")
+      return
+    end
+
+    unless user_signed_in?
+      # Quita la barra final si existe (/admin/ -> /admin)
+      # path ya normalizado arriba
 
       # Permitimos que vaya al login para que pueda entrar
       if path == "/admin"
         store_location_for(:user, request.fullpath)
         redirect_to new_user_session_path, alert: "Por favor, inicia sesión para acceder al panel."
-
       elsif path.start_with?("/admin")
         redirect_to root_path, alert: "La página que buscas no existe."
       else
@@ -37,16 +43,21 @@ class ApplicationController < ActionController::Base
   end
 
   rescue_from ActiveRecord::RecordNotFound do |exception|
+    if request.path.start_with?("/rails/active_storage")
+      raise exception
+    end
     flash[:alert] = "El recurso que estás buscando no existe."
     previous_url = request.referer || default_redirect_path
     redirect_to previous_url
   end
 
-    # agrego esto para manejar error con la session
-    rescue_from ActionController::InvalidAuthenticityToken do |exception|
-      flash[:alert] = "Hubo un problema con la sesión."
-      redirect_to new_user_session_path
+  rescue_from ActionController::InvalidAuthenticityToken do |exception|
+    if request.path.start_with?("/rails/active_storage")
+      raise exception
     end
+    flash[:alert] = "Hubo un problema con la sesión."
+    redirect_to new_user_session_path
+  end
 
 
   private
