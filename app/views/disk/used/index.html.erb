@@ -6,6 +6,7 @@
     </div>
   </div>
 
+  <%= stylesheet_link_tag "disks_index", media: "all" %>
   <div class="filters-bar">
     <%= form_with url: disk_used_index_path, method: :get, local: true, class: "filters-form" do |f| %>
       <div class="filter-group">
@@ -30,13 +31,22 @@
       <div class="filter-group">
         <%= f.number_field :max_price, placeholder: "Precio máx...", value: params[:max_price], class: "filter-input", min: 0 %>
       </div>
+
+      <div class="filter-group">
+        <%= f.number_field :min_year, placeholder: "Año mín...", value: params[:min_year], class: "filter-input", min: 1900 %>
+      </div>
+
+      <div class="filter-group">
+        <%= f.number_field :max_year, placeholder: "Año máx...", value: params[:max_year], class: "filter-input", min: 1900, max: Time.now.year %>
+      </div>
       
       <div class="filter-group">
-        <%= f.submit "Buscar", class: "btn-filter" %>
-        <%= link_to "Limpiar", disk_used_index_path, class: "btn-filter-clear" %>
+        <%= link_to "Limpiar", disk_used_index_path, class: "btn-filter" %>
+        <%= f.submit "Buscar", class: "btn-filter-clear" %>
       </div>
     <% end %>
   </div>
+
 
   <div class="disks-grid">
     <% if @disks.any? %>
@@ -44,19 +54,37 @@
         <div class="disk-card">
           <%= link_to disk_used_path(disk), class: "card-link" do %>
             <div class="disk-media">
-              <% if disk.cover.present? %>
-                <div class="disk-thumb-wrap">
-                  <%= image_tag disk.cover, alt: disk.name, class: "disk-thumb-img" %>
+              <% if disk.cover.attached? %>
+                <div class="card-carousel" data-disk-id="<%= disk.id %>">
+                  <button type="button" class="carousel-btn prev" aria-label="Anterior">‹</button>
+                  <div class="carousel-track">
+                    <div class="carousel-slide">
+                      <%= image_tag disk.cover, alt: disk.name %>
+                    </div>
+
+                    <% if disk.images.attached? %>
+                      <% disk.images.each do |img| %>
+                        <div class="carousel-slide">
+                          <%= image_tag img, alt: disk.name %>
+                        </div>
+                      <% end %>
+                    <% end %>
+                  </div>
+                  <button type="button" class="carousel-btn next" aria-label="Siguiente">›</button>
                 </div>
               <% else %>
-                <%= image_tag "/tony/tony#{rand(1..5)}.png", alt: "Imagen provisional", class: "fallback-img" %>
+                <div class="cover-placeholder" role="img" aria-label="Disco sin portada">Disco sin portada</div>
               <% end %>
             </div>
 
             <div class="disk-body">
               <h3 class="disk-title"><%= disk.name %></h3>
-              <div class="disk-meta"><%= disk.author %></div>
-              <div class="disk-meta"><%= disk.year %></div>
+              <div class="disk-meta">
+                <%= disk.author %>
+                <% if disk.date_ingreso.present? %>
+                  <span class="disk-year"> · <%= disk.date_ingreso.year %></span>
+                <% end %>
+              </div>
               <% if disk.genres.any? %>
                 <div class="tags">
                   <% disk.genres.each do |g| %>

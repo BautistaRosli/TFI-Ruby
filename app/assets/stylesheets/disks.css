@@ -17,7 +17,7 @@
 
 .filter-group {
   display: flex;
-  flex-direction: column;
+  flex-direction: row-reverse;
 }
 
 .filter-input,
@@ -50,14 +50,16 @@
 }
 
 .btn-filter {
-  padding: 10px 24px;
-  border-radius: 8px;
+  padding: 12px 28px;
+  border-radius: 10px;
   border: none;
   background: linear-gradient(135deg, var(--primary-color) 0%, #1e40af 100%);
   color: #fff;
-  font-weight: 500;
+  font-size: 0.97rem;
   cursor: pointer;
-  transition: transform var(--transition), box-shadow var(--transition);
+  text-decoration: none !important;
+  border-bottom: none !important;
+  box-shadow: 0 8px 18px rgba(37,99,235,0.25);
 }
 
 .btn-filter:hover {
@@ -65,22 +67,30 @@
   box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
 }
 
+
+/* Also ensure any child element does not inherit an underline */
+ a.btn-filter-clear * {
+   text-decoration: none !important;
+   border-bottom: none !important;
+ }
 .btn-filter-clear {
-  padding: 10px 24px;
+  padding: 8px 20px;
   border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  background: transparent;
-  color: #fff;
-  font-weight: 500;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255,255,255,0.02);
+  color: rgba(255,255,255,0.85);
+  font-weight: 600;
   cursor: pointer;
   text-decoration: none;
   display: inline-block;
-  transition: background var(--transition), border-color var(--transition);
+  transition: background var(--transition), border-color var(--transition), opacity var(--transition);
+
 }
 
 .btn-filter-clear:hover {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.28);
+  opacity: 1;
 }
 
 .no-results {
@@ -208,6 +218,141 @@
   color: var(--accent-2);
   margin: 0;
 }
+
+/* Year labels inside cards */
+.disk-year,
+.recommendation-year {
+  display: inline-block;
+  color: rgba(255,255,255,0.62);
+  font-size: 0.9rem;
+  margin-left: 6px;
+}
+
+/* Placeholder for missing covers */
+.cover-placeholder {
+  width: 100%;
+  height: 100%;
+  min-height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #000;
+  color: #fff;
+  font-weight: 700;
+  border-radius: 8px;
+  text-align: center;
+  padding: 10px;
+}
+
+.disk-large-placeholder {
+  width: 100%;
+  height: 100%;
+  min-height: 320px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #000;
+  color: #fff;
+  font-weight: 800;
+  border-radius: 10px;
+  text-align: center;
+  padding: 18px;
+}
+
+/* Carousel styles */
+.card-carousel,
+.show-carousel {
+  position: relative;
+  overflow: hidden;
+}
+
+.card-carousel .carousel-track,
+.show-carousel .carousel-track {
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
+
+.carousel-slide img {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: cover;
+}
+
+/* ensure each slide occupies full carousel width even before JS runs */
+.carousel-slide {
+  flex: 0 0 100%;
+  width: 100%;
+  height: 100%;
+}
+
+
+/* carousel controls: hidden by default, shown on hover only when carousel.has-multiple */
+.carousel-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 3;
+  background: rgba(0,0,0,0.45);
+  color: #fff;
+  border: none;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 160ms ease, transform 160ms ease;
+}
+
+.card-carousel .carousel-btn { font-size: 18px; }
+.show-carousel .carousel-btn { width: 44px; height: 44px; font-size: 22px; }
+
+.carousel-btn.prev { left: 10px; }
+.carousel-btn.next { right: 10px; }
+
+/* show buttons when hovering and the carousel actually has multiple slides */
+.card-carousel.has-multiple:hover .carousel-btn,
+.show-carousel.has-multiple:hover .carousel-btn {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* smaller slides in cards to keep consistent heights */
+.card-carousel .carousel-slide { min-height: 120px; display:flex; align-items:center; justify-content:center; }
+.show-carousel .carousel-slide { min-height: 320px; display:flex; align-items:center; justify-content:center; }
+
+/* Ensure placeholder fills the slide area */
+.carousel-slide > .cover-placeholder,
+.carousel-slide > .disk-large-placeholder {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: inherit !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* badge for out-of-stock */
+.disk-card { position: relative; }
+.no-stock-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(220,38,38,0.95);
+  color: #fff;
+  padding: 6px 8px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.75rem;
+  z-index: 6;
+  box-shadow: 0 6px 16px rgba(2,6,23,0.45);
+}
+
 
 @media (max-width: 1200px) {
   .recommendations-grid {
