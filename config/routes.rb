@@ -69,5 +69,7 @@ Rails.application.routes.draw do
   #
   root to: "disk/new#index"
 
-  match "*path", to: "application#routing_error", via: :all
+  match "*path", to: "application#routing_error", via: :all,
+    constraints: lambda { |req| !req.path.start_with?("/rails/active_storage") }
+
 end

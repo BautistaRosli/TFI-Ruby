@@ -17,15 +17,15 @@ class Disk < ApplicationRecord
             numericality: { greater_than: 0 },
             presence: true
 
-  # Sin caracteres especiales
-  NAME_REGEX = /\A[[:alnum:]\s\.\-\/ÁÉÍÓÚáéíóúÑñ]+\z/
-  validates :name, :author, :format,
-            format: { with: NAME_REGEX, message: "solo letras/números, espacios, . - / y acentos" }
+  # Texto permitido (letras con acentos, números, espacios y símbolos comunes)
+  ALLOWED_TEXT_REGEX = /\A[\p{L}\p{N}\s\.\,\-\/&'!\?:;\(\)#]+\z/u
 
-  # evitar caracteres no alfanuméricos
-  DESCRIPTION_REGEX = /\A[[:alnum:]\s\.\,\-\!\?\:\;]+\z/
+  validates :name, :author, :format,
+            format: { with: ALLOWED_TEXT_REGEX,
+                      message: "solo letras/números, espacios y . , - / & ' ! ? : ; ( ) #" }
   validates :description,
-            format: { with: DESCRIPTION_REGEX, message: "contiene caracteres no permitidos" }
+            format: { with: ALLOWED_TEXT_REGEX,
+                      message: "contiene caracteres no permitidos (permitidos: letras con acentos, números y . , - / & ' ! ? : ; ( ) #)" }
 
   validate :validate_images_limit
   validate :validate_images_content_type

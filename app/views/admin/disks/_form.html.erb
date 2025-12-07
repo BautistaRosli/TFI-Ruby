@@ -27,19 +27,25 @@
     <div class="form-group bordered">
       <%= f.label :name, "Nombre", class: "form-label top-label" %>
       <%= f.text_field :name, class: 'form-control', required: true,
-            pattern: "[A-Za-z0-9 \\.,\\-!\\?:;]+", title: "Evitar caracteres especiales no permitidos", id: 'disk_name' %>
+            pattern: "[A-Za-z0-9ÁÉÍÓÚáéíóúÑñ \\./,&'\\-!\\?:;()#]+",
+            title: "Permitidos: letras con acentos, números, espacio y . , - / & ' ! ? : ; ( ) #",
+            id: 'disk_name' %>
     </div>
 
     <div class="form-group bordered">
       <%= f.label :author, "Autor/Artista", class: "form-label top-label" %>
       <%= f.text_field :author, class: 'form-control', required: true,
-            pattern: "[A-Za-z0-9 \\.,\\-!\\?:;]+", title: "Evitar caracteres especiales no permitidos", id: 'disk_author' %>
+            pattern: "[A-Za-z0-9ÁÉÍÓÚáéíóúÑñ \\./,&'\\-!\\?:;()#]+",
+            title: "Permitidos: letras con acentos, números, espacio y . , - / & ' ! ? : ; ( ) #",
+            id: 'disk_author' %>
     </div>
 
     <div class="form-group bordered">
       <%= f.label :description, "Descripción", class: "form-label top-label" %>
       <%= f.text_area :description, class: 'form-control', required: true,
-            pattern: "[A-Za-z0-9 \\.,\\-!\\?:;]+", title: "Evitar caracteres especiales no permitidos", id: 'disk_description' %>
+            pattern: "[A-Za-z0-9ÁÉÍÓÚáéíóúÑñ \\./,&'\\-!\\?:;()#]+",
+            title: "Permitidos: letras con acentos, números, espacio y . , - / & ' ! ? : ; ( ) #",
+            id: 'disk_description' %>
     </div>
 
     <div class="form-row two-cols">
@@ -108,13 +114,15 @@
       <div class="form-group bordered" id="audio_field">
         <%= f.label :audio, "Audio opcional (muestra)", class: "form-label top-label" %>
         <%= f.file_field :audio, accept: 'audio/*', class: 'form-control' %>
-        <% if @disk.respond_to?(:audio) && @disk.audio.attached? %>
+        <% if @disk.persisted? && @disk.respond_to?(:audio) && @disk.audio.attached? %>
           <div class="audio-preview-wrap">
             <audio controls class="audio-preview">
-              <source src="<%= url_for(@disk.audio) %>" type="<%= @disk.audio.blob.content_type %>">
+              <source src="<%= rails_blob_path(@disk.audio, only_path: true) %>" type="<%= @disk.audio.blob.content_type %>">
               Tu navegador no soporta audio.
             </audio>
           </div>
+        <% elsif @disk.respond_to?(:audio) && @disk.audio.attached? %>
+          <small class="text-secondary">El audio se pre-guardó y se adjuntará al crear el disco.</small>
         <% end %>
       </div>
     </div>
@@ -158,11 +166,9 @@
         if (stockInput) stockInput.removeAttribute('required');
       }
     }
-
-    // Sanitizar inputs de texto y números (sin cambios)
     function sanitizeText(e) {
-      var allowed = /[A-Za-z0-9 \.\,\-\!\?\:\;]/;
-      var v = e.target.value;
+      var allowed = /[A-Za-z0-9ÁÉÍÓÚáéíóúÑñ \.\,\-\/&'!\?:;\(\)#]/;
+      var v = e.target.value || '';
       e.target.value = v.split('').filter(function(ch){ return allowed.test(ch); }).join('');
     }
     function sanitizeNumber(e) {
@@ -217,17 +223,14 @@
       var chips = qs('genre_selected_chips');
       if(!btn || !dd || !chips) return;
 
-      // Toggle dropdown
       btn.addEventListener('click', function(){
         dd.style.display = (dd.style.display === 'none' || dd.style.display === '') ? 'block' : 'none';
       });
 
-      // Cerrar al click fuera
       document.addEventListener('click', function(e){
         if(!dd.contains(e.target) && !btn.contains(e.target)) dd.style.display = 'none';
       });
 
-      // Seleccionar género
       dd.addEventListener('click', function(e){
         var option = e.target.closest('.genre-option');
         if(!option) return;
@@ -235,7 +238,6 @@
         var name = option.dataset.name;
         var ids = selectedIds(chips);
         if(ids.includes(id)){
-          // ya seleccionado → quitar
           Array.from(chips.querySelectorAll('.chip')).forEach(function(c){
             if(Number(c.dataset.id) === id) c.remove();
           });
@@ -244,28 +246,23 @@
           });
           option.style.background = 'transparent';
         } else {
-          // agregar
           chips.appendChild(createChip(id, name));
           chips.appendChild(createHidden(id));
           option.style.background = '#f1f5f9';
         }
-        // cerrar dropdown tras seleccionar
         dd.style.display = 'none';
       });
 
-      // Quitar género desde chip
       chips.addEventListener('click', function(e){
         var btnRemove = e.target.closest('.chip-remove');
         if(!btnRemove) return;
         var id = Number(btnRemove.dataset.id);
-        // quitar chip + hidden
         Array.from(chips.querySelectorAll('.chip')).forEach(function(c){
           if(Number(c.dataset.id) === id) c.remove();
         });
         Array.from(chips.querySelectorAll('input[name="disk[genre_ids][]"]')).forEach(function(h){
           if(Number(h.value) === id) h.remove();
         });
-        // desmarcar en dropdown
         Array.from(dd.querySelectorAll('.genre-option')).forEach(function(opt){
           if(Number(opt.dataset.id) === id) opt.style.background = 'transparent';
         });

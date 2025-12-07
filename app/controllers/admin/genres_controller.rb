@@ -1,4 +1,5 @@
 class Admin::GenresController < ApplicationController
+  before_action :authenticate_user!
   layout "admin"
 
   def index
@@ -8,8 +9,7 @@ class Admin::GenresController < ApplicationController
 
   def create
     name = genre_params["name"].downcase.capitalize
-    modified_params = genre_params.merge(name: name)
-    @genre = Genre.new(modified_params)
+    @genre = Genre.new(genre_params.merge(name: name))
     if @genre.save
       redirect_to admin_genres_path, notice: "Género creado"
     else

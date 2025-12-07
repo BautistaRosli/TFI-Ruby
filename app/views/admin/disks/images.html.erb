@@ -38,7 +38,11 @@
           <% @disk.images.each do |img| %>
             <div class="images-item">
               <div class="disk-preview-wrap">
-                <%= image_tag img, alt: 'preview', class: 'disk-preview-img' %>
+                <% if img&.blob.present? %>
+                  <%= image_tag img, alt: 'preview', class: 'disk-preview-img' %>
+                <% else %>
+                  <div class="cover-placeholder">Sin imagen</div>
+                <% end %>
               </div>
               <% if cover_blob_id.present? && cover_blob_id == img.blob_id %>
                 <span class="disk-date" style="position:absolute; top:8px; left:8px;">Portada</span>
