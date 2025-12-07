@@ -22,7 +22,7 @@
                 </div>
                 <div class="header-buttons">
                     <%= link_to "Volver a menú de gestión", admin_dashboard_path, class: "btn btn-logout" %>
-                    <% if can? :analize, :admin_graphics_path %>
+                    <% if can? :read, :admin_graphic %>
                         <%= link_to "Ver análisis de ventas", admin_graphics_path, class:  "btn btn-logout"%>
                     <% end %>
                     <%= button_to "Salir", destroy_user_session_path, method: :get, class: "btn btn-logout" %>

@@ -1,5 +1,6 @@
 # db/seeds.rb
 require 'open-uri'
+require 'set'
 
 puts "🗑️  Limpiando base de datos..."
 # Borramos en orden para mantener integridad referencial
@@ -9,6 +10,8 @@ Sale.delete_all
 Disk.all.each { |d| d.genres.clear }
 Disk.delete_all
 Genre.delete_all
+User.delete_all
+Client.delete_all
 
 # URL de imagen genérica para el seed
 PLACEHOLDER_URL = "https://placehold.co/400x400/png"
@@ -80,7 +83,45 @@ puts "\n💿 Creando discos USADOS (Stock fijo en 1)..."
 end
 
 # -----------------------------------------------------------------------------
-# 4. GENERACIÓN DE VENTAS E HISTORIAL
+# 4. GENERACIÓN De Usuarios y Clientes
+# -----------------------------------------------------------------------------
+puts "\n 👤 --- Generando Usuarios y Clientes ---"
+names = [ "Pepe", "Pedro", "Lucía", "Mateo", "Carla", "Julián", "María", "Diego", "Sofía", "Nicolás", "Valentina", "Agustín", "Camila", "Tomás", "Martina", "Bruno", "Julieta", "Lautaro", "Renata", "Franco" ]
+
+lastnames = [ "González", "Martínez", "Fernández", "López", "Ramírez", "Torres", "Sánchez", "Duarte", "Herrera", "Pérez", "Álvarez", "Romero", "Benítez", "Vargas", "Castillo", "Navarro", "Medina", "Suárez", "Muñoz", "Rivas" ]
+
+# Creamos al administrador
+User.create!(email: "admin@example.com", password: "123456", name: names.sample, lastname: lastnames.sample, role: 0, is_active: true)
+
+# Creamos gerentes
+10.times do |i|
+  User.create!(email: "gerente#{i + 1}@example.com", password: "123456", name: names.sample, lastname: lastnames.sample, role: 1, is_active: true)
+end
+
+# Creamos empleados
+10.times do |i|
+  User.create!(email: "empleado#{i + 1}@example.com", password: "123456", name: names.sample, lastname: lastnames.sample, role: 2, is_active: true)
+end
+
+
+type = [ "DNI", "PASAPORTE", "LE", "LC" ]
+documents = Set.new
+
+# generar 20 documentos únicos entre 5M y 50M
+while documents.size < 20
+  documents << rand(5_000_000..50_000_000)
+end
+
+documents = documents.to_a
+
+20.times do |i|
+  Client.create!(name: names.sample, lastname: lastnames.sample, email: "cliente#{i + 1}@example.com", document_type: type.sample, document_number: documents[i])
+end
+
+Client.create!(name: "Anónimo", lastname: "Anónimo", email: "anonimo@anonimo.com", document_type: "DNI", document_number: "0")
+
+# -----------------------------------------------------------------------------
+# 5. GENERACIÓN DE VENTAS E HISTORIAL
 # -----------------------------------------------------------------------------
 puts "\n📈 --- Generando Ventas Históricas ---"
 

@@ -1,6 +1,6 @@
 class Admin::GraphicsController < ApplicationController
   before_action :authenticate_user!
-  authorize_resource class: false
+  authorize_resource :admin_graphic, class: false
 
   def index
     @sales_by_disks = Disk.sold_in_active_sales
@@ -14,7 +14,7 @@ class Admin::GraphicsController < ApplicationController
     @sales_by_hour = Sale.sales_by_hour
     @low_stock = NewDisk.low_stock
     @deleted_sales = Sale.deleted_sales.group_by_month(:created_at).count
-    @anonymous = Client.find_by(document_number: "000000", document_type: "DNI")
+    @anonymous = Client.find_by(document_number: "0", document_type: "DNI")
 
     if @anonymous
       anon_sales = Sale.anonymous_sales(@anonymous.id)
