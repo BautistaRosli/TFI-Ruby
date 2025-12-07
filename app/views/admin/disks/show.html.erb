@@ -59,7 +59,7 @@
                 <h3 style="margin:0 0 6px 0;">Audio de muestra</h3>
                 <% if @disk.audio&.attached? %>
                   <audio id="admin-sample-audio" preload="none" style="width:100%; max-width:420px; border:1px solid #e2e8f0; border-radius:10px; padding:6px;">
-                    <source src="<%= url_for(@disk.audio) %>" type="<%= @disk.audio.blob.content_type %>">
+                    <source src="<%= rails_blob_path(@disk.audio, only_path: true) %>" type="<%= @disk.audio.blob.content_type %>">
                     Tu navegador no soporta audio.
                   </audio>
                   <div style="margin-top:10px;">
@@ -77,7 +77,7 @@
             <%= link_to 'Imágenes', images_admin_disk_path(@disk), class: 'btn btn-outline-secondary' %>
             <%= link_to 'Volver', admin_disks_path, class: 'btn btn-outline-secondary' %>
 
-            <% unless @disk.deleted_at.present? %>
+            <% unless @disk.deleted_at.present? && (@disk.stock.to_i == 0) %>
               <%= button_to 'Dar de baja', soft_delete_admin_disk_path(@disk), method: :patch,
                     form: { data: { turbo_confirm: '¿Confirmás dar de baja este disco?' } },
                     class: 'btn btn-warning' %>
