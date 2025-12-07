@@ -1,0 +1,89 @@
+
+class Admin::UsersController < ApplicationController
+  before_action :authenticate_user!
+  load_and_authorize_resource
+  layout "admin_users"
+  def index
+    @users = can?(:delete, User) ? User.page(params[:page]).per(10) : User.where(is_active: true).page(params[:page]).per(10)
+
+    @users = @users.where("users.name LIKE ?", "%#{params[:name]}%") if params[:name].present?
+
+    @users = @users.where("users.lastname LIKE ?", "%#{params[:lastname]}%") if params[:lastname].present?
+
+    @users = @users.where("users.lastname LIKE ?", "%#{params[:email]}%") if params[:email].present?
+
+    if params[:role].present?
+      normalized_role = params[:role].downcase
+      @users = @users.where(role: normalized_role)
+    end
+  end
+
+
+  def show(method: :patch)
+    @user = User.find(params[:id])
+  end
+
+  def update
+    @user = User.find(params[:id])
+    if @user.update(user_params)
+      redirect_to admin_user_path(@user), notice: "Usuario actualizado correctamente."
+    else
+      flash.now[:alert] = "El usuario no pudo ser actualizado. Revisa los errores."
+      render :show, status: :unprocessable_entity
+    end
+  end
+
+  def new
+    @user = User.new
+  end
+
+  def create
+    @user = User.new(creation_params)
+    if @user.save
+      redirect_to admin_users_path, notice: "Usuario creado correctamente."
+    else
+      flash.now[:alert] = "El usuario no pudo ser creado. Revisa los errores."
+      render :new, status: :unprocessable_entity
+    end
+  end
+
+  def destroy
+    @user = User.find(params[:id])
+    @user.update(is_active: false)
+    redirect_to admin_users_path, notice: "Usuario desactivado correctamente."
+  end
+
+  def reactivate(method: :patch)
+    @user = User.find(params[:id])
+    @user.update(is_active: true)
+    redirect_to admin_users_path, notice: "Usuario reactivado correctamente."
+  end
+
+  def see_password(method: :get)
+  end
+
+  def change_password(method: :put)
+    @user = User.find(params[:id])
+    if @user.update(password_params)
+      redirect_to admin_user_path(@user), notice: "Contraseña actualizada correctamente"
+    else
+      flash.now[:alert] = "El usuario no pudo ser actualizado. Revisa los errores."
+      render :show, status: :unprocessable_entity
+    end
+  end
+
+
+  private
+
+  def creation_params
+    params.require(:user).permit(:email, :name, :lastname, :role, :is_active, :password, :password_confirmation)
+  end
+
+  def user_params
+    params.require(:user).permit(:email, :name, :lastname, :role, :is_active)
+  end
+
+  def password_params
+    params.require(:user).permit(:password, :password_confirmation)
+  end
+end

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <%= stylesheet_link_tag "login", media: "all" %>
+</head>
+<body>
+  <% if flash.any? %>
+    <div class="flash-notifications">
+      <% flash.each do |type, message| %>
+        <% 
+          alert_class = case type.to_s
+          when 'notice' then 'alert-success'
+          when 'alert' then 'alert-danger'
+          when 'warning' then 'alert-warning'
+          when 'info' then 'alert-info'
+          else 'alert-primary'
+          end
+        %>
+        <div class="alert <%= alert_class %> alert-dismissible fade show" role="alert">
+          <span class="alert-message"><%= message %></span>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+  <div class="login-container">
+    <div class="flash-messages">
+
+    
+  </div>
+    <div class="login-wrapper">
+      <h2 class="login-title">Inicia Sesión</h2>
+      <p class="login-subtitle">Accede a tu cuenta</p>
+
+      <%= form_for(:user, url: new_user_session_path) do |f| %>
+        <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+
+        <div class="form-label">
+            <%= f.label :email %><br>
+            <%= f.email_field :email, autofocus: true, class: "form-control login-input" %>
+        </div>
+
+        <div class="form-label">
+            <%= f.label :password %><br>
+            <%= f.password_field :password, autocomplete: "current-password", class: "form-control login-input" %>
+        </div>
+
+        <div class="form-label">
+            <%= f.submit "Ingresar", class: "btn btn-login w-100" %>
+        </div>
+        
+      <% end %>
+
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

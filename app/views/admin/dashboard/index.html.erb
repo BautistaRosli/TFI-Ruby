@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Disquería</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <%= stylesheet_link_tag 'admin_index', media: 'all' %>
+</head>
+<body>
+    <div class="flash-messages">
+        <% if flash.any? %>
+            <div class="flash-notifications">
+            <% flash.each do |type, message| %>
+                <% 
+                alert_class = case type.to_s
+                when 'notice' then 'alert-success'
+                when 'alert' then 'alert-danger'
+                when 'warning' then 'alert-warning'
+                when 'info' then 'alert-info'
+                else 'alert-primary'
+                end
+                %>
+                <div class="alert <%= alert_class %> alert-dismissible fade show" role="alert">
+                    <span class="alert-message"><%= message %></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            <% end %>
+            </div>
+        <% end %>
+    </div>
+    <div class="dashboard-container">
+        <header class="dashboard-header">
+            <div class="header-content">
+                <div class="header-top">
+                    <div>
+                        <h1 class="header-title">Panel Administrativo</h1>
+                        <p class="header-subtitle">Disquería - Sistema de Gestión</p>
+                    </div>
+                    <%= button_to "Salir", destroy_user_session_path, method: :get, class: "btn btn-logout" %>
+                </div>
+            </div>
+        </header>
+
+        <main class="dashboard-main">
+            <div class="container-fluid">
+                <div class="modules-grid">
+                   
+                    <div class="module-card sales-card">
+                        <div class="card-icon">💰</div>
+                        <h2 class="card-title">Gestión de Ventas</h2>
+                        <p class="card-description">Administra tus ventas, pedidos y facturas</p>
+                        <%= button_to "Acceder", admin_sales_path, method: :get, class: "btn btn-primary btn-lg" %>
+                    </div>
+
+                    <div class="module-card users-card">
+                        <div class="card-icon">👥</div>
+                        <h2 class="card-title">Administración de Usuarios</h2>
+                        <p class="card-description">Gestiona clientes, empleados y permisos</p>
+                        <%= button_to "Acceder", admin_users_path, method: :get, class: "btn btn-primary btn-lg" %>
+                    </div>
+
+                    <div class="module-card discs-card">
+                        <div class="card-icon">💿</div>
+                        <h2 class="card-title">Administración de Discos</h2>
+                        <p class="card-description">Gestiona tu catálogo de música</p>
+                        <%= button_to "Acceder", admin_disks_path, method: :get, class: "btn btn-primary btn-lg" %>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="dashboard-footer">
+            <p>&copy; 2025 Disquería. Todos los derechos reservados.</p>
+        </footer>
+    </div>
+</body>
+</html>

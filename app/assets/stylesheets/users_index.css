@@ -1,0 +1,831 @@
+:root {
+  --primary-color: #2563eb;
+  --primary-dark: #1e40af;
+  --secondary-color: #64748b;
+  --success-color: #059669;
+  --danger-color: #dc2626;
+  --warning-color: #f59e0b;
+  --info-color: #3b82f6;
+  --light-bg: #f8fafc;
+  --card-bg: #ffffff;
+  --border-color: #e2e8f0;
+  --text-primary: #1e293b;
+  --text-secondary: #64748b;
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Fondo con gradiente profesional igual al dashboard */
+body {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  color: var(--text-primary);
+  min-height: 100vh;
+}
+
+/* Notificaciones flash con estilos consistentes */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.flash-notifications {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  max-width: 500px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 9999;
+}
+
+.alert {
+  border: none;
+  border-radius: 8px;
+  padding: 14px 16px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: var(--shadow-lg);
+  animation: slideDown 0.3s ease-out;
+}
+
+.alert-message {
+  flex: 1;
+  font-weight: 500;
+}
+
+.alert-success {
+  background-color: #ecfdf5;
+  color: #065f46;
+  border-left: 4px solid var(--success-color);
+}
+
+.alert-danger {
+  background-color: #fef2f2;
+  color: #7f1d1d;
+  border-left: 4px solid var(--danger-color);
+}
+
+.alert-warning {
+  background-color: #fffbeb;
+  color: #78350f;
+  border-left: 4px solid var(--warning-color);
+}
+
+.alert-info {
+  background-color: #eff6ff;
+  color: #0c2d6b;
+  border-left: 4px solid var(--info-color);
+}
+
+.alert-primary {
+  background-color: #eff6ff;
+  color: #0c2d6b;
+  border-left: 4px solid var(--info-color);
+}
+
+.alert .btn-close {
+  padding: 4px;
+  opacity: 0.6;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+  font-size: 1.5rem;
+}
+
+.alert .btn-close:hover {
+  opacity: 1;
+}
+
+/* Header azul extendido a todo el ancho de la pantalla */
+.users-header {
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+  color: white;
+  padding: 2.5rem 2rem;
+  box-shadow: var(--shadow-lg);
+  margin: 0;
+  width: 100%;
+}
+
+.header-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+}
+
+.header-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  letter-spacing: -0.5px;
+}
+
+.header-subtitle {
+  font-size: 1.1rem;
+  opacity: 0.95;
+  font-weight: 300;
+}
+
+/* Botón logout con estilos consistentes del dashboard */
+.btn-logout {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  padding: 0.6rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  white-space: nowrap;
+  text-decoration: none;
+}
+
+.btn-logout:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  color: white;
+  text-decoration: none;
+}
+
+.btn-logout:active {
+  transform: translateY(0);
+}
+
+/* Estilos mejorados para el dropdown de perfil */
+.dropdown {
+  position: relative;
+  display: inline-block;
+  /* Asegurar que el dropdown no se desplace */
+  overflow: visible;
+}
+
+.dropdown .btn {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+  /* remover outline de focus para un look más limpio */
+  outline: none;
+}
+
+.dropdown .btn:hover {
+  background-color: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.6);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  color: white;
+}
+
+.dropdown .btn:focus,
+.dropdown .btn:active {
+  background-color: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.7);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.2);
+  color: white;
+  outline: none;
+  /* Remover transform para evitar que el botón se desplace */
+  transform: none !important;
+}
+
+/* Estilos que anulan el comportamiento de Bootstrap para evitar desplazamiento */
+.dropdown-menu {
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15);
+  padding: 0.75rem 0;
+  /* Aumentar margen-top para separar del botón */
+  margin-top: 8px;
+  min-width: 200px;
+  animation: slideDownMenu 0.2s ease-out;
+  position: absolute !important;
+  /* Posicionar correctamente para que no superponga el botón */
+  top: calc(100% + 8px) !important;
+  right: 0 !important;
+  left: auto !important;
+  z-index: 1050;
+  background-color: #ffffff;
+  display: none;
+  /* Remover cualquier transform de Bootstrap con !important */
+  transform: none !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.dropdown-menu.show {
+  display: block !important;
+  /* Mantener transform en none cuando se muestra */
+  transform: none !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Neutralizar estilos de Popper.js */
+.dropdown-menu[data-popper-placement] {
+  position: absolute !important;
+  transform: none !important;
+  top: calc(100% + 8px) !important;
+  right: 0 !important;
+  left: auto !important;
+}
+
+/* Remover animación de transform de Bootstrap sobre dropdown-menu */
+.dropdown-menu[data-bs-popper] {
+  transform: none !important;
+  top: calc(100% + 8px) !important;
+  right: 0 !important;
+}
+
+@keyframes slideDownMenu {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dropdown-menu .dropdown-item {
+  padding: 0.75rem 1.25rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  border-radius: 8px;
+  margin: 0.25rem 0.5rem;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  display: block;
+}
+
+.dropdown-menu .dropdown-item:hover {
+  background-color: rgba(37, 99, 235, 0.08);
+  color: var(--primary-color);
+  transform: translateX(4px);
+}
+
+.dropdown-menu .dropdown-item.text-danger {
+  color: var(--danger-color);
+}
+
+.dropdown-menu .dropdown-item.text-danger:hover {
+  background-color: rgba(220, 38, 38, 0.08);
+  color: #991b1b;
+}
+
+/* Contenedor del botón crear usuario */
+.create-user-button-container {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 2rem;
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* Estilos mejorados para el botón "Crear Usuario" */
+.create-user-button-container .btn {
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+  color: white;
+  border: none;
+  padding: 0.8rem 2rem;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: 0.3px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.create-user-button-container .btn:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(37, 99, 235, 0.4);
+  background: linear-gradient(135deg, #1d4ed8 0%, #1e3a8a 100%);
+  color: white;
+  text-decoration: none;
+}
+
+.create-user-button-container .btn:active {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+.users-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 3rem 2rem;
+}
+
+.users-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 1.75rem;
+}
+
+.user-card {
+  background: var(--card-bg);
+  border-radius: 12px;
+  padding: 1.75rem;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border-color);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+  position: relative;
+  overflow: hidden;
+}
+
+
+.btn-user-action {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  white-space: nowrap;
+  z-index: 10;
+}
+
+.btn-delete {
+  background-color: var(--danger-color);
+  color: white;
+  border: 2px solid var(--danger-color);
+}
+
+.btn-delete:hover {
+  background-color: #b91c1c;
+  border-color: #991b1b;
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+}
+
+.btn-delete:active {
+  transform: scale(0.98);
+}
+
+.btn-reactivate {
+  background-color: var(--success-color);
+  color: white;
+  border: 2px solid var(--success-color);
+}
+
+.btn-reactivate:hover {
+  background-color: #047857;
+  border-color: #065f46;
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
+}
+
+.btn-reactivate:active {
+  transform: scale(0.98);
+}
+
+.user-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
+  transition: left 0.4s ease;
+}
+
+.user-card:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--primary-color);
+}
+
+.user-card:hover::before {
+  left: 100%;
+}
+
+.user-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.1) 0%, rgba(59, 130, 246, 0.1) 100%);
+  border-radius: 50%;
+  font-size: 2.5rem;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+  border: 2px solid rgba(37, 99, 235, 0.2);
+}
+
+.user-card:hover .user-avatar {
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.2) 0%, rgba(59, 130, 246, 0.2) 100%);
+  transform: scale(1.12) rotate(-5deg);
+  border-color: var(--primary-color);
+}
+
+.user-info {
+  flex: 1;
+}
+
+.user-name {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.35rem 0;
+  letter-spacing: -0.3px;
+}
+
+.user-apellido {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 0 0 0.5rem 0;
+  font-weight: 500;
+}
+
+.user-username {
+  font-size: 0.85rem;
+  color: var(--primary-color);
+  font-weight: 600;
+  margin: 0 0 1rem 0;
+  word-break: break-all;
+}
+
+.user-role {
+  display: inline-block;
+  padding: 0.4rem 1rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: capitalize;
+  letter-spacing: 0.3px;
+  transition: all 0.3s ease;
+}
+
+.role-admin {
+  background: rgba(220, 38, 38, 0.15);
+  color: #7f1d1d;
+  border: 1px solid rgba(220, 38, 38, 0.3);
+}
+
+.user-card:hover .role-admin {
+  background: rgba(220, 38, 38, 0.25);
+  border-color: rgba(220, 38, 38, 0.5);
+}
+
+.role-vendedor {
+  background: rgba(59, 130, 246, 0.15);
+  color: #0c2d6b;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.user-card:hover .role-vendedor {
+  background: rgba(59, 130, 246, 0.25);
+  border-color: rgba(59, 130, 246, 0.5);
+}
+
+.role-empleado {
+  background: rgba(5, 150, 105, 0.15);
+  color: #065f46;
+  border: 1px solid rgba(5, 150, 105, 0.3);
+}
+
+.user-card:hover .role-empleado {
+  background: rgba(5, 150, 105, 0.25);
+  border-color: rgba(5, 150, 105, 0.5);
+}
+
+.role-gestor {
+  background: rgba(245, 158, 11, 0.15);
+  color: #78350f;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.user-card:hover .role-gestor {
+  background: rgba(245, 158, 11, 0.25);
+  border-color: rgba(245, 158, 11, 0.5);
+}
+
+/* Responsive design con Bootstrap breakpoints */
+@media (max-width: 768px) {
+  .users-grid {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  .user-card {
+    padding: 1.5rem;
+    gap: 1.25rem;
+  }
+
+  .user-avatar {
+    width: 70px;
+    height: 70px;
+    font-size: 2rem;
+  }
+
+  .user-name {
+    font-size: 1.05rem;
+  }
+
+  .header-title {
+    font-size: 2rem;
+  }
+
+  .header-top {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.5rem;
+  }
+
+  .btn-logout {
+    align-self: flex-start;
+  }
+
+  .dropdown {
+    width: 100%;
+  }
+
+  .dropdown .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .dropdown-menu {
+    width: 100%;
+    left: 0;
+    right: 0;
+  }
+
+  .flash-notifications {
+    width: 95%;
+    max-width: 450px;
+  }
+
+  .alert {
+    font-size: 13px;
+    padding: 12px 14px;
+  }
+
+  .header-content {
+    padding: 0 1rem;
+  }
+
+  .users-container {
+    padding: 2.5rem 1rem;
+  }
+
+  .create-user-button-container {
+    padding: 0 1rem;
+    justify-content: center;
+  }
+
+  .create-user-button-container .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .users-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .user-card {
+    padding: 1.25rem;
+    gap: 1rem;
+  }
+
+  .user-avatar {
+    width: 60px;
+    height: 60px;
+    font-size: 1.75rem;
+  }
+
+  .user-name {
+    font-size: 1rem;
+  }
+
+  .user-apellido {
+    font-size: 0.85rem;
+  }
+
+  .user-username {
+    font-size: 0.8rem;
+  }
+
+  .user-role {
+    font-size: 0.75rem;
+    padding: 0.35rem 0.8rem;
+  }
+
+  .header-title {
+    font-size: 1.5rem;
+  }
+
+  .header-subtitle {
+    font-size: 0.95rem;
+  }
+
+  .header-top {
+    gap: 1rem;
+  }
+
+  .btn-logout {
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+  }
+
+  .users-container {
+    padding: 2rem 1rem;
+  }
+
+  .alert {
+    font-size: 12px;
+    padding: 10px 12px;
+  }
+
+  .flash-notifications {
+    width: 95%;
+    top: 10px;
+  }
+
+  .header-content {
+    padding: 0 0.75rem;
+  }
+
+  .create-user-button-container {
+    padding: 0 1rem;
+    margin: 1.5rem auto;
+  }
+
+  .create-user-button-container .btn {
+    width: 100%;
+    padding: 0.7rem 1.5rem;
+    font-size: 0.9rem;
+  }
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin: 30px 0;
+  padding: 20px 0;
+}
+
+/* --- Estilos del Buscador Mejorados --- */
+
+.search-card {
+  background-color: #ffffff;
+  padding: 2rem;
+
+  /* 1. TAMAÑO Y POSICIÓN: */
+  /* Limitamos el ancho para que no toque los bordes y quede centrado */
+  max-width: 1000px;
+  margin: 0 auto 2.5rem auto;
+  /* Centrado horizontal y margen inferior */
+
+  /* 2. CONTRASTE Y PROFUNDIDAD: */
+  /* Borde sutil pero visible */
+  border: 1px solid #cbd5e1;
+  border-radius: 16px;
+  /* Sombra más pronunciada para que "flote" */
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
+}
+
+.search-card h4 {
+  color: var(--primary-dark);
+  /* Título más oscuro y legible */
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid #f1f5f9;
+  /* Línea separadora sutil */
+  padding-bottom: 0.5rem;
+}
+
+/* Inputs con más contraste */
+.search-input {
+  /* Fondo grisáceo para que resalte sobre el blanco de la tarjeta */
+  background-color: #f8fafc;
+  border: 1px solid #94a3b8;
+  /* Borde gris medio (más visible) */
+  border-radius: 8px;
+  padding: 0.7rem 1rem;
+  color: #334155;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+}
+
+.search-input::placeholder {
+  color: #94a3b8;
+  /* Color del placeholder */
+}
+
+.search-input:focus {
+  background-color: #ffffff;
+  border-color: var(--primary-color);
+  /* Sombra de foco para resaltar cual estás escribiendo */
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+  outline: none;
+}
+
+/* Etiquetas más oscuras */
+.form-label {
+  color: #475569;
+  /* Gris oscuro en lugar de gris claro */
+  font-size: 0.85rem;
+  margin-bottom: 0.4rem;
+  display: block;
+}
+
+/* Botón de búsqueda mejorado */
+.btn-search {
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+  color: white;
+  border: none;
+  padding: 0.7rem 1rem;
+  border-radius: 8px;
+  font-weight: 600;
+  box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+  transition: transform 0.1s ease;
+}
+
+.btn-search:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 8px -1px rgba(37, 99, 235, 0.3);
+  color: white;
+}
+
+/* RESPONSIVE: En celular ocupa todo el ancho disponible pero con márgenes */
+@media (max-width: 768px) {
+  .search-card {
+    margin: 0 1rem 2rem 1rem;
+    /* Margen lateral en celular */
+    padding: 1.25rem;
+    max-width: 100%;
+    /* Permitir que ocupe espacio en pantallas chicas */
+  }
+
+  .btn-search {
+    width: 100%;
+    margin-top: 0.5rem;
+  }
+}

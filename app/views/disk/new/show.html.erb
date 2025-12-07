@@ -1,0 +1,91 @@
+<div class="container">
+  <div class="disk-show-card">
+    <div class="disk-show-info">
+      <h1 class="disk-show-title"><%= @disk.name %></h1>
+
+      <ul class="disk-details">
+        <li><strong>Artista:</strong> <span class="muted"><%= @disk.author %></span></li>
+        <li><strong>Año:</strong> <span class="muted"><%= @disk.year if @disk.respond_to?(:year) %></span></li>
+        <li><strong>Formato:</strong> <span class="muted"><%= @disk.format %></span></li>
+        <li><strong>Stock:</strong> <span class="muted"><%= @disk.stock if @disk.respond_to?(:stock) %></span></li>
+        <li><strong>Precio:</strong> <span class="price">$<%= @disk.unit_price %></span></li>
+        <% if @disk.genres.any? %>
+          <li>
+            <strong>Géneros:</strong>
+            <span class="muted">
+              <% @disk.genres.each do |g| %>
+                <span class="tag"><%= g.name + ", " %> </span>
+              <% end %>
+            </span>
+          </li>
+        <% end %>
+      </ul>
+
+        <div class="disk-description">
+    <h2>Descripción</h2>
+    <div class="description-body">
+      <%= simple_format(@disk.description || 'Sin descripción disponible') %>
+    </div>
+  </div>
+
+      <div class="disk-actions">
+        <%= link_to 'Volver al catálogo', disk_new_index_path, class: 'btn-primary btn-gold' %>
+      </div>
+    </div>
+
+    <div class="disk-show-media">
+      <% if @disk.cover.attached? %>
+        <div class="show-carousel" data-disk-id="<%= @disk.id %>">
+          <button type="button" class="carousel-btn prev" aria-label="Anterior">‹</button>
+          <div class="carousel-track">
+            <div class="carousel-slide">
+              <%= image_tag @disk.cover, alt: @disk.name, class: 'disk-large-img' %>
+            </div>
+
+            <% if @disk.images.attached? %>
+              <% @disk.images.each do |img| %>
+                <div class="carousel-slide">
+                  <%= image_tag img, alt: @disk.name, class: 'disk-large-img' %>
+                </div>
+              <% end %>
+            <% end %>
+          </div>
+          <button type="button" class="carousel-btn next" aria-label="Siguiente">›</button>
+        </div>
+      <% else %>
+        <div class="disk-large-placeholder" role="img" aria-label="Disco sin portada">Disco sin portada</div>
+      <% end %>
+    </div>
+
+    
+  </div>
+
+  <% if @recommended_disks.any? %>
+    <div class="recommendations-section">
+      <h2 class="recommendations-title">Discos que podrían interesarte</h2>
+      <div class="recommendations-grid">
+        <% @recommended_disks.each do |disk| %>
+          <div class="recommendation-card">
+            <%= link_to disk_new_path(disk), class: "recommendation-link" do %>
+              <div class="recommendation-media">
+                <% if disk.cover.present? %>
+                  <%= image_tag disk.cover, alt: disk.name, class: "recommendation-img" %>
+                <% else %>
+                  <div class="cover-placeholder recommendation-img" role="img" aria-label="Disco sin portada">Disco sin portada</div>
+                <% end %>
+              </div>
+              <div class="recommendation-body">
+                <h3 class="recommendation-title"><%= disk.name %></h3>
+                <p class="recommendation-author"><%= disk.author %></p>
+                <% if disk.date_ingreso.present? %>
+                  <p class="recommendation-year"><%= disk.date_ingreso.year %></p>
+                <% end %>
+                <p class="recommendation-price">$<%= disk.unit_price %></p>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+</div>

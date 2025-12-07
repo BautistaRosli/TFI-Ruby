@@ -1,0 +1,140 @@
+<% content_for :stylesheets do %>
+  <%= stylesheet_link_tag 'admin_layout', media: 'all' %>
+  <%= stylesheet_link_tag 'admin_index', media: 'all' %>
+  <%= stylesheet_link_tag 'admin_disks', media: 'all' %>
+<% end %>
+
+<div class="dashboard-container">
+  <header class="admin-header">
+    <div class="header-content">
+      <div class="header-top">
+        <div>
+          <h1 class="header-title"><%= @disk.name %></h1>
+          <p class="header-subtitle">Detalles del disco</p>
+        </div>
+        <div class="header-buttons">
+          <%= link_to 'Volver al catálogo', admin_disks_path, class: 'btn-logout' %>
+        </div>
+      </div>
+    </div>
+  </header>
+  <main class="admin-main">
+    <div class="module-card">
+      <div class="disk-show-card" style="display:flex; gap:24px;">
+        <div style="flex:1;">
+          <div class="disk-media" style="margin-bottom:16px;">
+            <% cover = @disk.cover&.attached? ? @disk.cover : @disk.images.first %>
+            <% if cover.present? && cover.blob.present? %>
+              <div class="disk-large-wrap">
+                <%= image_tag cover, alt: @disk.name, class: "disk-large-img" %>
+              </div>
+            <% else %>
+              <div class="disk-large-wrap">
+                <div class="disk-large-placeholder">Disco sin portada</div>
+              </div>
+            <% end %>
+          </div>
+
+          <div class="disk-body">
+            <div class="disk-meta"><strong>Artista:</strong> <%= @disk.author.presence || '—' %></div>
+            <div class="disk-meta"><strong>Formato:</strong> <%= @disk.format.present? ? @disk.format.to_s.capitalize : '—' %></div>
+            <div class="disk-meta"><strong>Año:</strong> <%= @disk.year.presence || '—' %></div>
+            <div class="disk-meta"><strong>Descripción:</strong> <%= @disk.description.presence || '—' %></div>
+            <div class="disk-meta">
+              <strong>Géneros:</strong>
+              <%= @disk.genres.any? ? @disk.genres.map(&:name).join(', ') : '—' %>
+            </div>
+            <div class="disk-meta"><strong>Tipo:</strong> <%= @disk.is_a?(UsedDisk) ? 'Usado' : 'Nuevo' %></div>
+            <div class="disk-meta"><strong>Fecha de ingreso:</strong> <%= @disk.date_ingreso.present? ? l(@disk.date_ingreso, format: :short) : '—' %></div>
+            <div class="disk-meta"><strong>Última modificación:</strong> <%= @disk.updated_at.present? ? l(@disk.updated_at, format: :short) : '—' %></div>
+            <div class="disk-meta"><strong>Fecha de baja:</strong> <%= @disk.deleted_at.present? ? l(@disk.deleted_at, format: :short) : '—' %></div>
+            <div class="price" style="margin-top:8px;">$<%= number_with_precision(@disk.unit_price.to_f, precision: 2) %></div>
+            <div class="disk-meta"><strong>Stock:</strong> <%= @disk.stock.present? ? @disk.stock.to_i : '—' %></div>
+            <% if @disk.stock.to_i == 0 %>
+              <div class="alert alert-warning" style="margin-top:10px;">
+                <strong>Sin stock:</strong> Este disco no tiene unidades disponibles.
+              </div>
+            <% end %>
+
+            <% if @disk.is_a?(UsedDisk) %>
+              <div class="disk-audio" style="margin-top:14px;">
+                <h3 style="margin:0 0 6px 0;">Audio de muestra</h3>
+                <% if @disk.audio&.attached? %>
+                  <audio id="admin-sample-audio" preload="none" style="width:100%; max-width:420px; border:1px solid #e2e8f0; border-radius:10px; padding:6px;">
+                    <source src="<%= rails_blob_path(@disk.audio, only_path: true) %>" type="<%= @disk.audio.blob.content_type %>">
+                    Tu navegador no soporta audio.
+                  </audio>
+                  <div style="margin-top:10px;">
+                    <button id="admin-play-sample" type="button" class="btn btn-primary">Reproducir audio</button>
+                  </div>
+                <% else %>
+                  <div class="no-cover-text">Sin audio cargado</div>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+
+          <div class="disk-actions" style="margin-top:16px; display:flex; gap:8px;">
+            <%= link_to 'Editar', edit_admin_disk_path(@disk), class: 'btn btn-primary' %>
+            <%= link_to 'Imágenes', images_admin_disk_path(@disk), class: 'btn btn-outline-secondary' %>
+            <%= link_to 'Volver', admin_disks_path, class: 'btn btn-outline-secondary' %>
+
+            <% unless @disk.deleted_at.present? && (@disk.stock.to_i == 0) %>
+              <%= button_to 'Dar de baja', soft_delete_admin_disk_path(@disk), method: :patch,
+                    form: { data: { turbo_confirm: '¿Confirmás dar de baja este disco?' } },
+                    class: 'btn btn-warning' %>
+            <% end %>
+          </div>
+        </div>
+
+        <div style="flex:0 0 360px;">
+          <h3 style="margin-bottom:8px;">Imágenes del disco</h3>
+
+          <% if @disk.images.attached? && @disk.images.any? %>
+            <% cover_blob_id = @disk.cover&.attached? ? @disk.cover.blob_id : nil %>
+            <%= form_with url: set_cover_admin_disk_path(@disk), method: :patch, local: true do %>
+              <div class="images-grid">
+                 <% @disk.images.each do |img| %>
+                  <label class="images-item" style="cursor:pointer;">
+                     <% checked = (cover_blob_id.present? && cover_blob_id == img.blob_id) %>
+                     <%= radio_button_tag :cover_image_id, img.id, checked, style: 'position:absolute; top:6px; left:6px; z-index:2;' %>
+                    <div class="disk-preview-wrap">
+                      <%= image_tag img, alt: 'preview', class: 'disk-preview-img' %>
+                    </div>
+                   </label>
+                 <% end %>
+               </div>
+              <div style="margin-top:10px;">
+                <%= submit_tag 'Cambiar portada', class: 'btn btn-primary', data: { turbo: false } %>
+              </div>
+            <% end %>
+          <% else %>
+            <div class="no-cover-text">No hay imágenes cargadas</div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+  (function(){
+    function setupAudio(){
+      var btn = document.getElementById('admin-play-sample');
+      var audio = document.getElementById('admin-sample-audio');
+      if(!btn || !audio) return;
+      btn.addEventListener('click', function(){
+        if(audio.paused){
+          audio.play();
+          btn.textContent = 'Pausar audio';
+        } else {
+          audio.pause();
+          btn.textContent = 'Reproducir audio';
+        }
+      });
+      audio.addEventListener('ended', function(){ btn.textContent = 'Reproducir audio'; });
+    }
+    document.addEventListener('DOMContentLoaded', setupAudio);
+    document.addEventListener('turbo:load', setupAudio);
+  })();
+</script>

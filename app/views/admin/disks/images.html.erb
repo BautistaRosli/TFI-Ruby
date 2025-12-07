@@ -1,0 +1,62 @@
+<% content_for :stylesheets do %>
+  <%= stylesheet_link_tag 'admin_layout', media: 'all' %>
+  <%= stylesheet_link_tag 'admin_index', media: 'all' %>
+  <%= stylesheet_link_tag 'admin_disks', media: 'all' %>
+<% end %>
+
+<div class="dashboard-container">
+  <header class="admin-header">
+    <div class="header-content">
+      <div class="header-top">
+        <div>
+          <h1 class="header-title">Imágenes de <%= @disk.name %></h1>
+          <p class="header-subtitle">Gestioná las imágenes y la portada</p>
+        </div>
+        <div class="header-buttons">
+          <%= link_to 'Volver al disco', admin_disk_path(@disk), class: 'btn-logout' %>
+        </div>
+      </div>
+    </div>
+  </header>
+  <main class="admin-main">
+    <section class="module-card" style="padding:1.5rem;">
+      <h3 style="margin-bottom:10px;">Subir imagen (una por vez)</h3>
+      <%= form_with url: add_image_admin_disk_path(@disk), method: :post, local: true, html: { multipart: true } do %>
+        <div style="display:flex; gap:10px; align-items:center;">
+          <input type="file" name="image" accept="image/*" class="form-control" />
+          <%= submit_tag 'Agregar', class: 'btn btn-primary' %>
+        </div>
+        <p class="text-secondary" style="margin-top:8px;">Máximo 10 imágenes. La portada es una de estas imágenes.</p>
+      <% end %>
+    </section>
+
+    <section class="module-card" style="padding:1.5rem; margin-top:16px;">
+      <h3 style="margin-bottom:10px;">Previsualización</h3>
+      <% if @disk.images.attached? && @disk.images.any? %>
+        <% cover_blob_id = @disk.cover&.attached? ? @disk.cover.blob_id : nil %>
+        <div class="images-grid">
+          <% @disk.images.each do |img| %>
+            <div class="images-item">
+              <div class="disk-preview-wrap">
+                <% if img&.blob.present? %>
+                  <%= image_tag img, alt: 'preview', class: 'disk-preview-img' %>
+                <% else %>
+                  <div class="cover-placeholder">Sin imagen</div>
+                <% end %>
+              </div>
+              <% if cover_blob_id.present? && cover_blob_id == img.blob_id %>
+                <span class="disk-date" style="position:absolute; top:8px; left:8px;">Portada</span>
+              <% end %>
+              <div style="display:flex; gap:8px; margin-top:8px;">
+                <%= button_to 'Eliminar', remove_image_admin_disk_path(@disk, id: img.id), method: :delete, class: 'btn btn-outline-secondary', form: { data: { turbo: false } } %>
+                <%= button_to 'Hacer portada', set_cover_admin_disk_path(@disk, cover_image_id: img.id), method: :patch, class: 'btn btn-primary', form: { data: { turbo: false } } %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <p class="text-secondary">Aún no hay imágenes cargadas.</p>
+      <% end %>
+    </section>
+  </main>
+</div>

@@ -1,0 +1,106 @@
+/*
+ * This is a manifest file that'll be compiled into application.css.
+ *
+ * With Propshaft, assets are served efficiently without preprocessing steps. You can still include
+ * application-wide styles in this file, but keep in mind that CSS precedence will follow the standard
+ * cascading order, meaning styles declared later in the document or manifest will override earlier ones,
+ * depending on specificity.
+ *
+ * Consider organizing styles into separate files for maintainability.
+ */
+
+/* ============================================
+   ESTILOS GLOBALES DE PAGINACIÓN (KAMINARI)
+   ============================================ */
+
+/* Contenedor principal de paginación */
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 3rem 0 2rem;
+    width: 100%;
+}
+
+/* Nav de paginación generado por Kaminari */
+.pagination-container nav.pagination,
+nav.pagination {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    padding: 0;
+    margin: 0;
+    justify-content: center;
+}
+
+/* Todos los spans dentro de la paginación */
+.pagination-container nav.pagination span,
+nav.pagination span {
+    display: inline-flex;
+}
+
+/* Links y números de página */
+.pagination-container nav.pagination span a,
+.pagination-container nav.pagination span.current,
+nav.pagination span a,
+nav.pagination span.current {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px;
+    height: 40px;
+    padding: 0.5rem 0.75rem;
+    background: white;
+    color: #2563eb;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+/* Hover en los links */
+.pagination-container nav.pagination span a:hover,
+nav.pagination span a:hover {
+    background: #2563eb;
+    color: white;
+    border-color: #2563eb;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(37, 99, 235, 0.3);
+}
+
+/* Página actual */
+.pagination-container nav.pagination span.current,
+nav.pagination span.current {
+    background: linear-gradient(135deg, #2563eb 0%, #051ca0 100%);
+    color: white;
+    border-color: #2563eb;
+    box-shadow: 0 4px 8px rgba(37, 99, 235, 0.4);
+    cursor: default;
+}
+
+/* Gap (puntos suspensivos ...) */
+.pagination-container nav.pagination span.gap,
+nav.pagination span.gap {
+    border: none;
+    background: transparent;
+    color: #718096;
+    cursor: default;
+    min-width: auto;
+}
+
+/* Disabled (cuando no hay prev/next) */
+.pagination-container nav.pagination span.disabled,
+nav.pagination span.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.pagination-container nav.pagination span.disabled a,
+nav.pagination span.disabled a {
+    background: #f8fafc;
+    color: #cbd5e1;
+    border-color: #e2e8f0;
+    cursor: not-allowed;
+}

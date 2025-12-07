@@ -1,0 +1,24 @@
+<% content_for :title, "Editar disco - Disquería" %>
+<% content_for :page_title, "Editar disco" %>
+<% content_for :stylesheets do %>
+  <%= stylesheet_link_tag 'admin_layout', media: 'all' %>
+  <%= stylesheet_link_tag 'admin_index', media: 'all' %>
+<% end %>
+
+<div class="dashboard-container">
+  <header class="admin-header">
+    <div class="header-content">
+      <div class="header-top">
+        <div>
+          <h1 class="header-title">Editar disco</h1>
+          <p class="header-subtitle">Actualizá la información del disco</p>
+        </div>
+      </div>
+    </div>
+  </header>
+  <main class="admin-main">
+    <section class="module-card">
+      <%= render 'form' %>
+    </section>
+  </main>
+</div>

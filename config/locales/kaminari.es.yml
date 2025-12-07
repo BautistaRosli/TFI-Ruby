@@ -1,0 +1,9 @@
+es:
+  views:
+    pagination:
+      first: "« Primera"
+      last: "Última »"
+      previous: "‹ Anterior"
+      next: "Siguiente ›"
+      truncate: "…"
+ #Este archivo indica que es para kaminari en español

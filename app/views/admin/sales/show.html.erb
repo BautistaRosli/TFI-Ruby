@@ -1,0 +1,114 @@
+<% content_for :title, "Detalle Venta ##{@sale.id} - Disquería" %>
+<% content_for :page_title, "Detalle de Venta ##{@sale.id}" %>
+<% content_for :stylesheets do %>
+    <%= stylesheet_link_tag 'sales_show', media: 'all' %>
+<% end %>
+
+<div class="sales-container">
+    <div class="sale-detail-card">
+        <!-- Información general de la venta -->
+        <div class="sale-header">
+            <div class="sale-info-section">
+                <h3>Información General</h3>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Fecha y Hora:</span>
+                        <span class="info-value"><%= @sale.datetime&.strftime("%d/%m/%Y %H:%M") || @sale.created_at.strftime("%d/%m/%Y %H:%M") %></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Total:</span>
+                        <span class="info-value sale-total">$<%= number_with_precision(@sale.total_amount, precision: 2) %></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Empleado:</span>
+                        <span class="info-value">
+                            <% if @sale.user %>
+                                <%= @sale.user.name %> <%= @sale.user.lastname %> (ID: <%= @sale.user.id %>)
+                            <% else %>
+                                N/A
+                            <% end %>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <% if @sale.customer %>
+                <div class="sale-info-section customer-section">
+                    <h3>Información del Cliente</h3>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label">Nombre:</span>
+                            <span class="info-value"><%= @sale.customer.name %> <%= @sale.customer.lastname %></span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label"><%= @sale.customer.document_type %>:</span>
+                            <span class="info-value"><%= @sale.customer.document_number %></span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Email:</span>
+                            <span class="info-value"><%= @sale.customer.email %></span>
+                        </div>
+                       
+                    </div>
+                </div>
+            <% else %>
+                <div class="sale-info-section customer-section">
+                    <h3>Información del Cliente</h3>
+                    <p class="no-customer">No hay cliente asociado a esta venta</p>
+                </div>
+            <% end %>
+        </div>
+
+        <!-- Items de la venta -->
+        <div class="sale-items-section">
+            <h3>Items de la Venta</h3>
+            <% if @sale.items.any? %>
+                <div class="items-table-container">
+                    <table class="items-table">
+                        <thead>
+                            <tr>
+                                <th>Disco</th>
+                                <th>Formato</th>
+                                <th>Descripción</th>
+                                <th>Cantidad</th>
+                                <th>Precio Unitario</th>
+                                <th>Precio Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% @sale.items.each do |item| %>
+                                <tr>
+                                    <td class="item-disk-name">
+                                        <%= item.disk&.name || 'Sin disco asociado' %>
+                                    </td>
+                                    <td>
+                                        <% if item.disk&.format %>
+                                            <span class="format-badge format-<%= item.disk.format.downcase %>"><%= item.disk.format %></span>
+                                        <% else %>
+                                            <span class="format-badge">N/A</span>
+                                        <% end %>
+                                    </td>
+                                    <td><%= item.description %></td>
+                                    <td class="text-center"><%= item.units_sold %></td>
+                                    <td class="text-center">$<%= number_with_precision(item.price, precision: 2) %></td>
+                                    <td class="text-center  item-subtotal">$<%= number_with_precision(item.price * item.units_sold, precision: 2) %></td>
+                                </tr>
+                            <% end %>
+                        </tbody>
+                    </table>
+                </div>
+            <% else %>
+                <div class="no-items-message">
+                    <p>Esta venta no tiene items asociados</p>
+                </div>
+            <% end %>
+        </div>
+
+        <!-- Acciones -->
+        <div class="sale-actions">
+            <%= link_to "Volver a Ventas", admin_sales_path, class: "btn btn-secondary" %>
+            <%= link_to "Descargar Comprobante PDF", admin_sale_path(@sale, format: :pdf), class: "btn btn-primary", target: "_blank" %>
+        </div>
+
+    </div>
+</div>

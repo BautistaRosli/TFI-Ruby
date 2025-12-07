@@ -1,0 +1,65 @@
+
+<% content_for :stylesheets do %>
+  <%= stylesheet_link_tag "users_show", media: "all" %>
+<% end %>
+<div class="user-detail-container">
+    <div class="user-detail-card">
+        <div class="user-detail-form">
+            <%= form_for @user, url: admin_users_path, method: :post do |f| %>
+                <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+                <% if @user.errors.any? %>
+                    <div class="alert alert-danger" style="color: red; padding: 10px; margin-bottom: 15px; border: 1px solid red; border-radius: 5px;">
+                        <strong style="display: block; margin-bottom: 10px;">
+                            Se encontró <%= pluralize(@user.errors.count, "error", plural: "errores") %>:
+                        </strong>
+                        <ul>
+                        <% @user.errors.full_messages.each do |msg| %>
+                            <li><%= msg %></li>
+                        <% end %>
+                        </ul>
+                    </div>
+                    <% end %>
+                <div class="user-detail-info">
+                    <div class="form-label">
+                        <label>Correo Electrónico</label><br>
+                        <%= f.email_field :email, autofocus: true, class: "form-control login-input" %>
+                    </div>
+                    <div class="form-label">
+                        <label>Nombre</label><br>
+                        <%= f.text_field :name, class: "form-control login-input" %>
+                    </div>
+                    <div class="form-label">
+                        <label>Apellido</label><br>
+                        <%= f.text_field :lastname, class: "form-control login-input" %>
+                    </div>
+                    <div class="form-label">
+                        <label>Rol</label><br>
+                        <% if current_user.admin? %>
+                            <% roles = [['Administrador', 'admin'], ['Gerente', 'manager'], ['Empleado', 'employee']] %>
+                        <% elsif current_user.manager? %>
+                            <% roles = [['Empleado', 'employee']] %>
+                        <% end %>
+
+                        <%= f.select :role,
+                                options_for_select(roles, @user.role || 'employee'),
+                                {},
+                                class: "form-control login-input custom-select" %>
+                        </div>
+                    <div class="form-label">
+                        <label>Contraseña</label><br>
+                        <%= f.password_field :password, autocomplete: "new-password", class: "form-control login-input" %>
+                    </div>
+                    <div class="form-label">
+                        <label>Confirmar Contraseña</label><br>
+                        <%= f.password_field :password_confirmation, autocomplete: "new-password", class: "form-control login-input" %>
+                    </div>
+                    <div class="form-label">
+                        <%= f.submit "Guardar Cambios", class: "btn btn-save w-100" %>
+                    </div>
+                </div>
+            <% end %>
+        </div>
+        
+    </div>
+</div>
+

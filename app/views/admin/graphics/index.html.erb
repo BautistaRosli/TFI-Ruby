@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= content_for(:title) || "Admin - Disquería" %></title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <%= stylesheet_link_tag 'application', media: 'all' %>
+    <%= stylesheet_link_tag 'graphics_index', media: 'all' %>
+</head>
+<body>
+    <header class="admin-header w-100">
+        <div class="header-content">
+            <div class="header-top">
+                <div>
+                    <h1 class="header-title"><%= content_for(:page_title) || "Panel Administrativo" %></h1>
+                    <p class="header-subtitle">Disquería - Sistema de Gestión</p>
+                </div>
+                <div class="header-buttons">
+                    <%= link_to "Volver a gestión de ventas", admin_sales_path, class: "btn btn-logout" %>
+                    <%= button_to "Salir", destroy_user_session_path, method: :get, class: "btn btn-logout" %>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="flash-messages">
+        <% if flash.any? %>
+            <div class="flash-notifications">
+                <% flash.each do |type, message| %>
+                    <% 
+                    alert_class = case type.to_s
+                    when 'notice' then 'alert-success'
+                    when 'alert' then 'alert-danger'
+                    when 'warning' then 'alert-warning'
+                    when 'info' then 'alert-info'
+                    else 'alert-primary'
+                    end
+                    %>
+                    <div class="alert <%= alert_class %> alert-dismissible fade show" role="alert">
+                        <span class="alert-message"><%= message %></span>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                <% end %>
+            </div>
+        <% end %>
+    </div>
+
+    <div class="container mt-4 mb-5">
+
+      <div class="card shadow-sm mb-4 bg-light">
+        <div class="card-body py-3">
+          <%= form_with url: admin_graphics_path, method: :get, class: "row g-2 align-items-end" do |f| %>
+            
+            <div class="col-12 col-md-3 mb-2 mb-md-0">
+              <label class="fw-bold small text-muted">TIPO DE REPORTE</label>
+              <%= select_tag :report_type, 
+                  options_for_select([
+                    ['Analizar Empleado (Email)', 'employee'], 
+                    ['Analizar Cliente (DNI)', 'client'], 
+                    ['Analizar Categoría (Nombre)', 'category']
+                  ], params[:report_type]), 
+                  class: "form-select", 
+                  id: "report_type",
+                  prompt: "Selecciona una opción..." %>
+            </div>
+
+            <div class="col-12 col-md-6 mb-2 mb-md-0">
+              <label class="fw-bold small text-muted">DATO A BUSCAR</label>
+              
+              <div class="input-group flex-nowrap"> 
+                <%= select_tag :document_type, 
+                    options_for_select(['DNI', 'PASAPORTE', 'LE', 'LC'], params[:document_type]), 
+                    class: "form-select d-none", 
+                    id: "document_type_select",
+                    style: "max-width: 110px; background-color: #f8f9fa;" %>
+
+                <%= text_field_tag :search_query, params[:search_query], 
+                    class: "form-control", 
+                    id: "search_input", 
+                    placeholder: "Selecciona una opción..." %>
+              </div>
+            </div>
+
+            <div class="col-12 col-md-3">
+              <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary w-100">🔍 Buscar</button>
+                <% if params[:report_type].present? %>
+                  <%= link_to "❌", admin_graphics_path, class: "btn btn-outline-secondary", title: "Limpiar filtros" %>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <% if @custom_entity %>
+        
+        <div class="col-12 mb-4">
+          <div class="alert alert-info d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+            <h3 class="mb-0 text-center text-md-start">
+              📊 Resultados para: 
+              <strong>
+                <% if @custom_entity.is_a?(String) %>
+                  <%= @custom_entity %>
+                <% else %>
+                  <%= @custom_entity.try(:name) || @custom_entity.try(:email) %>
+                  <%= @custom_entity.try(:lastname) %>
+                <% end %>
+              </strong>
+            </h3>
+
+            <span class="badge bg-primary fs-5 text-wrap text-break text-center">
+              <% if @report_type == 'client' %>
+                Dinero Promedio Gastado: <%= number_to_currency(@custom_kpi) %>
+              <% else %>
+                Dinero Generado: <%= number_to_currency(@custom_kpi) %>
+              <% end %>
+            </span>
+          </div>
+        </div>
+
+        <div class="row g-4">
+          <div class="col-md-8">
+            <div class="card h-100 shadow-sm">
+              <div class="card-body">
+                <% 
+                  # Lógica limpia de título y prefijo antes de pintar el gráfico
+                  chart1_title = "Gráfico"
+                  chart1_prefix = "$"
+                  
+                  if @report_type == 'employee'
+                    chart1_title = "📈 Evolución de Ventas ($)"
+                    chart1_prefix = "$"
+                  elsif @report_type == 'client'
+                    chart1_title = "🛒 Historial de Compras (Cant)"
+                    chart1_prefix = "" # Cantidad, sin signo pesos
+                  else
+                    chart1_title = "🎵 Evolución del Género"
+                    chart1_prefix = "" 
+                  end 
+                %>
+                
+                <h5 class="card-title"><%= chart1_title %></h5>
+                <%= line_chart @custom_chart_1, prefix: chart1_prefix, defer: true, height: "350px" %>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <div class="card h-100 shadow-sm">
+              <div class="card-body">
+                <% 
+                   chart2_title = "Distribución"
+                   if @report_type == 'employee'
+                     chart2_title = "💿 Formato más vendido"
+                   elsif @report_type == 'client'
+                     chart2_title = "🎧 Géneros Favoritos"
+                   else 
+                     chart2_title = "⭐ Top Discos"
+                   end 
+                %>
+                <h5 class="card-title"><%= chart2_title %></h5>
+                
+                
+                  <%= bar_chart @custom_chart_2, colors: ["#F59E0B"], defer: true, height: "350px" %>
+                
+                 
+              </div>
+            </div>
+          </div>
+        </div>
+
+      <% else %>
+
+        <div class="row g-4">
+          <div class="col-md-6">
+            <div class="card h-100">
+              <h3>Ventas por disco</h3>
+              <% series = [{name: "Discos", data: @sales_by_disks}] %>
+              <% options = { ytitle: "Cantidad Vendido", stacked: true, defer: true } %>
+              <%= column_chart(series, {**options, theme: 'palette4'}) %>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="card h-100">
+              <h3>Ingresos por Semana</h3>
+              <%= column_chart @revenue_by_week, {
+                title: "Dinero recaudado", ytitle: "Total ($)", prefix: "$", 
+                stacked: false, defer: true
+              } %>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="card h-100">
+              <h3>🏆 Empleados con más Ventas (Cantidad)</h3>
+              <%= bar_chart @employee_with_more_sales, {
+                xtitle: "Cantidad de Ventas", ytitle: "Empleado",
+                height: "400px", colors: ["#3B82F6"], defer: true
+              } %>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card h-100">
+              <h3> Tipos de discos vendidos</h3>
+              <%= pie_chart([
+                {name: "Ventas de CDs", data: @sales_from_cd},
+                {name: "Ventas de vinilos", data: @sales_from_vinilo}
+              ], legend: "left") %>
+            </div>
+          </div>
+
+          <div class="card full-width">
+            <div class="card h-100">
+              <h3>Tendencia Gasto Promedio</h3>
+              <%= line_chart @aov_by_day, { ytitle: "Monto ($)", prefix: "$", defer: true } %>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="card h-100">
+              <h3>Ventas por Categoría</h3>
+              <%= column_chart @category_sold, { colors: ["#60A5FA"], defer: true } %>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="card h-100">
+              <h3>⭐ Top Clientes</h3>
+              <%= bar_chart @top_customer, { colors: ["#FBBF24"], prefix: "$", defer: true } %>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="card h-100">
+              <h3>Horario Actividad</h3>
+              <%= column_chart @sales_by_hour, { colors: ["#8B5CF6"], defer: true } %>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="card h-100">
+              <h3>⚠️ Alerta Stock</h3>
+              <% if @low_stock.any? %>
+                <%= bar_chart @low_stock, { colors: ["#EF4444"], defer: true } %>
+              <% else %>
+                <p class="text-success p-3">Stock saludable</p>
+              <% end %>
+            </div>
+          </div>
+          
+          <div class="col-md-6">
+            <div class="card h-100 shadow-sm"> <div class="card-body">
+                <h3>Cantidad de ventas anónimas (Semanal)</h3>
+                <%= bar_chart @anonymous_qty_chart, { colors: ["#EF4444"], defer: true } %>
+              </div>
+            </div>
+          </div>
+          
+          <div class="col-md-6">
+            <div class="card h-100 shadow-sm">
+              <div class="card-body">
+                <h3>Dinero recaudado anónimo (Semanal)</h3>
+                
+                <% if @total_anonymous_revenue > 0 %>
+                  <%= line_chart @anonymous_money_chart, prefix: "$", defer: true, colors: ["#10B981"] %>
+                <% else %>
+                  <div class="text-center py-5 text-muted">
+                    <h4>No hay datos de ventas anónimas</h4>
+                  </div>
+                <% end %>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-12">
+            <div class="card h-100 shadow-sm"> <div class="card-body">
+                <h3>Cantidad de ventas canceladas (Mensual)</h3>
+                <%= bar_chart @deleted_sales, { colors: ["#EF4444"], defer: true } %>
+              </div>
+            </div>
+          </div>
+          
+        </div> 
+        <% end %> </div> <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() { 
+  const reportTypeSelect = document.getElementById('report_type');
+  const docSelect = document.getElementById('document_type_select');
+  const searchInput = document.getElementById('search_input');
+
+  function updateFormState() {
+    const selectedValue = reportTypeSelect.value;
+    
+    // Lógica visual: Mostrar/Ocultar el selector de documento
+    if (selectedValue === 'client') {
+      docSelect.classList.remove('d-none'); 
+      searchInput.classList.add('border-start-0');
+      searchInput.placeholder = "Número de documento...";
+    } else {
+      docSelect.classList.add('d-none');
+      searchInput.classList.remove('border-start-0');
+      
+      if (selectedValue === 'employee') {
+        searchInput.placeholder = "Ingrese el Email del empleado...";
+      } else if (selectedValue === 'category') {
+        searchInput.placeholder = "Ingrese el nombre del Género...";
+      } else {
+        searchInput.placeholder = "Selecciona una opción...";
+      }
+    }
+  }
+
+  if(reportTypeSelect) {
+    reportTypeSelect.addEventListener('change', updateFormState);
+    updateFormState();
+  }
+});
+</script>

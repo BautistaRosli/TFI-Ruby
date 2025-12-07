@@ -1,0 +1,54 @@
+<script>
+  (function() {
+    function initCarousels() {
+      document.querySelectorAll('.card-carousel, .show-carousel').forEach(function(carousel){
+        if (carousel._initialized) return;
+        carousel._initialized = true;
+
+        var track = carousel.querySelector('.carousel-track');
+        var slides = Array.from(carousel.querySelectorAll('.carousel-slide'));
+        var prev = carousel.querySelector('.carousel-btn.prev');
+        var next = carousel.querySelector('.carousel-btn.next');
+        var index = 0;
+
+        function show(i) {
+          if (!slides.length) return;
+          index = (i + slides.length) % slides.length;
+          var offset = -index * 100;
+          track.style.transform = 'translateX(' + offset + '%)';
+        }
+
+        // set widths
+        slides.forEach(function(s){ s.style.flex = '0 0 100%'; });
+        track.style.display = 'flex';
+        track.style.transition = 'transform 0.36s ease';
+
+        if (prev) prev.addEventListener('click', function(e){ e.preventDefault(); show(index-1); });
+        if (next) next.addEventListener('click', function(e){ e.preventDefault(); show(index+1); });
+
+        // add class when there are multiple slides and hide controls otherwise
+        if (slides.length > 1) {
+          carousel.classList.add('has-multiple');
+        } else {
+          carousel.classList.remove('has-multiple');
+        }
+
+        // autoplay on hover for cards, persistent for show carousel
+        var autoplay = carousel.classList.contains('card-carousel');
+        var timer = null;
+
+        function startAuto(){ if(!autoplay || slides.length<2) return; stopAuto(); timer = setInterval(function(){ show(index+1); }, 3500); }
+        function stopAuto(){ if(timer) { clearInterval(timer); timer = null; } }
+
+        carousel.addEventListener('mouseenter', startAuto);
+        carousel.addEventListener('mouseleave', stopAuto);
+
+        // initialize
+        show(0);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', initCarousels);
+    document.addEventListener('turbo:load', initCarousels);
+  })();
+</script>

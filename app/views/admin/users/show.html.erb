@@ -1,0 +1,54 @@
+<% content_for :stylesheets do %>
+  <%= stylesheet_link_tag "users_show", media: "all" %>
+<% end %>  
+<div class="user-detail-container">
+    <div class="user-detail-card">
+        <div class="user-avatar-large"><%= @user.name.first.upcase + @user.lastname.first.upcase %></div>
+        <div class="user-detail-form">
+            <%= form_for @user, url: admin_user_path(@user), method: :patch do |f| %>
+                <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+                <% if @user.errors.any? %>
+                    <div class="alert alert-danger" style="color: red; padding: 10px; margin-bottom: 15px; border: 1px solid red; border-radius: 5px;">
+                        <strong style="display: block; margin-bottom: 10px;">
+                            Se encontraron <%= pluralize(@user.errors.count, "error", plural: "errores") %>:
+                        </strong>
+                        <ul>
+                        <% @user.errors.full_messages.each do |msg| %>
+                            <li><%= msg %></li>
+                        <% end %>
+                        </ul>
+                    </div>
+                <% end %>
+                <div class="user-detail-info">
+                    <div class="form-label">
+                        <label>Correo Electrónico</label><br>
+                        <%= f.email_field :email, autofocus: true, class: "form-control login-input" %>
+                    </div>
+                    <div class="form-label">
+                        <label>Nombre</label><br>
+                        <%= f.text_field :name, class: "form-control login-input" %>
+                    </div>
+                    <div class="form-label">
+                        <label>Apellido</label><br>
+                        <%= f.text_field :lastname, class: "form-control login-input" %>
+                    </div>
+                    <% if current_user.admin? %>
+                        <div class="form-label">
+                            <label>Rol</label><br>
+                            <%= f.select :role, options_for_select([['Administrador', 'admin'], ['Gerente', 'manager'], ['Empleado', 'employee']], @user.role), {}, class: "form-select login-input" %>
+                        </div>
+                    <% end %>
+                    <div class="form-label">
+                        <%= f.submit "Guardar Cambios", class: "btn btn-save w-100" %>
+                    </div>
+                </div>
+            <% end %>
+        </div>
+        <p class="user-created-at"><strong>Creado el:</strong> <%= @user.created_at.strftime("%d/%m/%Y") %></p>
+        <p class="user-updated-at"><strong>Última actualización:</strong> <%= @user.updated_at.strftime("%d/%m/%Y") %></p>
+        <% if current_user.admin? %>
+            <%= button_to "Cambiar Contraseña", see_password_admin_user_path, method: :get, class: "btn" %>
+        <% end %>
+    </div>
+</div>
+
