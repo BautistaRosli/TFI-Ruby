@@ -29,7 +29,9 @@
                 <%= image_tag cover, alt: @disk.name, class: "disk-large-img" %>
               </div>
             <% else %>
-              <div class="no-cover-text">No hay imagen cargada</div>
+              <div class="disk-large-wrap">
+                <div class="disk-large-placeholder">Disco sin portada</div>
+              </div>
             <% end %>
           </div>
 

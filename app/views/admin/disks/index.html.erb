@@ -3,6 +3,7 @@
   <%= stylesheet_link_tag 'admin_layout', media: 'all' %>
   <%= stylesheet_link_tag 'admin_index', media: 'all' %>
   <%= stylesheet_link_tag 'admin_disks', media: 'all' %>
+  <%= stylesheet_link_tag 'disks_public', media: 'all' %> <!-- placeholders -->
 <% end %>
 
 <% from_sale = (params[:from] == 'sale') %>
@@ -46,7 +47,9 @@
                           <%= image_tag cover, alt: disk.name, class: "disk-thumb-img" %>
                         </div>
                       <% else %>
-                        <div class="text-muted text-center">No hay imagen cargada</div>
+                        <div class="disk-thumb-wrap">
+                          <div class="cover-placeholder">Disco sin portada</div>
+                        </div>
                       <% end %>
                     </div>
 
@@ -82,7 +85,9 @@
                            <%= image_tag cover, alt: disk.name, class: "disk-thumb-img" %>
                          </div>
                         <% else %>
-                         <div class="text-muted text-center">No hay imagen cargada</div>
+                         <div class="disk-thumb-wrap">
+                           <div class="cover-placeholder">Disco sin portada</div>
+                         </div>
                         <% end %>
                       </div>
 
@@ -141,7 +146,9 @@
                         <%= image_tag cover, alt: disk.name, class: "disk-thumb-img" %>
                       </div>
                     <% else %>
-                      <div class="text-muted text-center">No hay imagen cargada</div>
+                      <div class="disk-thumb-wrap">
+                        <div class="cover-placeholder">Disco sin portada</div>
+                      </div>
                     <% end %>
                   </div>
 
@@ -174,7 +181,9 @@
                          <%= image_tag cover, alt: disk.name, class: "disk-thumb-img" %>
                        </div>
                       <% else %>
-                       <div class="text-muted text-center">No hay imagen cargada</div>
+                       <div class="disk-thumb-wrap">
+                         <div class="cover-placeholder">Disco sin portada</div>
+                       </div>
                       <% end %>
                     </div>
 
