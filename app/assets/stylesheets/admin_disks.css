@@ -131,7 +131,7 @@
   position: absolute;
   top: 10px;
   left: 10px;
-  background: rgba(148, 163, 184, 0.9); /* slate */
+  background: rgba(148, 163, 184, 0.9);
   color: #fff;
   padding: 4px 8px;
   border-radius: 6px;
@@ -140,9 +140,9 @@
   z-index: 2;
 }
 
-.row.g-3 > [class*="col-"] {
-  display: flex;
-}
+.row.g-3 { }
+.row.g-3 > [class*="col-"] { /* no tocar display */ }
+
 .row.g-3 > [class*="col-"] > .card {
   width: 100%;
   display: flex;
@@ -156,15 +156,7 @@
   min-height: 360px;
 }
 
-.card .card-body .disk-thumb-wrap {
-  width: 100%;
-  max-width: 100%;
-  height: 180px;
-  margin: 0 auto 8px auto;
-}
+.card .card-body .card-footer-fixed { margin-top: auto; }
 
-.card .card-body .d-flex.justify-content-between {
-  margin-top: auto;
-}
-
-.disk-thumb-wrap { max-width: 100%; }
+.disk-thumb-wrap { max-width: 280px; }
+.card.shadow-sm { /* sin min-width para no achatar las cards */ }
