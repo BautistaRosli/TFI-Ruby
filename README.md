@@ -7,6 +7,7 @@ DB -> SQLite3 (archivo local en `storage/`)
 Pasos al momento de clonar:
 - bundle install
 - rails db:create db:migrate
+- rails db:seed
 - rails server
 - rails generate wicked_pdf o rails g wicked_pdf (Crea los archivos de configuración e inicialización para la gema WickedPDF.)
 
