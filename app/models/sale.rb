@@ -16,6 +16,17 @@ class Sale < ApplicationRecord
   belongs_to :user
   belongs_to :customer, class_name: "Client", optional: true
 
+  # Scopes
+  scope :active, -> { where(deleted: false) }
+  scope :deleted_sales, -> { where(deleted: true) }
+  scope :by_sale_id, ->(id) { where(id: id) }
+  scope :by_user, ->(user_id) { where(user_id: user_id) }
+  scope :by_customer, ->(customer_id) { where(customer_id: customer_id) }
+  scope :min_amount, ->(amount) { where("total_amount >= ?", amount) }
+  scope :max_amount, ->(amount) { where("total_amount <= ?", amount) }
+  scope :date_range, ->(from_date, to_date) { where("DATE(datetime) BETWEEN ? AND ?", from_date, to_date) }
+  scope :recent_first, -> { order(created_at: :desc) }
+
   private
 
   def validate_and_decrease_stock
