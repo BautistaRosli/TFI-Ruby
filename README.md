@@ -13,15 +13,21 @@ Sistema web para la gestión de ventas de discos musicales (nuevos y usados) des
 - [Clientes Predefinidos](#clientes-predefinidos)
 - [Solución de Problemas](#solución-de-problemas)
 - [Arquitectura del Sistema](#arquitectura-del-sistema)
+- [Módulo de Usuarios](#modulo-de-usuarios)
+  - [Flujo de Creación](#flujo-de-creación/edición-de-un-usuario)
+  - [Componentes Principales](#componentes-principales-de-usuario)
+  - [Manejo de sesiones](#manejo-de-sesiones)
+- [Módulo de Estadísticas y Gráficos](#modulo-de-estadísticas-y-gráficos)
+  - [Flujo de Gráficos](#flujo-de-gráficos)
 - [Módulo de Ventas](#modulo-de-ventas)
   - [Flujo de Creación](#flujo-de-creación-de-una-venta)
   - [Componentes Principales](#componentes-principales)
   - [Sistema de Filtros](#sistema-de-filtros)
   - [Borrado Lógico](#borrado-lógico)
   - [Notas Técnicas](#notas)
-- [Módulo de Usuarios](#modulo-de-usuarios)
-  - [Permisos](#permisos)
-  - []
+- [Ruteo](#ruteo)
+  - [Flujo de Ruteo](#flujo-de-ruteo)
+
 ---
 
 ## Dependencias Necesarias
@@ -179,8 +185,8 @@ El módulo de usuarios permite gestionar la visualización, creación, edición 
    - En caso de fallar alguna validación no se realiza la acción y se indica el problema.
 ---
 
-### Componentes Principales
-
+### Componentes Principales de usuario
+ 
 #### Modelos
 
 - **`Ability`**: Representa los permisos de la entidad User, se maneja mediante la gema CanCanCan
@@ -238,7 +244,7 @@ El módulo de gráficos permite visualizar información respecto a las ventas de
 
 ---
 
-### Notas 
+### Notas de graficos
 
 - **Un solo controlador**: Se optó por utilizar un solo controlador ya que técnicamente todo es una misma vista solo que se brinda la opcion de realizar una especie de filtro.
 - **Manejo de permisos**: Para que este controlador se visto para que se le manejen permisos se tuvo que incluir `authorize_resource :admin_graphic, class: false` ya que este controlador no maneja un modelo de Active Record.
