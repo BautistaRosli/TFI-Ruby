@@ -19,7 +19,9 @@ Sistema web para la gestión de ventas de discos musicales (nuevos y usados) des
   - [Sistema de Filtros](#sistema-de-filtros)
   - [Borrado Lógico](#borrado-lógico)
   - [Notas Técnicas](#notas)
-
+- [Módulo de Usuarios](#modulo-de-usuarios)
+  - [Permisos](#permisos)
+  - []
 ---
 
 ## Dependencias Necesarias
@@ -153,14 +155,74 @@ El sistema está construido siguiendo el patrón **MVC (Model-View-Controller)**
 - **WickedPDF**: Generación de comprobantes en formato PDF
 - **Bootstrap 5**: Framework CSS para interfaz responsive
 
-### Módulos del Sistema
+# Módulos del Sistema
 
-#### Módulo de Usuarios
-- Gestión de empleados, gerentes y administradores
-- Sistema de roles con permisos diferenciados
-- Autenticación con Devise
+## Módulo de Usuarios
 
-#### Modulo de estadisticas y gráficos
+### Descripción General
+
+El módulo de usuarios permite gestionar la visualización, creación, edición y borrado lógico de usuarios. Entendiendo a un usuario como Empleado, Manager y Administrador, estos con sus respectivos permisos.
+
+---
+
+###  Flujo de de creación/edición de un usuarios
+1. **Seleccionar acción**
+   - En caso de creación al ser un administrador o manager se presentará al final del listado de usuarios un botón para crear un usuario.
+   - En caso de la edición se podrá a esta vista si se selecciona un usuario ajeno (si se tiene permiso) o al detalle de uno mismo.
+
+2. **Rellenar el formulario**
+   - En caso de creación se solicitara llenar todos los campos solicitados incluyendo entre estos email y contraseña.
+   - En caso de edición los campos se rellenan automaticamente, luego de editar al usuario se podrá guardar los cambios.
+   - Como administrador se presentar la opción de cambiar contraseña de los demás usuarios, funciona igual que la edición.
+3. **Envío del formulario**
+   - En cualquier caso se validan todos los datos ingresado en el formulario para que cumpla las restricciones del modelo.
+   - En caso de fallar alguna validación no se realiza la acción y se indica el problema.
+---
+
+### Componentes Principales
+
+#### Modelos
+
+- **`Ability`**: Representa los permisos de la entidad User, se maneja mediante la gema CanCanCan
+  - Los administradores pueden realizar cualquier acción.
+  - Los manager pueden:
+    - Ver el listado de usuarios habilitados.
+    - Ver detalles de usuarios con rol de empleado.
+    - Editar usuarios de rol de empleado.
+    - Editar su propio perfil.
+    - Crear usuarios de rol empleado.
+    - Ver la sección de graficos.
+  - Los empleados pueden:
+    - Ver el listado de usuarios habilitados.
+    - Editar su propio perfil.
+
+- **`User`**: Representa a un usuario.
+  - Relaciones: `has_many :sales`
+  - Scopes: Filtrado por nombre, apellido, email y rol. Obtener las ventas que el realizó.
+  - Rol: Se maneja mediante enum.
+  - Devise: La entidad incluye modulos de devise, entre ellos
+    - `database_authenticatable`: Permite guardar la contraseña hasheada y validar al usuario para iniciar sesión
+    - `timeoutable`: Permite mantener un tiempo limitado de sesión para las sesiones de los usuarios.
+    - `validatable`: Incluye validaciones basicas como formatos de email o contraseñas.
+
+#### Manejo de sesiones
+  Para esto nos apoyamos en la gema Devise. Su uso se aprecia principalmente en 2 controladores:
+  - **`admin/auth/session_controller`**
+    - Se hereda del controlador que brinda Devise `Auth::SessionsController < Devise::SessionsController`
+    - Se extienden metodos heredados para agregar funcionalidad y personalización.
+  - **`application_controller`**
+    - Se redefine `after_sign_in_path_for`, `after_sign_out_path_for` y `authenticate_user!`. Métodos que utiliza devise para el manejo del log-in, log-out y el chequeo de estar validado para acceder a recursos.
+
+
+
+## Modulo de estadisticas y gráficos
+
+### Descripción General
+
+El módulo de gráficos permite visualizar información respecto a las ventas del sistema.
+
+---
+
 
 
 #### Módulo de Discos
