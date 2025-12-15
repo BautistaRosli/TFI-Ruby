@@ -165,7 +165,7 @@ El módulo de usuarios permite gestionar la visualización, creación, edición 
 
 ---
 
-###  Flujo de de creación/edición de un usuarios
+###  Flujo de creación/edición de un usuarios
 1. **Seleccionar acción**
    - En caso de creación al ser un administrador o manager se presentará al final del listado de usuarios un botón para crear un usuario.
    - En caso de la edición se podrá a esta vista si se selecciona un usuario ajeno (si se tiene permiso) o al detalle de uno mismo.
@@ -223,6 +223,25 @@ El módulo de gráficos permite visualizar información respecto a las ventas de
 
 ---
 
+###  Flujo de los gráficos
+1. **Seleccionar acción**
+   - En caso de ser un administrador o manager tanto en el layout de ventas como de discos esta la el botón de `Ver analisís de ventas`
+
+2. **Manejo en vista**
+   - Se presentara una vista con todos gráficos generales presentes hasta la fecha
+   - En la parte superior se presentar la opción de que tipo de reportes consultar
+
+3. **Gráficos personalizados (Reportes)**
+   - Se pueden realizar 3 tipos de reportes, Empleado, Cliente y Género Musical.
+   - Cada tipo de reporte pide un dato para mostrar gráficos especificos de esa entidad dentro del tipo seleccionado.
+   - En caso de no encontrar el dato se muestra los gráficos generales nuevamente.
+
+---
+
+### Notas 
+
+- **Un solo controlador**: Se optó por utilizar un solo controlador ya que técnicamente todo es una misma vista solo que se brinda la opcion de realizar una especie de filtro.
+- **Manejo de permisos**: Para que este controlador se visto para que se le manejen permisos se tuvo que incluir `authorize_resource :admin_graphic, class: false` ya que este controlador no maneja un modelo de Active Record.
 
 
 #### Módulo de Discos
@@ -336,6 +355,38 @@ El módulo de ventas permite gestionar el proceso completo de venta de discos, d
    - Al confirmar la venta, se limpia automáticamente el carrito de la sesión
 
 ---
+
+## Ruteo
+
+El archivo principal de este modulo es `routes.rb`. Aquí configuramos los recursos de nuestro sistema y sus rutas.
+En este archivo se realizan configuraciones clave como:
+- `devise_for :users...`: Se le asigna a devise el recurso de user para que maneje las sesiones con esta entidad y se le indica que controladores usar.
+- `namespace :admin do`: Se define un namespace `admin` para que sea la base de las rutas de los modulos privados.
+- `root to: "disk/new#index"`: Se define una landing page de la aplicación.
+- `match "*path", to: "application#routing_error", via: :all,`: Se define una acción en caso de que la ruta ruta buscado por un usuario de la aplicación no coincida con ninguna, delegando la accion a la funcion routing_error del controlador application_controller.
+
+Se configuro también en el archivo `ApplicationController` el cual es la base de todos nuestros controladores manejadores de excepciones y decisiones de ruteo. Una importante decision de ruteo se encuentra dentro del metodo `authenticate_user!` luego de la clausula `unless user_signed_in?`, en esta sección se ocultan rutas a usuarios no autenticados.
+
+---
+
+### Flujo de ruteo
+
+1. **Inicio de la aplicacíon**
+   - Una vez dentro de la aplicación nuestra landing page es `disk/new#index`
+2. **Acceso a sección administrativa**
+   - Se le agruega al navegador el path `/admin` o `/admin/login`.
+   - Si no estas logeado `/admin` te redirige a `/admin/login` indicando que se requiere estar logeado.
+   - En caso de no estar logeado y queres ir a cualquier seccion de qute contengas el prefijo `/admin` que no sean las mencionadas anteriormente
+   se nos denegara el acceso exista o no la ruta, indicando el mismo mensaje ya sea una ruta existente o no.
+3. **Acceso a sección restringida**
+   - En caso de no estar logeados e intentar ingresar a una seccion con permisos la clausula de `before_action :authenticate_user`
+   no nos permitira el ingreso.
+   - En caso de estar logeados e intentar ingresar a una seccion con permisos el manejador de la excepcion `CanCan::AccessDenied` no nos permitira al ingreso y nos indicara la falta de permisos.
+4. **Acceso a recursos inexistent**
+   - En caso de estar logeado si queremos acceder a un recurso inexistente como `/admin/users/1132` el manejador de la excepcion `ActiveRecord::RecordNotFound` no nos permitira al ingreso y nos indicara la inexistencia del recurso. 
+
+
+
 
 ## Licencia
 
