@@ -21,4 +21,12 @@ class User < ApplicationRecord
     .where(sales: { deleted: [ false, nil ] })
     .distinct
   }
+
+  scope :by_name, ->(name) { where("name LIKE ?", "%#{name}%") if name.present? }
+
+  scope :by_lastname, ->(lastname) { where("lastname LIKE ?", "%#{lastname}%") if lastname.present? }
+
+  scope :by_email, ->(email) { where("email LIKE ?", "%#{email}%") if email.present? }
+
+  scope :by_role, ->(role) { where(role: role.downcase) if role.present? }
 end
