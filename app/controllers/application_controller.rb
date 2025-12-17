@@ -21,12 +21,10 @@ class ApplicationController < ActionController::Base
 
       # Permitimos que vaya al login para que pueda entrar
       if path == "/admin"
-        store_location_for(:user, request.fullpath)
         redirect_to new_user_session_path, alert: "Por favor, inicia sesión para acceder al panel."
       elsif path.start_with?("/admin")
         redirect_to root_path, alert: "La página que buscas no existe."
       else
-        store_location_for(:user, request.fullpath)
         redirect_to new_user_session_path, alert: "Por favor, inicia sesión para continuar."
       end
     end
@@ -37,7 +35,7 @@ class ApplicationController < ActionController::Base
   end
 
   rescue_from CanCan::AccessDenied do |exception|
-    previous_url = default_redirect_path
+    previous_url = request.referer || default_redirect_path
     flash[:alert] = "No tenés permisos para acceder a esa página."
     redirect_to previous_url
   end
@@ -64,7 +62,6 @@ class ApplicationController < ActionController::Base
   def default_redirect_path
     if current_user
       admin_dashboard_path
-
     else
       root_path
     end

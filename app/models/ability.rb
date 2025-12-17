@@ -2,9 +2,7 @@ class Ability
   include CanCan::Ability
 
   def initialize(user)
-    if user.nil?
-      can :read, :public
-    elsif user.admin?
+    if user.admin?
       can :manage, :all
     elsif user.manager?
       can :index, User
@@ -13,7 +11,7 @@ class Ability
       can :update, User, role: "employee"
       can :update, User, id: user.id
       can :create, User, role: [ "employee" ]
-      can :analize, :admin_graphics_path
+      can :read, :admin_graphic
     elsif user.employee?
       can :index, User
       can :show, User, id: user.id

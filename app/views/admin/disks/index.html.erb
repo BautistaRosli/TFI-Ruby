@@ -3,7 +3,6 @@
   <%= stylesheet_link_tag 'admin_layout', media: 'all' %>
   <%= stylesheet_link_tag 'admin_index', media: 'all' %>
   <%= stylesheet_link_tag 'admin_disks', media: 'all' %>
-  <%= stylesheet_link_tag 'disks_public', media: 'all' %> <!-- placeholders -->
 <% end %>
 
 <% from_sale = (params[:from] == 'sale') %>
@@ -218,8 +217,6 @@
     <div class="d-flex justify-content-end mt-3">
          <% unless from_sale %>
           <%= link_to 'Nuevo disco', new_admin_disk_path, class: 'btn btn-primary' %>
-         <% else %>
-          <%= link_to 'Ver carrito', cart_admin_sales_path, class: 'btn btn-warning' %>
          <% end %>
     </div>
    </main>

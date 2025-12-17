@@ -4,20 +4,14 @@ class Admin::UsersController < ApplicationController
   load_and_authorize_resource
   layout "admin_users"
   def index
-    @users = can?(:delete, User) ? User.page(params[:page]).per(10) : User.where(is_active: true).page(params[:page]).per(10)
+    @users = can?(:delete, User) ? User.all : User.where(is_active: true)
 
-    @users = @users.where("users.name LIKE ?", "%#{params[:name]}%") if params[:name].present?
-
-    @users = @users.where("users.lastname LIKE ?", "%#{params[:lastname]}%") if params[:lastname].present?
-
-    @users = @users.where("users.lastname LIKE ?", "%#{params[:email]}%") if params[:email].present?
-
-    if params[:role].present?
-      normalized_role = params[:role].downcase
-      @users = @users.where(role: normalized_role)
-    end
+    @users = @users.by_name(params[:name])
+    @users = @users.by_lastname(params[:lastname])
+    @users = @users.by_email(params[:email])
+    @users = @users.by_role(params[:role])
+    @users = @users.page(params[:page]).per(10)
   end
-
 
   def show(method: :patch)
     @user = User.find(params[:id])

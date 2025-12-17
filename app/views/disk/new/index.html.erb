@@ -37,7 +37,7 @@
       </div>
 
       <div class="filter-group">
-        <%= f.number_field :max_year, placeholder: "Año máx...", value: params[:max_year], class: "filter-input", min: 1900, max: Time.now.year %>
+        <%= f.number_field :max_year, placeholder: "Año máx...", value: params[:max_year], class: "filter-input", min: 1900 %>
       </div>
       
       <div class="filter-group">
@@ -85,7 +85,7 @@
               <div class="disk-meta">
                 <%= disk.author %>
                 <% if disk.date_ingreso.present? %>
-                  <span class="disk-year"> · <%= disk.date_ingreso.year %></span>
+                  <span class="disk-year"> · <%= disk.year %></span>
                 <% end %>
               </div>
               <% if disk.genres.any? %>

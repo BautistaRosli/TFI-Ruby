@@ -9,35 +9,23 @@ class Admin::SalesController < ApplicationController
 
   def index
     # Filtrar por ventas eliminadas o no eliminadas
-    if params[:show_deleted] == "1"
-      @sales = Sale.where(deleted: true)
-    else
-      @sales = Sale.where(deleted: false)
-    end
+    @sales = params[:show_deleted] == "1" ? Sale.deleted_sales : Sale.active
     
-    # Filtrar por ID de venta
-    @sales = @sales.where(id: params[:sale_id]) if params[:sale_id].present?
+    # Aplicar filtros usando scopes
+    @sales = @sales.by_sale_id(params[:sale_id]) if params[:sale_id].present?
+    @sales = @sales.by_user(params[:user_id]) if params[:user_id].present?
+    @sales = @sales.by_customer(params[:customer_id]) if params[:customer_id].present?
+    @sales = @sales.min_amount(params[:min_amount]) if params[:min_amount].present?
+    @sales = @sales.max_amount(params[:max_amount]) if params[:max_amount].present?
     
-    # Filtrar por ID de empleado
-    @sales = @sales.where(user_id: params[:user_id]) if params[:user_id].present?
-    
-    # Filtrar por ID de cliente
-    @sales = @sales.where(customer_id: params[:customer_id]) if params[:customer_id].present?
-    
-    # Filtrar por monto mínimo
-    @sales = @sales.where("total_amount >= ?", params[:min_amount]) if params[:min_amount].present?
-    
-    # Filtrar por monto máximo
-    @sales = @sales.where("total_amount <= ?", params[:max_amount]) if params[:max_amount].present?
-    
-    # Filtrar por rango de fechas (ambas fechas requeridas)
+    # Filtrar por rango de fechas
     if params[:from_date].present? && params[:to_date].present?
-      @sales = @sales.where("DATE(datetime) BETWEEN ? AND ?", params[:from_date], params[:to_date])
+      @sales = @sales.date_range(params[:from_date], params[:to_date])
     elsif params[:from_date].present? || params[:to_date].present?
       flash.now[:alert] = "Debes especificar ambas fechas (desde y hasta) para filtrar por período."
     end
     
-    @sales = @sales.order(created_at: :desc).page(params[:page]).per(8)
+    @sales = @sales.recent_first.page(params[:page]).per(8)
   end
 
   def show

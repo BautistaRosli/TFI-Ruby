@@ -21,11 +21,11 @@ def index
   # Filtro por precio máximo
   @disks = @disks.where("disks.unit_price <= ?", params[:max_price]) if params[:max_price].present?
 
-  # Filtro por año mínimo (simple, igual que precio)
-  @disks = @disks.where("disks.date_ingreso >= ?", "#{params[:min_year]}-01-01") if params[:min_year].present?
+  # Filtro por año mínimo 
+  @disks = @disks.where("disks.year >= ?", params[:min_year]) if params[:min_year].present?
 
-  # Filtro por año máximo (simple, igual que precio)
-  @disks = @disks.where("disks.date_ingreso <= ?", "#{params[:max_year]}-12-31 23:59:59") if params[:max_year].present?
+  # Filtro por año máximo 
+  @disks = @disks.where("disks.year <= ?", params[:max_year]) if params[:max_year].present?
 
   @disks = @disks.page(params[:page]).per(8)
   @genres = Genre.order(name: :asc)
