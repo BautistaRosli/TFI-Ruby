@@ -42,10 +42,10 @@ Rails.application.routes.draw do
     resources :disks do
       member do
         patch :soft_delete
-        patch :set_cover
         get  :images
         post :add_image
-        delete :remove_image
+        patch :set_cover
+        delete "images/:attachment_id", action: :remove_image, as: :remove_image
       end
     end
 

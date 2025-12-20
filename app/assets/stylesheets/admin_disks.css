@@ -111,9 +111,13 @@
 }
 .images-item {
   position: relative;
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  padding: 8px;
+}
+
+.images-item.is-cover {
+  border: 2px solid #2f80ed;
+  box-shadow: 0 0 0 4px rgba(47, 128, 237, 0.18);
+  border-radius: 12px;
+  padding: 10px;
 }
 
 .card-out-of-stock {
@@ -160,3 +164,27 @@
 
 .disk-thumb-wrap { max-width: 280px; }
 .card.shadow-sm { /* sin min-width para no achatar las cards */ }
+
+.cover-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+
+  background: #2f80ed;
+  color: #fff;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  font-size: 12px;
+
+  padding: 6px 10px;
+  border-radius: 999px;
+
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18);
+}
+
+.cover-caption {
+  margin-top: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #2f80ed;
+}

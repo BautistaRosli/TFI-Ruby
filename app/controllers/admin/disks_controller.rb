@@ -71,7 +71,10 @@ class Admin::DisksController < ApplicationController
   end
 
   def remove_image
-    @disk.remove_image!(params[:id].to_i)
+    attachment_id = params[:attachment_id].presence
+    return redirect_to(images_admin_disk_path(@disk), alert: "Imagen no encontrada") if attachment_id.blank?
+
+    @disk.remove_image!(attachment_id.to_i)
     redirect_to images_admin_disk_path(@disk), notice: "Imagen eliminada"
   rescue ActiveRecord::RecordNotFound
     redirect_to images_admin_disk_path(@disk), alert: "Imagen no encontrada"

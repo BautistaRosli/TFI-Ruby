@@ -84,15 +84,21 @@ class Disk < ApplicationRecord
     attachment = images.attachments.find(attachment_id)
     was_cover = cover.attached? && cover.blob_id == attachment.blob_id
 
-    attachment.purge
+    transaction do
+      attachment.purge
 
-    return unless was_cover
+      return unless was_cover
 
-    first = images.first
-    if first
-      cover.attach(first.blob)
-    else
-      cover.purge if cover.attached?
+      # Asegura que no usemos una colección cacheada
+      images.attachments.reload
+
+      next_attachment = images.attachments.order(:created_at).first
+
+      if next_attachment.present?
+        cover.attach(next_attachment.blob)
+      else
+        cover.purge if cover.attached?
+      end
     end
   end
 

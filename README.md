@@ -14,11 +14,18 @@ Sistema web para la gestión de ventas de discos musicales (nuevos y usados) des
 - [Solución de Problemas](#solución-de-problemas)
 - [Arquitectura del Sistema](#arquitectura-del-sistema)
 - [Módulo de Usuarios](#modulo-de-usuarios)
-  - [Flujo de Creación](#flujo-de-creación/edición-de-un-usuario)
+  - [Flujo de Creación](#flujo-de-creaciónedición-de-un-usuario)
   - [Componentes Principales](#componentes-principales-de-usuario)
   - [Manejo de sesiones](#manejo-de-sesiones)
 - [Módulo de Estadísticas y Gráficos](#modulo-de-estadísticas-y-gráficos)
   - [Flujo de Gráficos](#flujo-de-gráficos)
+- [Módulo de Discos](#modulo-de-discos)
+  - [Descripción General](#descripción-general-1)
+  - [Decisiones de Diseño](#decisiones-de-diseño)
+  - [Flujo de Administración (CRUD)](#flujo-de-administración-crud)
+  - [Gestión de Imágenes y Portada](#gestión-de-imágenes-y-portada)
+  - [CRUD de Géneros Musicales](#crud-de-géneros-musicales)
+  - [Componentes Principales](#componentes-principales-del-módulo-de-discos)
 - [Módulo de Ventas](#modulo-de-ventas)
   - [Flujo de Creación](#flujo-de-creación-de-una-venta)
   - [Componentes Principales](#componentes-principales)
@@ -250,19 +257,152 @@ El módulo de gráficos permite visualizar información respecto a las ventas de
 - **Manejo de permisos**: Para que este controlador se visto para que se le manejen permisos se tuvo que incluir `authorize_resource :admin_graphic, class: false` ya que este controlador no maneja un modelo de Active Record.
 
 
-#### Módulo de Discos
-- Catálogo de discos nuevos y usados
-- Gestión de stock diferenciado por tipo
-- Carga de imágenes de portada con Active Storage
-- Atributos: artista, álbum, género, año, precio
+## Modulo de Discos
 
+### Descripción General
+
+El módulo de discos permite administrar el catálogo interno de la disquería desde la sección **/admin**:
+- Crear, editar y eliminar discos.
+- Manejar stock y “baja lógica”.
+- Subir y administrar imágenes (galería) y seleccionar una portada.
+- Para discos usados, permite adjuntar un **audio de muestra**.
+- Asociar discos a uno o varios **géneros musicales**.
+
+Este módulo se utiliza desde el panel administrativo:
+- `Admin::DisksController` (CRUD + gestión de imágenes/portada).
+- `Admin::GenresController` (mini CRUD de géneros).
+
+---
+
+### Decisiones de Diseño
+
+#### 1) Jerarquía de discos con STI (Single Table Inheritance)
+
+Se decidió modelar los discos usando **STI** sobre la tabla `disks`:
+
+- `Disk` (base)
+- `NewDisk < Disk`
+- `UsedDisk < Disk`
+
+**Motivo:** ambos tipos de discos comparten casi la totalidad de su estructura y comportamiento (nombre, autor, año, formato, precio, validaciones, asociaciones, etc.) excepto por algunas diferencias:
+
+- **Discos nuevos**: pueden tener **stock >= 0**.
+- **Discos usados**: como decisión del grupo se considera que **existe una única unidad por disco usado**, por lo que su stock se maneja internamente como `1` para compatibilizar con la lógica general (carrito/venta/ítems) que usa `stock`.
+- **Discos usados** agregan la posibilidad de **audio de muestra** (adjunto vía Active Storage).
+
+STI simplifica:
+- Reutilización de validaciones y lógica común (DRY).
+- Consultas mas simples (se puede listar todo desde `Disk`, o por tipo desde `NewDisk`/`UsedDisk`).
+- Menos tablas y menos joins, manteniendo convenciones Rails.
+
+---
+
+### Flujo de Administración (CRUD)
+
+1. **Listado**
+   - Ruta: `GET /admin/disks`
+   - Se muestran discos nuevos y usados (paginar por tipo).
+
+2. **Creación**
+   - Ruta: `GET /admin/disks/new` (form)
+   - Ruta: `POST /admin/disks`
+   - Se crea el disco y luego se redirige al panel de imágenes.
+   - El tipo (`NewDisk`/`UsedDisk`) se define en el alta (STI).
+
+3. **Edición**
+   - Ruta: `GET /admin/disks/:id/edit`
+   - Ruta: `PATCH /admin/disks/:id`
+
+4. **Baja lógica (soft delete)**
+   - Ruta: `PATCH /admin/disks/:id/soft_delete`
+   - Decisión: al dar de baja un disco se marca `deleted_at` y se lleva el `stock` a `0` para que deje de estar disponible.
+
+---
+
+### Gestión de Imágenes y Portada
+
+La gestión de imágenes se implementa con **Active Storage**:
+
+- `Disk#images` (`has_many_attached`)
+- `Disk#cover` (`has_one_attached`)
+
+Rutas principales:
+- `GET /admin/disks/:id/images` (pantalla de administración de imágenes)
+- `POST /admin/disks/:id/add_image` (sube una imagen a la galería)
+- `PATCH /admin/disks/:id/set_cover` (setea portada desde una imagen existente)
+- `DELETE /admin/disks/:id/images/:attachment_id` (elimina una sola imagen)
+
+Decisiones y reglas:
+- Máximo de imágenes por disco: **10**.
+- Tipos permitidos y tamaño máximo validados en el modelo.
+- Si se elimina la imagen que era portada, la portada se actualiza automáticamente:
+  - pasa a la siguiente imagen disponible; si no hay, queda sin portada.
+
+---
+
+### CRUD de Géneros Musicales
+
+Se agregó un mini CRUD de **géneros musicales** como decisión de diseño porque:
+- Con el tiempo pueden aparecer nuevos géneros, modificarse nombres, o dejar de usarse.
+- Es preferible administrar esto desde /admin en lugar de hardcodear opciones en el front.
+
+Modelo y relaciones:
+- `Genre` con `has_and_belongs_to_many :disks`
+- Un disco puede tener **varios géneros** y un género puede tener varios discos.
+
+Rutas principales:
+- `GET /admin/genres`
+- `POST /admin/genres`
+- `GET /admin/genres/:id/edit`
+- `PATCH /admin/genres/:id`
+- `DELETE /admin/genres/:id`
+
+---
+
+### Componentes Principales del módulo de Discos
+
+#### Modelos
+
+- **`Disk`**
+  - Responsable de la lógica común del catálogo:
+    - Validaciones generales (campos, precio, año).
+    - Borrado lógico (stock en 0).
+    - Lógica de portada e imágenes
+  - Asociaciones:
+    - `has_and_belongs_to_many :genres`
+    - `has_many :items`
+    - `has_many :sales, through: :items`
+
+- **`NewDisk < Disk`**
+  - Valida stock obligatorio y entero `>= 0`.
+  - Restringe que no exista audio (no aplica a nuevos).
+
+- **`UsedDisk < Disk`**
+  - Único.
+  - Setea stock por defecto `1` (decisión del grupo).
+  - Agrega `has_one_attached :audio` para muestra.
+  - Valida tipo/tamaño de audio.
+
+- **`Genre`**
+  - CRUD para mantener un catálogo escalable de géneros.
+  - valida unicidad (case-insensitive).
+  - Scope `ordered` para listados consistentes.
+
+#### Controllers (Admin)
+
+- **`Admin::DisksController`**
+  - Implementa el flujo CRUD.
+- **`Admin::GenresController`**
+  - CRUD simple de géneros.
+
+---
 
 ### Módulo de Frontsore
 - Interfaz para que los clientes visualicen el catálogo
 - Búsqueda y filtrado de discos
 - Recomendaciones por similaridad al ver el detalle de un disco 
 
-
+---
 
 ## Modulo de Ventas
 
