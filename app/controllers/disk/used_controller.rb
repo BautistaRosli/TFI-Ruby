@@ -2,32 +2,18 @@ class Disk::UsedController < ApplicationController
   layout 'disks'
 
 def index
-  @disks = UsedDisk.all.order(created_at: :desc)
-
-  # Filtro por nombre
-  @disks = @disks.where("disks.name LIKE ?", "%#{params[:name]}%") if params[:name].present?
-
-  # Filtro por autor
-  @disks = @disks.where("disks.author LIKE ?", "%#{params[:author]}%") if params[:author].present?
-
-  # Filtro por género
-  if params[:genre_id].present?
-    @disks = @disks.joins(:genres).where(genres: { id: params[:genre_id] }).distinct
-  end
-
-  # Filtro por precio mínimo
-  @disks = @disks.where("disks.unit_price >= ?", params[:min_price]) if params[:min_price].present?
-
-  # Filtro por precio máximo
-  @disks = @disks.where("disks.unit_price <= ?", params[:max_price]) if params[:max_price].present?
-
-  # Filtro por año mínimo 
-  @disks = @disks.where("disks.year >= ?", params[:min_year]) if params[:min_year].present?
-
-  # Filtro por año máximo 
-  @disks = @disks.where("disks.year <= ?", params[:max_year]) if params[:max_year].present?
-
-  @disks = @disks.page(params[:page]).per(8)
+  @disks = NewDisk
+            .ordered
+            .by_name(params[:name])
+            .by_author(params[:author])
+            .by_genre(params[:genre_id])
+            .min_price(params[:min_price])
+            .max_price(params[:max_price])
+            .min_year(params[:min_year])
+            .max_year(params[:max_year])
+            .page(params[:page])
+            .per(8)
+            
   @genres = Genre.order(name: :asc)
   
 end

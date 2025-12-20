@@ -33,4 +33,37 @@ class UsedDisk < Disk
 
   # def update_stock_on_delete
   # end
+
+    scope :ordered, -> {
+    order(created_at: :desc)
+  }
+
+  scope :by_name, ->(name) {
+    where("disks.name LIKE ?", "%#{name}%") if name.present?
+  }
+
+  scope :by_author, ->(author) {
+    where("disks.author LIKE ?", "%#{author}%") if author.present?
+  }
+
+  scope :by_genre, ->(genre_id) {
+    joins(:genres).where(genres: { id: genre_id }).distinct if genre_id.present?
+  }
+
+  scope :min_price, ->(price) {
+    where("disks.unit_price >= ?", price) if price.present?
+  }
+
+  scope :max_price, ->(price) {
+    where("disks.unit_price <= ?", price) if price.present?
+  }
+
+  scope :min_year, ->(year) {
+    where("disks.year >= ?", year) if year.present?
+  }
+
+  scope :max_year, ->(year) {
+    where("disks.year <= ?", year) if year.present?
+  }
 end
+
