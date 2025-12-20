@@ -34,22 +34,46 @@
       <h3 style="margin-bottom:10px;">Previsualización</h3>
       <% if @disk.images.attached? && @disk.images.any? %>
         <% cover_blob_id = @disk.cover&.attached? ? @disk.cover.blob_id : nil %>
+
         <div class="images-grid">
           <% @disk.images.each do |img| %>
-            <div class="images-item">
+            <% is_cover = cover_blob_id.present? && cover_blob_id == img.blob_id %>
+
+            <div class="images-item <%= "is-cover" if is_cover %>">
               <div class="disk-preview-wrap">
                 <% if img&.blob.present? %>
                   <%= image_tag img, alt: 'preview', class: 'disk-preview-img' %>
                 <% else %>
                   <div class="cover-placeholder">Sin imagen</div>
                 <% end %>
+
+                <% if is_cover %>
+                  <span class="cover-badge">PORTADA</span>
+                <% end %>
               </div>
-              <% if cover_blob_id.present? && cover_blob_id == img.blob_id %>
-                <span class="disk-date" style="position:absolute; top:8px; left:8px;">Portada</span>
+
+              <% if is_cover %>
+                <div class="cover-caption">Portada actual</div>
               <% end %>
+
               <div style="display:flex; gap:8px; margin-top:8px;">
-                <%= button_to 'Eliminar', remove_image_admin_disk_path(@disk, id: img.id), method: :delete, class: 'btn btn-outline-secondary', form: { data: { turbo: false } } %>
-                <%= button_to 'Hacer portada', set_cover_admin_disk_path(@disk, cover_image_id: img.id), method: :patch, class: 'btn btn-primary', form: { data: { turbo: false } } %>
+                <%= button_to 'Eliminar',
+                  remove_image_admin_disk_path(@disk, attachment_id: img.id),
+                  method: :delete,
+                  class: 'btn btn-outline-secondary',
+                  form: { data: { turbo: false } } %>
+
+                <% unless is_cover %>
+                  <%= button_to 'Hacer portada',
+                    set_cover_admin_disk_path(@disk, cover_image_id: img.id),
+                    method: :patch,
+                    class: 'btn btn-primary',
+                    form: { data: { turbo: false } } %>
+                <% else %>
+                  <button class="btn btn-primary" disabled style="opacity:.6; cursor:not-allowed;">
+                    Es portada
+                  </button>
+                <% end %>
               </div>
             </div>
           <% end %>

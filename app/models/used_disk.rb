@@ -7,8 +7,13 @@ class UsedDisk < Disk
 
   validate :validate_audio_content_type_and_size
 
-  private
+  def attach_audio(file)
+    return if file.blank?
 
+    audio.attach(file)
+  end
+
+  private
 
   def validate_audio_content_type_and_size
     return unless audio.attached? && audio.blob.present?
